@@ -1,0 +1,18 @@
+{% extends "dashboard.base.html" %}
+
+{% block title %}Organizer Dashboard - {{ super() }}{% endblock %}
+
+{% block dashboard_sidebar_links %}
+    <hr>
+    <li><a href="#">My Programs</a></li> {# Placeholder #}
+    <li><a href="#">Create New Program</a></li> {# Placeholder #}
+    <li><a href="#">Manage Activities</a></li> {# Placeholder #}
+    <li><a href="#">View Volunteers</a></li> {# Placeholder #}
+{% endblock %}
+
+{% block dashboard_main_content %}
+    <h1>Organizer Dashboard</h1>
+    <p>Welcome, {{ current_user.username }}! You are an Organizer.</p>
+    <p>Manage your programs, create new ones, and oversee activities and volunteers.</p>
+    {# More organizer-specific content will go here #}
+{% endblock %}

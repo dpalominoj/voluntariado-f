@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - {{ super() }}{% endblock %}
+
+{% block content %}
+<style>
+  .dashboard-container {
+    display: flex;
+    min-height: calc(100vh - 120px); /* Adjust based on header/footer height */
+  }
+  .dashboard-sidebar {
+    width: 250px;
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-right: 1px solid #dee2e6;
+  }
+  .dashboard-sidebar h3 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+  }
+  .dashboard-sidebar ul {
+    list-style: none;
+    padding-left: 0;
+  }
+  .dashboard-sidebar ul li a {
+    display: block;
+    padding: 0.5rem 1rem;
+    color: #333;
+    text-decoration: none;
+    border-radius: 0.25rem;
+  }
+  .dashboard-sidebar ul li a:hover, .dashboard-sidebar ul li a.active {
+    background-color: #e9ecef;
+    color: #007bff;
+  }
+  .dashboard-content {
+    flex-grow: 1;
+    padding: 20px;
+  }
+</style>
+
+<div class="dashboard-container">
+    <nav class="dashboard-sidebar">
+        <h3>Dashboard Menu</h3>
+        <ul>
+            <li><a href="{{ url_for('main.home') }}">Site Home</a></li>
+            <li><a href="{{ url_for('user_dashboard.profile') }}">My Profile</a></li>
+            <!-- Role-specific links will be added by child templates -->
+            {% block dashboard_sidebar_links %}{% endblock %}
+        </ul>
+    </nav>
+    <main class="dashboard-content">
+        {% block dashboard_main_content %}
+            <p>Welcome to your dashboard!</p>
+        {% endblock %}
+    </main>
+</div>
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends "dashboard.base.html" %}
+
+{% block title %}Volunteer Dashboard - {{ super() }}{% endblock %}
+
+{% block dashboard_sidebar_links %}
+    <hr>
+    <li><a href="#">My Signed-up Activities</a></li> {# Placeholder #}
+    <li><a href="{{ url_for('main.programs') }}">Find Opportunities</a></li>
+    <li><a href="#">My Contributions</a></li> {# Placeholder #}
+{% endblock %}
+
+{% block dashboard_main_content %}
+    <h1>Volunteer Dashboard</h1>
+    <p>Welcome, {{ current_user.username }}!</p>
+    <p>Here you can see your upcoming activities, find new opportunities, and track your contributions.</p>
+    {# More volunteer-specific content will go here #}
+{% endblock %}

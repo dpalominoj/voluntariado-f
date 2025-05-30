@@ -1,0 +1,9 @@
+Flask
+Flask-SQLAlchemy
+psycopg2-binary # For PostgreSQL
+Flask-Migrate
+Flask-WTF
+Flask-Login
+Werkzeug
+requests
+python-dotenv # For local .env file support (Replit uses Secrets)
