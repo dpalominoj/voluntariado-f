@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}Programs - {{ super() }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>Available Programs</h1>
+    <p>Find a program that interests you and see how you can contribute.</p>
+    
+    {% if programs %}
+        <div class="row row-cols-1 row-cols-md-2 g-4">
+            {% for program in programs %}
+            <div class="col">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ program.name }}</h5>
+                        <p class="card-text">{{ program.description if program.description else "No description available." }}</p>
+                        {% if program.id in compatibility_scores and compatibility_scores[program.id] is not none %}
+                            <p class="card-text"><small class="text-success"><strong>Your Compatibility: {{ compatibility_scores[program.id] }}%</strong></small></p>
+                        {% endif %}
+                        <a href="#" class="btn btn-primary">View Details</a> {# Placeholder link #}
+                    </div>
+                    <div class="card-footer">
+                        <small class="text-muted">Organizer: {{ program.organizer.username if program.organizer else "N/A" }}</small>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="alert alert-info" role="alert">
+            No programs available at the moment. Please check back later.
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

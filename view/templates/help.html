@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block title %}Help Center - {{ super() }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>Help & Support</h1>
+    <p>Find answers to common questions and learn how to use Volunteer Connect.</p>
+
+    <div class="accordion" id="helpAccordion">
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingOne">
+                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                    How do I sign up as a volunteer?
+                </button>
+            </h2>
+            <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#helpAccordion">
+                <div class="accordion-body">
+                    To sign up as a volunteer, you'll first need to create an account. Once registered, you can browse available programs and activities and sign up for those that interest you.
+                </div>
+            </div>
+        </div>
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingTwo">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                    How can I list my organization's programs?
+                </button>
+            </h2>
+            <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#helpAccordion">
+                <div class="accordion-body">
+                    If you are an organizer, you will need an 'Organizer' account. Once approved, you will have access to a dashboard where you can create and manage your programs and activities.
+                </div>
+            </div>
+        </div>
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingThree">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                    Who do I contact for support?
+                </button>
+            </h2>
+            <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#helpAccordion">
+                <div class="accordion-body">
+                    For any issues or questions not covered here, please reach out to our support team at support@volunteerconnect.example.com.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <hr class="my-4">
+
+    <!-- Chatbot Section -->
+    <h2>Need More Help? Chat with Us!</h2>
+    <div id="chatbot-container" style="height: 400px; border: 1px solid #ccc; background-color: #f9f9f9; display: flex; align-items: center; justify-content: center; border-radius: 0.25rem;">
+        <!-- 
+          Placeholder for Chatbot Embed Snippet.
+          The actual embed code (likely a <script> tag or a series of tags) 
+          from the chosen chatbot service (e.g., n8n, Dialogflow, Tidio, Crisp) 
+          will be placed here.
+
+          For n8n, this might involve:
+          1. Creating a workflow in n8n that handles chat interactions.
+          2. Using an n8n chat node (if available for embedding) or exposing the workflow via a webhook.
+          3. Obtaining an HTML/JavaScript snippet from n8n or a third-party chat interface that connects to the n8n webhook.
+        -->
+        <p style="text-align: center; color: #666; font-family: sans-serif;">
+            <strong>Interactive Chat Support</strong><br><br>
+            Our chatbot will be available here soon to assist you with your questions.
+            <br>
+            <em>(Awaiting integration with n8n or a similar chat service)</em>
+        </p>
+    </div>
+    <p class="mt-2 text-muted small">Our chatbot can help answer common questions. If it can't help, it can guide you on how to reach our support team.</p>
+
+</div>
+{% endblock %}

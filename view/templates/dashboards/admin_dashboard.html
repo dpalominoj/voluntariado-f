@@ -1,0 +1,17 @@
+{% extends "dashboard.base.html" %}
+
+{% block title %}Admin Dashboard - {{ super() }}{% endblock %}
+
+{% block dashboard_sidebar_links %}
+    <hr>
+    <li><a href="#">User Management</a></li> {# Placeholder #}
+    <li><a href="#">Site Settings</a></li>   {# Placeholder #}
+    <li><a href="#">View All Programs</a></li> {# Placeholder #}
+{% endblock %}
+
+{% block dashboard_main_content %}
+    <h1>Admin Dashboard</h1>
+    <p>Welcome, {{ current_user.username }}! You have Admin privileges.</p>
+    <p>From here, you can manage users, configure site settings, and oversee all programs and activities.</p>
+    {# More admin-specific content will go here #}
+{% endblock %}
