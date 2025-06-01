@@ -9,6 +9,7 @@ from flask_migrate import Migrate # Import Migrate
 from model.models import Usuarios # Changed User to Usuarios
 from database.datos_iniciales import seed_data # Added import for seed_data
 
+
 app = Flask(__name__, instance_relative_config=True, template_folder='view/templates') # Enable instance folder
 
 # Configuration
@@ -34,7 +35,7 @@ login_manager.login_message_category = 'info' # Flash message category
 
 @login_manager.user_loader
 def load_user(user_id):
-    return Usuarios.query.get(int(user_id)) # Changed User to Usuarios
+    return Usuarios.query.get(int(user_id))
 
 # Register Blueprints
 app.register_blueprint(main_bp)
