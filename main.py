@@ -11,10 +11,8 @@ from model.models import User
 app = Flask(__name__, instance_relative_config=True, template_folder='view/templates') # Enable instance folder
 
 # Configuration
-# SECRET_KEY and DATABASE_URL should be set in Replit Secrets for production/hosted environment
-# For local development, they can be in a .env file (loaded by python-dotenv) or set directly here for simplicity if not using .env
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev_secret_key_replace_me_if_not_using_env_or_secrets')
-default_sqlite_uri = f"sqlite:///{os.path.join(app.instance_path, 'site.db')}"
+default_sqlite_uri = f"sqlite:///{os.path.join(app.instance_path, 'konectai.db')}"
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', default_sqlite_uri)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
