@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, redirect, url_for, flash
 from flask_login import login_user, logout_user, login_required, current_user
 from database.db import db
-from model.models import User
+from model.models import Usuarios
 from controller.forms import RegistrationForm, LoginForm
 
 auth_bp = Blueprint('auth', __name__,
@@ -15,7 +15,7 @@ def register():
         return redirect(url_for('main.home'))
     form = RegistrationForm()
     if form.validate_on_submit():
-        user = User(username=form.username.data,
+        user = Usuarios(username=form.username.data,
                     email=form.email.data,
                     role=form.role.data)
         user.set_password(form.password.data)
@@ -31,7 +31,7 @@ def login():
         return redirect(url_for('main.home'))
     form = LoginForm()
     if form.validate_on_submit():
-        user = User.query.filter_by(email=form.email.data).first()
+        user = Usuarios.query.filter_by(email=form.email.data).first()
         if user and user.check_password(form.password.data):
             login_user(user) # 'remember=form.remember_me.data' can be added if you have a remember_me field
             flash('Login successful!', 'success')
