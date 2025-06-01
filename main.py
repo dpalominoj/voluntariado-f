@@ -6,7 +6,8 @@ from controller.auth_routes import auth_bp
 from controller.dashboard_routes import dashboard_bp
 from flask_login import LoginManager
 from flask_migrate import Migrate # Import Migrate
-from model.models import User
+from model.models import Usuarios # Changed User to Usuarios
+from database.datos_iniciales import seed_data # Added import for seed_data
 
 app = Flask(__name__, instance_relative_config=True, template_folder='view/templates') # Enable instance folder
 
@@ -33,7 +34,7 @@ login_manager.login_message_category = 'info' # Flash message category
 
 @login_manager.user_loader
 def load_user(user_id):
-    return User.query.get(int(user_id))
+    return Usuarios.query.get(int(user_id)) # Changed User to Usuarios
 
 # Register Blueprints
 app.register_blueprint(main_bp)
@@ -47,6 +48,14 @@ def create_db_command():
         import model.models # Ensure all models are imported
         db.create_all()
     print('Database tables created.')
+
+@app.cli.command('seed-db')
+def seed_db_command():
+    """Seeds the database with initial data."""
+    with app.app_context():
+        seed_data()
+    # The print statement is now inside seed_data() from datos_iniciales.py
+    # print('Database seeded with initial data.') # This can be removed or kept if preferred
 
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
