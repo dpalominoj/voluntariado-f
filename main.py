@@ -6,7 +6,7 @@ from controller.auth_routes import auth_bp
 from controller.dashboard_routes import dashboard_bp
 from flask_login import LoginManager
 from flask_migrate import Migrate # Import Migrate
-from model.models import User
+from model.models import usuarios
 
 app = Flask(__name__, instance_relative_config=True, template_folder='view/templates') # Enable instance folder
 
@@ -33,7 +33,7 @@ login_manager.login_message_category = 'info' # Flash message category
 
 @login_manager.user_loader
 def load_user(user_id):
-    return User.query.get(int(user_id))
+    return usuarios.query.get(int(user_id))
 
 # Register Blueprints
 app.register_blueprint(main_bp)
