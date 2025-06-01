@@ -11,21 +11,21 @@ def seed_data():
     # Crea organizaciones
     if Organizaciones.query.count() == 0:
     organizaciones = [
-        Organizacion(
+        Organizaciones(
             nombre_org="Fundación Inclusión Perú",
             descripcion_org="Organización dedicada a promover la inclusión social de personas con discapacidad",
             direccion_fisica="Av. Arequipa 123, Lima",
             logo="☺",
             fecha_registro=datetime(2025, 1, 13, 15, 0),
         ),
-        Organizacion(
+        Organizaciones(
             nombre_org="Manos Solidarias",
             descripcion_org="ONG enfocada en brindar apoyo a comunidades vulnerables.",
             direccion_fisica="Calle Solidaridad 456, Cusco",
             logo="♥",
             fecha_registro=datetime(2024, 11, 20, 10, 30),
         ),
-        Organizacion(
+        Organizaciones(
             nombre_org="Red de Voluntarios Ambientales",
             descripcion_org="Grupo dedicado a la conservación del medio ambiente y la educación ecológica.",
             direccion_fisica="Jr. Amazonas 789, Iquitos",
