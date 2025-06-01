@@ -1,17 +1,77 @@
 {% extends "dashboard.base.html" %}
 
-{% block title %}Volunteer Dashboard - {{ super() }}{% endblock %}
+{% block title %}Volunteer Dashboard - Panel - KONECTAi{% endblock %}
 
 {% block dashboard_sidebar_links %}
-    <hr>
-    <li><a href="#">My Signed-up Activities</a></li> {# Placeholder #}
-    <li><a href="{{ url_for('main.programs') }}">Find Opportunities</a></li>
-    <li><a href="#">My Contributions</a></li> {# Placeholder #}
+    <hr class="my-2 border-gray-200">
+    <li>
+        <a href="{{ url_for('user_dashboard.volunteer_my_enrollments') if 'user_dashboard.volunteer_my_enrollments' in get_flashed_messages(category_filter=['url_exists']) else '#' }}"
+           class="block py-2.5 px-4 text-gray-700 hover:bg-indigo-100 hover:text-indigo-700 rounded-md text-sm transition-colors duration-150 {% if request.endpoint == 'user_dashboard.volunteer_my_enrollments' %}bg-indigo-100 text-indigo-700 font-semibold{% endif %}">
+           My Enrollments
+        </a>
+    </li>
+    <li>
+        <a href="{{ url_for('main.programs') }}"
+           class="block py-2.5 px-4 text-gray-700 hover:bg-indigo-100 hover:text-indigo-700 rounded-md text-sm transition-colors duration-150 {% if request.endpoint == 'main.programs' %}bg-indigo-100 text-indigo-700 font-semibold{% endif %}">
+           Browse Programs
+        </a>
+    </li>
+    {#
+    <li>
+        <a href="{{ url_for('user_dashboard.volunteer_my_contributions') if 'user_dashboard.volunteer_my_contributions' in get_flashed_messages(category_filter=['url_exists']) else '#' }}"
+           class="block py-2.5 px-4 text-gray-700 hover:bg-indigo-100 hover:text-indigo-700 rounded-md text-sm transition-colors duration-150 {% if request.endpoint == 'user_dashboard.volunteer_my_contributions' %}bg-indigo-100 text-indigo-700 font-semibold{% endif %}">
+           My Contributions
+        </a>
+    </li>
+    #}
 {% endblock %}
 
 {% block dashboard_main_content %}
-    <h1>Volunteer Dashboard</h1>
-    <p>Welcome, {{ current_user.username }}!</p>
-    <p>Here you can see your upcoming activities, find new opportunities, and track your contributions.</p>
-    {# More volunteer-specific content will go here #}
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8">
+        <h1 class="text-3xl font-bold text-gray-800 mb-4 sm:mb-0">Volunteer Dashboard</h1>
+        <a href="{{ url_for('main.programs') }}"
+           class="inline-flex items-center px-6 py-3 border border-transparent shadow-sm text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-150">
+            <svg class="-ml-1 mr-3 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M6.5 5a.5.5 0 01.5.5v2h2a.5.5 0 010 1h-2v2a.5.5 0 01-1 0v-2h-2a.5.5 0 010-1h2v-2a.5.5 0 01.5-.5zM3 3a2 2 0 00-2 2v10a2 2 0 002 2h14a2 2 0 002-2V5a2 2 0 00-2-2H3zm14 12H3V5h14v10z" clip-rule="evenodd" />
+            </svg>
+            Browse Available Programs
+        </a>
+    </div>
+
+    <div class="bg-white p-6 rounded-lg shadow-md mb-8">
+        <h2 class="text-xl font-semibold text-gray-700 mb-2">Welcome, {{ current_user.username }}!</h2>
+        <p class="text-gray-600">
+            Here you can see your upcoming activities, find new opportunities, and track your contributions.
+        </p>
+    </div>
+
+    {# Placeholder for "My Enrolled Programs" #}
+    <div class="bg-white p-6 rounded-lg shadow-md mb-8">
+        <h3 class="text-xl font-semibold text-gray-700 mb-4">My Enrolled Programs (Placeholder)</h3>
+        <p class="text-gray-600">
+            Programs you are currently enrolled in or have applied to will be listed here.
+        </p>
+        {# Example of an enrolled program item #}
+        {#
+        <div class="mt-4 border-t border-gray-200 pt-4">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h4 class="text-lg font-medium text-indigo-700">Local Park Cleanup</h4>
+                    <p class="text-sm text-gray-500">Status: <span class="font-semibold text-green-600">Enrolled</span></p>
+                    <p class="text-sm text-gray-500">Next Activity: Tomorrow, 10:00 AM</p>
+                </div>
+                <a href="#" class="text-sm text-indigo-600 hover:text-indigo-900">View Details</a>
+            </div>
+        </div>
+        #}
+    </div>
+
+    {# Placeholder for "Recommended Programs" or "My Applications" #}
+    <div class="bg-white p-6 rounded-lg shadow-md">
+        <h3 class="text-xl font-semibold text-gray-700 mb-4">Recommended For You (Placeholder)</h3>
+        <p class="text-gray-600">
+            Based on your profile and interests, relevant programs will be recommended here.
+        </p>
+    </div>
+
 {% endblock %}

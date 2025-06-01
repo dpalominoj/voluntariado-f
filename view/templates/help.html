@@ -1,75 +1,86 @@
 {% extends "base.html" %}
 
-{% block title %}Help Center - {{ super() }}{% endblock %}
+{% block title %}Ayuda - KONECTAi{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <h1>Help & Support</h1>
-    <p>Find answers to common questions and learn how to use Volunteer Connect.</p>
+<div class="bg-gray-50 py-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="lg:text-center">
+            <h2 class="text-3xl font-extrabold text-gray-900 sm:text-4xl">
+                Help & Support Center
+            </h2>
+            <p class="mt-4 max-w-2xl text-xl text-gray-600 lg:mx-auto">
+                Find answers to common questions and learn how to use KONECTAi.
+            </p>
+        </div>
 
-    <div class="accordion" id="helpAccordion">
-        <div class="accordion-item">
-            <h2 class="accordion-header" id="headingOne">
-                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                    How do I sign up as a volunteer?
-                </button>
-            </h2>
-            <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#helpAccordion">
-                <div class="accordion-body">
-                    To sign up as a volunteer, you'll first need to create an account. Once registered, you can browse available programs and activities and sign up for those that interest you.
+        <div class="mt-12 max-w-3xl mx-auto">
+            <div x-data="{ openAccordion: 1 }" class="space-y-4">
+                {# Accordion Item 1 #}
+                <div class="border border-gray-200 rounded-lg">
+                    <button @click="openAccordion === 1 ? openAccordion = null : openAccordion = 1" class="w-full flex items-center justify-between p-4 sm:p-6 text-left text-gray-700 hover:bg-gray-100 focus:outline-none">
+                        <span class="text-lg font-medium">How do I sign up as a volunteer?</span>
+                        <svg class="w-6 h-6 transform transition-transform duration-200" :class="{ 'rotate-180': openAccordion === 1 }" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </button>
+                    <div x-show="openAccordion === 1" x-cloak x-transition:enter="transition ease-out duration-100" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100" x-transition:leave="transition ease-in duration-75" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95" class="p-4 sm:p-6 border-t border-gray-200">
+                        <p class="text-base text-gray-600">
+                            To sign up as a volunteer, you'll first need to create an account. Once registered, you can browse available programs and activities and sign up for those that interest you.
+                        </p>
+                    </div>
+                </div>
+
+                {# Accordion Item 2 #}
+                <div class="border border-gray-200 rounded-lg">
+                    <button @click="openAccordion === 2 ? openAccordion = null : openAccordion = 2" class="w-full flex items-center justify-between p-4 sm:p-6 text-left text-gray-700 hover:bg-gray-100 focus:outline-none">
+                        <span class="text-lg font-medium">How can I list my organization's programs?</span>
+                        <svg class="w-6 h-6 transform transition-transform duration-200" :class="{ 'rotate-180': openAccordion === 2 }" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </button>
+                    <div x-show="openAccordion === 2" x-cloak x-transition:enter="transition ease-out duration-100" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100" x-transition:leave="transition ease-in duration-75" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95" class="p-4 sm:p-6 border-t border-gray-200">
+                        <p class="text-base text-gray-600">
+                            If you are an organizer, you will need an 'Organizer' account. Once approved, you will have access to a dashboard where you can create and manage your programs and activities.
+                        </p>
+                    </div>
+                </div>
+
+                {# Accordion Item 3 #}
+                <div class="border border-gray-200 rounded-lg">
+                    <button @click="openAccordion === 3 ? openAccordion = null : openAccordion = 3" class="w-full flex items-center justify-between p-4 sm:p-6 text-left text-gray-700 hover:bg-gray-100 focus:outline-none">
+                        <span class="text-lg font-medium">Who do I contact for support?</span>
+                        <svg class="w-6 h-6 transform transition-transform duration-200" :class="{ 'rotate-180': openAccordion === 3 }" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </button>
+                    <div x-show="openAccordion === 3" x-cloak x-transition:enter="transition ease-out duration-100" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100" x-transition:leave="transition ease-in duration-75" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95" class="p-4 sm:p-6 border-t border-gray-200">
+                        <p class="text-base text-gray-600">
+                            For any issues or questions not covered here, please reach out to our support team at <a href="mailto:support@konectai.example.com" class="text-indigo-600 hover:text-indigo-500">support@konectai.example.com</a>.
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="accordion-item">
-            <h2 class="accordion-header" id="headingTwo">
-                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-                    How can I list my organization's programs?
-                </button>
-            </h2>
-            <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#helpAccordion">
-                <div class="accordion-body">
-                    If you are an organizer, you will need an 'Organizer' account. Once approved, you will have access to a dashboard where you can create and manage your programs and activities.
+
+        <div class="mt-16 pt-10 border-t border-gray-200">
+            <div class="text-center">
+                 <h3 class="text-2xl font-semibold text-gray-900">Need More Help? Chat with Us!</h3>
+            </div>
+            <div id="chatbot-container" class="mt-6 h-96 bg-gray-100 border border-gray-300 rounded-lg shadow-sm flex items-center justify-center">
+                <div class="text-center p-8">
+                    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg>
+                    <h4 class="mt-2 text-lg font-medium text-gray-700">Interactive Chat Support</h4>
+                    <p class="mt-1 text-sm text-gray-500">
+                        Our chatbot will be available here soon to assist you with your questions.
+                    </p>
+                    <p class="mt-1 text-xs text-gray-400">
+                        (Awaiting integration with n8n or a similar chat service)
+                    </p>
                 </div>
             </div>
-        </div>
-        <div class="accordion-item">
-            <h2 class="accordion-header" id="headingThree">
-                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
-                    Who do I contact for support?
-                </button>
-            </h2>
-            <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#helpAccordion">
-                <div class="accordion-body">
-                    For any issues or questions not covered here, please reach out to our support team at support@volunteerconnect.example.com.
-                </div>
-            </div>
+            <p class="mt-4 text-sm text-gray-500 text-center">Our chatbot can help answer common questions. If it can't help, it can guide you on how to reach our support team.</p>
         </div>
     </div>
-
-    <hr class="my-4">
-
-    <!-- Chatbot Section -->
-    <h2>Need More Help? Chat with Us!</h2>
-    <div id="chatbot-container" style="height: 400px; border: 1px solid #ccc; background-color: #f9f9f9; display: flex; align-items: center; justify-content: center; border-radius: 0.25rem;">
-        <!-- 
-          Placeholder for Chatbot Embed Snippet.
-          The actual embed code (likely a <script> tag or a series of tags) 
-          from the chosen chatbot service (e.g., n8n, Dialogflow, Tidio, Crisp) 
-          will be placed here.
-
-          For n8n, this might involve:
-          1. Creating a workflow in n8n that handles chat interactions.
-          2. Using an n8n chat node (if available for embedding) or exposing the workflow via a webhook.
-          3. Obtaining an HTML/JavaScript snippet from n8n or a third-party chat interface that connects to the n8n webhook.
-        -->
-        <p style="text-align: center; color: #666; font-family: sans-serif;">
-            <strong>Interactive Chat Support</strong><br><br>
-            Our chatbot will be available here soon to assist you with your questions.
-            <br>
-            <em>(Awaiting integration with n8n or a similar chat service)</em>
-        </p>
-    </div>
-    <p class="mt-2 text-muted small">Our chatbot can help answer common questions. If it can't help, it can guide you on how to reach our support team.</p>
-
 </div>
 {% endblock %}

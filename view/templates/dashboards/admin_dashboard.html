@@ -1,17 +1,75 @@
 {% extends "dashboard.base.html" %}
 
-{% block title %}Admin Dashboard - {{ super() }}{% endblock %}
+{% block title %}Admin Dashboard - Panel - KONECTAi{% endblock %}
 
 {% block dashboard_sidebar_links %}
-    <hr>
-    <li><a href="#">User Management</a></li> {# Placeholder #}
-    <li><a href="#">Site Settings</a></li>   {# Placeholder #}
-    <li><a href="#">View All Programs</a></li> {# Placeholder #}
+    <hr class="my-2 border-gray-200">
+    <li>
+        <a href="{{ url_for('user_dashboard.admin_manage_users') if 'user_dashboard.admin_manage_users' in get_flashed_messages(category_filter=['url_exists']) else '#' }}"
+           class="block py-2.5 px-4 text-gray-700 hover:bg-indigo-100 hover:text-indigo-700 rounded-md text-sm transition-colors duration-150 {% if request.endpoint == 'user_dashboard.admin_manage_users' %}bg-indigo-100 text-indigo-700 font-semibold{% endif %}">
+           Manage Users
+        </a>
+    </li>
+    <li>
+        <a href="{{ url_for('user_dashboard.admin_manage_programs') if 'user_dashboard.admin_manage_programs' in get_flashed_messages(category_filter=['url_exists']) else '#' }}"
+           class="block py-2.5 px-4 text-gray-700 hover:bg-indigo-100 hover:text-indigo-700 rounded-md text-sm transition-colors duration-150 {% if request.endpoint == 'user_dashboard.admin_manage_programs' %}bg-indigo-100 text-indigo-700 font-semibold{% endif %}">
+           Manage Programs
+        </a>
+    </li>
+    {# Add more admin links as needed, e.g., Site Settings if that route exists #}
+    {#
+    <li>
+        <a href="{{ url_for('user_dashboard.admin_site_settings') if 'user_dashboard.admin_site_settings' in get_flashed_messages(category_filter=['url_exists']) else '#' }}"
+           class="block py-2.5 px-4 text-gray-700 hover:bg-indigo-100 hover:text-indigo-700 rounded-md text-sm transition-colors duration-150 {% if request.endpoint == 'user_dashboard.admin_site_settings' %}bg-indigo-100 text-indigo-700 font-semibold{% endif %}">
+           Site Settings
+        </a>
+    </li>
+    #}
 {% endblock %}
 
 {% block dashboard_main_content %}
-    <h1>Admin Dashboard</h1>
-    <p>Welcome, {{ current_user.username }}! You have Admin privileges.</p>
-    <p>From here, you can manage users, configure site settings, and oversee all programs and activities.</p>
-    {# More admin-specific content will go here #}
+    <div class="flex justify-between items-center mb-8">
+        <h1 class="text-3xl font-bold text-gray-800">Admin Dashboard</h1>
+        {# Optional: Add a primary action button like "Create New Program" if relevant #}
+        {# <a href="#" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg shadow-md transition-colors duration-150">
+            Quick Action
+        </a> #}
+    </div>
+
+    <div class="bg-white p-6 rounded-lg shadow-md mb-8">
+        <h2 class="text-xl font-semibold text-gray-700 mb-2">Welcome, {{ current_user.username }}!</h2>
+        <p class="text-gray-600">
+            You have Admin privileges. From this dashboard, you can manage users, programs, and other site configurations.
+        </p>
+    </div>
+
+    {# Placeholder for Stats Cards #}
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <h3 class="text-lg font-medium text-gray-700">Total Users</h3>
+            <p class="text-3xl font-semibold text-gray-900 mt-2">N/A</p> {# Replace N/A with actual data later #}
+        </div>
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <h3 class="text-lg font-medium text-gray-700">Total Programs</h3>
+            <p class="text-3xl font-semibold text-gray-900 mt-2">N/A</p> {# Replace N/A with actual data later #}
+        </div>
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <h3 class="text-lg font-medium text-gray-700">Pending Approvals</h3>
+            <p class="text-3xl font-semibold text-gray-900 mt-2">N/A</p> {# Replace N/A with actual data later #}
+        </div>
+    </div>
+
+    {# Placeholder for a list or table #}
+    <div class="bg-white p-6 rounded-lg shadow-md">
+        <h3 class="text-xl font-semibold text-gray-700 mb-4">Recent Activity (Placeholder)</h3>
+        <p class="text-gray-600">
+            Future updates will show recent user registrations, program submissions, or other relevant activities here.
+        </p>
+        {# Example of a simple list item #}
+        {# <ul class="mt-4 space-y-3">
+            <li class="p-3 bg-gray-50 rounded-md shadow-sm">New user registered: test@example.com</li>
+            <li class="p-3 bg-gray-50 rounded-md shadow-sm">Program submitted: Community Cleanup</li>
+        </ul> #}
+    </div>
+
 {% endblock %}

@@ -1,33 +1,64 @@
 {% extends "dashboard.base.html" %}
 
-{% block title %}My Profile - {{ super() }}{% endblock %}
+{% block title %}Mi Perfil - Panel - KONECTAi{% endblock %}
 
 {% block dashboard_main_content %}
-    <h1>My Profile</h1>
-    <div class="card">
-        <div class="card-body">
-            <h5 class="card-title">User Information</h5>
-            <p><strong>Username:</strong> {{ user.username }}</p>
-            <p><strong>Email:</strong> {{ user.email }}</p>
-            <p><strong>Role:</strong> {{ user.role }}</p>
-            <hr>
-            <p><em>(Profile editing functionality will be available here in the future.)</em></p>
-            <a href="#" class="btn btn-primary">Edit Profile</a> {# Placeholder #}
+    <h1 class="text-3xl font-bold text-gray-800 mb-8">My Profile</h1>
+
+    {# User Information Card #}
+    <div class="bg-white shadow-md rounded-lg overflow-hidden">
+        <div class="px-4 py-5 sm:px-6 border-b border-gray-200">
+            <h3 class="text-xl leading-6 font-semibold text-gray-900">
+                User Information
+            </h3>
+            <p class="mt-1 max-w-2xl text-sm text-gray-500">
+                Your personal details.
+            </p>
+        </div>
+        <div class="border-t border-gray-200 px-4 py-5 sm:p-0">
+            <dl class="sm:divide-y sm:divide-gray-200">
+                <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                    <dt class="text-sm font-medium text-gray-500">Username</dt>
+                    <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{{ user.username }}</dd>
+                </div>
+                <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                    <dt class="text-sm font-medium text-gray-500">Email address</dt>
+                    <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{{ user.email }}</dd>
+                </div>
+                <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                    <dt class="text-sm font-medium text-gray-500">Role</dt>
+                    <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{{ user.role }}</dd>
+                </div>
+            </dl>
+        </div>
+        <div class="px-4 py-4 sm:px-6 border-t border-gray-200">
+            <p class="text-sm text-gray-500 italic mb-3">(Profile editing functionality will be available here in the future.)</p>
+            <a href="#" class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50" aria-disabled="true">
+                Edit Profile (Coming Soon)
+            </a>
         </div>
     </div>
 
-    {% if user.role == 'Volunteer' %}
-    <div class="card mt-4">
-        <div class="card-body">
-            <h5 class="card-title">My Volunteer Activity</h5>
-            <p><em>(Details about your signed-up activities and contributions will appear here.)</em></p>
+    {# Role-Specific Activity Card #}
+    {% if user.role == 'Volunteer' or user.role == 'Organizer' %}
+    <div class="mt-8 bg-white shadow-md rounded-lg overflow-hidden">
+        <div class="px-4 py-5 sm:px-6 border-b border-gray-200">
+            <h3 class="text-xl leading-6 font-semibold text-gray-900">
+                {% if user.role == 'Volunteer' %}
+                    My Volunteer Activity
+                {% elif user.role == 'Organizer' %}
+                    My Organizer Activity
+                {% endif %}
+            </h3>
         </div>
-    </div>
-    {% elif user.role == 'Organizer' %}
-    <div class="card mt-4">
-        <div class="card-body">
-            <h5 class="card-title">My Organizer Activity</h5>
-            <p><em>(Details about programs you manage will appear here.)</em></p>
+        <div class="px-4 py-5 sm:p-6">
+            <p class="text-sm text-gray-600 italic">
+                {% if user.role == 'Volunteer' %}
+                    (Details about your signed-up activities and contributions will appear here.)
+                {% elif user.role == 'Organizer' %}
+                    (Details about programs you manage will appear here.)
+                {% endif %}
+            </p>
         </div>
     </div>
     {% endif %}
