@@ -4,251 +4,162 @@
 
 {% block content %}
   <!-- Hero -->
-  <div class="bg-indigo-600 text-white pt-[150px] pb-[80px]" style="background-image: url('data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');">
-    <div class="hcont cont flex flex-row justify-between container mx-auto px-4">
-      <div class="texto-hero w-1/2">
-        <h1 class="text-4xl m-0">Voluntariado Inclusivo<br><span class="text-white/70">Para un mundo mejor</span></h1>
-        <p>Únete a nuestra comunidad de voluntarios y marca la diferencia en la vida de quienes más lo necesitan. Creamos espacios inclusivos donde todos pueden participar.</p>
-        <div class="bot-hero mt-4 flex gap-4">
-          <button class="btn-p bg-white text-indigo-600" onclick="abrirRegistro()">Comenzar ahora</button> <!-- Assuming --primario is indigo-600 -->
-          <button class="btn-s" ><a href="{{ url_for('user_dashboard.dashboard') }}">Conocer más</a></button>
-        </div>
-      </div>
-      <div class="img-hero" >
-		<svg class="hero-svg w-full max-w-md h-auto block" viewBox="0 0 500 400" xmlns="http://www.w3.org/2000/svg">
-			<circle cx="250" cy="150" r="100" fill="#ffffff" fill-opacity="0.2"></circle>
-			<g transform="translate(150, 50)">
-				<circle cx="50" cy="50" r="40" fill="#ffffff"></circle>
-				<circle cx="65" cy="40" r="10" fill="#4f46e5"></circle>
-				<circle cx="35" cy="40" r="10" fill="#4f46e5"></circle>
-				<path d="M30,65 Q50,80 70,65" stroke="#4f46e5" stroke-width="3" fill="none"></path>
-			</g>
-			<g transform="translate(250, 50)">
-				<circle cx="50" cy="50" r="40" fill="#ffffff"></circle>
-				<circle cx="65" cy="40" r="10" fill="#4f46e5"></circle>
-				<circle cx="35" cy="40" r="10" fill="#4f46e5"></circle>
-				<path d="M30,65 Q50,80 70,65" stroke="#4f46e5" stroke-width="3" fill="none"></path>
-			</g>
-			<g transform="translate(200, 150)">
-				<circle cx="50" cy="50" r="40" fill="#ffffff"></circle>
-				<circle cx="65" cy="40" r="10" fill="#4f46e5"></circle>
-				<circle cx="35" cy="40" r="10" fill="#4f46e5"></circle>
-				<path d="M30,65 Q50,80 70,65" stroke="#4f46e5" stroke-width="3" fill="none"></path>
-			</g>
-			<path d="M200,100 Q250,50 300,100" stroke="#ffffff" stroke-width="3" fill="none"></path>
-			<path d="M200,200 Q250,250 300,200" stroke="#ffffff" stroke-width="3" fill="none"></path>
-			<path d="M250,150 L250,200" stroke="#ffffff" stroke-width="3" fill="none"></path>
-		</svg>
+<div class="hero bg-gradient-to-r from-indigo-500 to-indigo-700 text-white py-20">
+  <div class="container mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-12">
+    <div class="text-center md:text-left max-w-2xl">
+      <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
+        Voluntariado Inclusivo<br>
+        <span class="text-indigo-200">Para un mundo mejor</span>
+      </h1>
+      <p class="text-xl md:text-2xl mb-8">
+        Únete a nuestra comunidad de voluntarios y marca la diferencia en la vida de quienes más lo necesitan. Creamos espacios inclusivos donde todos pueden participar.
+      </p>
+      <div class="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
+        <button 
+          onclick="abrirRegistro()" 
+          class="bg-white text-indigo-600 hover:bg-gray-100 font-bold py-3 px-8 rounded-full transition-all shadow-lg hover:shadow-xl"
+        > Comenzar ahora
+        </button>
+        <button class="bg-transparent border-2 border-white hover:bg-white hover:text-indigo-600 font-bold py-3 px-8 rounded-full transition-all">
+          <a href="{{ url_for('dashboard') }}" class="no-underline">Conocer más</a>
+        </button>
       </div>
     </div>
+    <div class="w-full md:w-1/2 flex justify-center">
+      <svg class="w-full max-w-md" viewBox="0 0 500 400" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="250" cy="150" r="100" fill="#ffffff" fill-opacity="0.2"></circle>
+        <g transform="translate(150, 50)">
+          <circle cx="50" cy="50" r="40" fill="#ffffff"></circle>
+          <circle cx="65" cy="40" r="10" fill="#4f46e5"></circle>
+          <circle cx="35" cy="40" r="10" fill="#4f46e5"></circle>
+          <path d="M30,65 Q50,80 70,65" stroke="#4f46e5" stroke-width="3" fill="none"></path>
+        </g>
+        <g transform="translate(250, 50)">
+          <circle cx="50" cy="50" r="40" fill="#ffffff"></circle>
+          <circle cx="65" cy="40" r="10" fill="#4f46e5"></circle>
+          <circle cx="35" cy="40" r="10" fill="#4f46e5"></circle>
+          <path d="M30,65 Q50,80 70,65" stroke="#4f46e5" stroke-width="3" fill="none"></path>
+        </g>
+        <g transform="translate(200, 150)">
+          <circle cx="50" cy="50" r="40" fill="#ffffff"></circle>
+          <circle cx="65" cy="40" r="10" fill="#4f46e5"></circle>
+          <circle cx="35" cy="40" r="10" fill="#4f46e5"></circle>
+          <path d="M30,65 Q50,80 70,65" stroke="#4f46e5" stroke-width="3" fill="none"></path>
+        </g>
+        <path d="M200,100 Q250,50 300,100" stroke="#ffffff" stroke-width="3" fill="none"></path>
+        <path d="M200,200 Q250,250 300,200" stroke="#ffffff" stroke-width="3" fill="none"></path>
+        <path d="M250,150 L250,200" stroke="#ffffff" stroke-width="3" fill="none"></path>
+      </svg>		
+    </div>
   </div>
+</div>
 
-  <main>
+ <main>
     <!-- Programas -->
-    <section class="prog">
-      <h1>Nuestros Programas de Voluntariado</h1>
-      <p>Ofrecemos oportunidades según tus habilidades e intereses.</p>
-      <div class="carousel-container relative overflow-hidden w-4/5 mx-auto mt-8 mb-8" role="region" aria-roledescription="carousel" aria-label="Nuestros Programas de Voluntariado">
-        <div id="programas-carousel-track" class="cards carousel-track flex transition-transform duration-500 ease-in-out" aria-live="off">
-          <article class="card carousel-slide w-full flex-shrink-0 box-border px-2.5" role="group" aria-roledescription="slide">
-            <div class="icono i1">🌻</div>
-            <div class="cuerpo">
-              <h3>Educación Inclusiva</h3>
-              <p>Apoya a estudiantes con necesidades especiales.</p>
-              <button class="btn-p"><a class="a-particip" href="{{ url_for('auth.register') }}">Participar</a></button>
-            </div>
-          </article>
-          <article class="card carousel-slide w-full flex-shrink-0 box-border px-2.5" role="group" aria-roledescription="slide">
-            <div class="icono i2">🌼</div>
-            <div class="cuerpo">
-              <h3>Medio Ambiente</h3>
-              <p>Participa en proyectos de reforestación.</p>
-              <button class="btn-p"><a class="a-particip" href="{{ url_for('auth.register') }}">Participar</a></button>
-            </div>
-          </article>
-          <article class="card carousel-slide w-full flex-shrink-0 box-border px-2.5" role="group" aria-roledescription="slide">
-            <div class="icono i3">🌸</div>
-            <div class="cuerpo">
-              <h3>Apoyo Comunitario</h3>
-              <p>Colabora en comedores sociales y visitas a residencias de ancianos.</p>
-              <button class="btn-p"><a class="a-particip" href="{{ url_for('auth.register') }}">Participar</a></button>
-            </div>
-          </article>
-        </div>
-        <button class="carousel-button prev absolute top-1/2 -translate-y-1/2 bg-white/70 hover:bg-white border border-gray-300 p-2.5 cursor-pointer z-[100] rounded-full text-gray-700 text-xl left-[-20px] leading-none" aria-label="Previous program" aria-controls="programas-carousel-track">‹</button>
-        <button class="carousel-button next absolute top-1/2 -translate-y-1/2 bg-white/70 hover:bg-white border border-gray-300 p-2.5 cursor-pointer z-[100] rounded-full text-gray-700 text-xl right-[-20px] leading-none" aria-label="Next program" aria-controls="programas-carousel-track">›</button>
+    <section class="py-8 text-center max-w-6xl mx-auto px-4">
+      <h1 class="text-4xl font-bold mb-4 text-gray-800">Nuestros Programas de Voluntariado</h1>
+      <p class="text-xl text-gray-600 mb-8">Ofrecemos oportunidades según tus habilidades e intereses.</p>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <article class="futuristic-card bg-white rounded-lg overflow-hidden shadow-lg">
+          <div class="i1 text-5xl p-8 bg-emerald-500">🌻</div>
+          <div class="p-6">
+			  <h3 class="text-2xl font-semibold mb-2 text-gray-800">Educación Inclusiva</h3>
+			  <p class="text-gray-600 mb-4">Apoya a estudiantes con necesidades especiales.</p>
+			  <button class="glow-button bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2 px-6 rounded-full transition-all">
+                <a class="text-white no-underline" href="{{ url_for('voluntario') }}">Participar</a>
+              </button>
+		  </div>
+        </article>
+		<article class="futuristic-card bg-white rounded-lg overflow-hidden shadow-lg">
+          <div class="i2 text-5xl p-8 bg-orange-500">🌼</div>
+		  <div class="p-6">
+			  <h3 class="text-2xl font-semibold mb-2 text-gray-800">Medio Ambiente</h3>
+			  <p class="text-gray-600 mb-4">Participa en proyectos de reforestación.</p>
+			  <button class="glow-button bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-6 rounded-full transition-all">
+                <a class="text-white no-underline" href="{{ url_for('organizador') }}">Participar</a>
+              </button>
+		  </div>
+        </article>
+		<article class="futuristic-card bg-white rounded-lg overflow-hidden shadow-lg">
+          <div class="i3 text-5xl p-8 bg-indigo-500">🌸</div>
+		  <div class="p-6">
+			  <h3 class="text-2xl font-semibold mb-2 text-gray-800">Apoyo Comunitario</h3>
+			  <p class="text-gray-600 mb-4">Colabora en comedores sociales y visitas a residencias de ancianos.</p>
+			  <button class="glow-button bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-6 rounded-full transition-all">
+                <a class="text-white no-underline" href="{{ url_for('administrador') }}">Participar</a>
+              </button>
+		  </div>
+        </article>
       </div>
     </section>
 
     <!-- Impacto -->
-    <section class="impacto">
-      <h2>Nuestro Impacto</h2>
-      <p>Juntos construimos un mundo más inclusivo.</p>
-      <div class="stats">
-        <div class="item">
-          <div class="ic-i"><!-- svg -->🧑‍💻</div>
-          <h3>5,000+</h3>
-          <p>Voluntarios activos</p>
-        </div>
-        <div class="item">
-          <div class="ic-i"><!-- svg -->🏢</div>
-          <h3>120+</h3>
-          <p>Proyectos realizados</p>
-        </div>
-		<div class="item">
-          <div class="ic-i"><!-- svg -->📍</div>
-          <h3>50+</h3>
-          <p>Comunidades beneficiadas</p>
+    <section class="py-16 bg-white">
+      <div class="max-w-6xl mx-auto px-4 text-center">
+        <h2 class="text-3xl font-bold mb-4 text-gray-800">Nuestro Impacto</h2>
+        <p class="text-xl text-gray-600 mb-12">Juntos construimos un mundo más inclusivo.</p>
+        <div class="flex flex-col md:flex-row justify-center gap-12 md:gap-24">
+          <div class="stat-item">
+            <div class="text-5xl mb-4">🧑‍💻</div>
+            <h3 class="text-4xl font-bold text-indigo-600 mb-2">5,000+</h3>
+            <p class="text-gray-600">Voluntarios activos</p>
+          </div>
+          <div class="stat-item">
+            <div class="text-5xl mb-4">🏢</div>
+            <h3 class="text-4xl font-bold text-indigo-600 mb-2">120+</h3>
+            <p class="text-gray-600">Proyectos realizados</p>
+          </div>
+          <div class="stat-item">
+            <div class="text-5xl mb-4">📍</div>
+            <h3 class="text-4xl font-bold text-indigo-600 mb-2">50+</h3>
+            <p class="text-gray-600">Comunidades beneficiadas</p>
+          </div>
         </div>
       </div>
     </section>
 
     <!-- Testimonios -->
-    <section class="test">
-      <h2>Testimonios</h2>
-      <p>Conoce las experiencias de nuestros voluntarios.</p>
-      <div class="test-cards">
-        <div class="test-card">
-          <div class="encab">
-			<div class="avatar">M</div>
-			<h4>María González</h4>
+    <section class="py-16 max-w-6xl mx-auto px-4">
+      <h2 class="text-3xl font-bold mb-4 text-center text-gray-800">Testimonios</h2>
+      <p class="text-xl text-gray-600 mb-12 text-center">Conoce las experiencias de nuestros voluntarios.</p>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div class="futuristic-card bg-white p-6 rounded-lg shadow-md">
+          <div class="flex items-center gap-4 mb-4">
+			<div class="w-10 h-10 bg-indigo-500 text-white rounded-full flex items-center justify-center font-bold">M</div>
+			<h4 class="text-lg font-semibold">María González</h4>
 		  </div>
-		  <p>Voluntaria desde 2020</p>
-          <p>"Participar en los programas de voluntariado inclusivo ha sido una de las experiencias más enriquecedoras de mi vida."</p>
+		  <p class="text-sm text-gray-500 mb-3">Voluntaria desde 2020</p>
+          <p class="text-gray-700">"Participar en los programas de voluntariado inclusivo ha sido una de las experiencias más enriquecedoras de mi vida."</p>
         </div>
-		<div class="test-card">
-          <div class="encab">
-			<div class="avatar">J</div>
-			<h4>Juan Pérez</h4>
+		<div class="futuristic-card bg-white p-6 rounded-lg shadow-md">
+          <div class="flex items-center gap-4 mb-4">
+			<div class="w-10 h-10 bg-indigo-500 text-white rounded-full flex items-center justify-center font-bold">J</div>
+			<h4 class="text-lg font-semibold">Juan Pérez</h4>
 		  </div>
-		  <p>Beneficiario</p>
-          <p>"Gracias a los programas educativos inclusivos, mi hijo ha podido desarrollar habilidades que pensábamos imposibles."</p>
+		  <p class="text-sm text-gray-500 mb-3">Beneficiario</p>
+          <p class="text-gray-700">"Gracias a los programas educativos inclusivos, mi hijo ha podido desarrollar habilidades que pensábamos imposibles."</p>
         </div>
-		<div class="test-card">
-          <div class="encab">
-			<div class="avatar">L</div>
-			<h4>Laura Martínez</h4>
+		<div class="futuristic-card bg-white p-6 rounded-lg shadow-md">
+          <div class="flex items-center gap-4 mb-4">
+			<div class="w-10 h-10 bg-indigo-500 text-white rounded-full flex items-center justify-center font-bold">L</div>
+			<h4 class="text-lg font-semibold">Laura Martínez</h4>			
 		  </div>
-		  <p>Coordinadora</p>
-          <p>"Ver cómo personas de diferentes capacidades trabajan juntas por un objetivo común es inspirador."</p>
+		  <p class="text-sm text-gray-500 mb-3">Coordinadora</p>
+          <p class="text-gray-700">"Ver cómo personas de diferentes capacidades trabajan juntas por un objetivo común es inspirador."</p>
         </div>
       </div>
     </section>
 
     <!-- CTA -->
-    <section class="cta">
-      <h2>¿Listo para unirte?</h2>
-      <p>Ayúdanos a construir un mundo inclusivo.</p>
-      <button id="ctaSignUpBtn" class="btn-p" onclick="abrirRegistro()">Registrarse ahora</button>
+    <section class="py-16 bg-indigo-600 text-white">
+      <div class="max-w-4xl mx-auto px-4 text-center">
+        <h2 class="text-3xl font-bold mb-4">¿Listo para unirte?</h2>
+        <p class="text-xl mb-8 opacity-90">Ayúdanos a construir un mundo inclusivo.</p>
+        <button id="ctaSignUpBtn" onclick="abrirRegistro()" class="glow-button bg-white text-indigo-600 hover:bg-gray-100 font-bold py-3 px-8 rounded-full text-lg transition-all">
+          Registrarse ahora
+        </button>
+      </div>
     </section>
   </main>
 
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-    const track = document.querySelector('.carousel-track');
-    if (!track) {
-        console.warn('Carousel track not found');
-        return;
-    }
-    const slides = Array.from(track.querySelectorAll('.carousel-slide'));
-    const nextButton = document.querySelector('.carousel-button.next');
-    const prevButton = document.querySelector('.carousel-button.prev');
-
-    if (!nextButton || !prevButton || slides.length === 0) {
-        console.warn('Carousel buttons or slides not found. Slides count:', slides.length);
-        return;
-    }
-
-    let slideWidth = 0; // Will be calculated
-    let currentIndex = 0;
-
-    const updateAriaLabels = () => {
-        slides.forEach((slide, index) => {
-            const slideTitleElement = slide.querySelector('h3');
-            const slideTitle = slideTitleElement ? slideTitleElement.textContent.trim() : '';
-            slide.setAttribute('aria-label', `Programa ${index + 1} de ${slides.length}${slideTitle ? ': ' + slideTitle : ''}`);
-        });
-    };
-
-    const calculateAndSetSlideWidth = () => {
-        if (slides.length > 0) {
-            // Ensure slides are visible before calculating width
-            // Temporarily remove transform to get accurate width if needed, then reapply
-            // However, getBoundingClientRect should work even with transform
-            slideWidth = slides[0].getBoundingClientRect().width;
-            if (slideWidth === 0) {
-                console.warn("Calculated slideWidth is 0. Carousel might not work as expected if slides are hidden initially.");
-            }
-        }
-        return slideWidth;
-    };
-
-    const updateCarouselVisuals = () => {
-        if (slideWidth > 0) {
-            track.style.transform = 'translateX(-' + (slideWidth * currentIndex) + 'px)';
-        }
-        slides.forEach((slide, index) => {
-            if (index === currentIndex) {
-                slide.classList.remove('opacity-50'); // Example: current slide is fully visible
-                slide.setAttribute('aria-hidden', 'false');
-            } else {
-                slide.classList.add('opacity-50'); // Example: non-current slides are dimmed
-                slide.setAttribute('aria-hidden', 'true');
-            }
-        });
-    };
-
-    const moveToSlide = (newIndex) => {
-        currentIndex = newIndex;
-        updateCarouselVisuals();
-    };
-
-    prevButton.addEventListener('click', () => {
-        let newIndex = currentIndex - 1;
-        if (newIndex < 0) {
-            newIndex = slides.length - 1;
-        }
-        moveToSlide(newIndex);
-    });
-
-    nextButton.addEventListener('click', () => {
-        let newIndex = currentIndex + 1;
-        if (newIndex >= slides.length) {
-            newIndex = 0;
-        }
-        moveToSlide(newIndex);
-    });
-
-    const initializeCarousel = () => {
-        updateAriaLabels();
-
-        // Delay initial width calculation and position update slightly
-        // to ensure all CSS has been applied and elements are rendered.
-        setTimeout(() => {
-            if (calculateAndSetSlideWidth() > 0) {
-                updateCarouselVisuals();
-            } else {
-                // Fallback or retry if width is still 0
-                console.warn("Slide width is 0 after initial timeout. Retrying calculation...");
-                setTimeout(() => {
-                    if(calculateAndSetSlideWidth() > 0) {
-                        updateCarouselVisuals();
-                    } else {
-                        console.error("Slide width remained 0. Carousel may not display correctly.");
-                    }
-                }, 500); // Longer delay for a second attempt
-            }
-        }, 100); // Initial short delay
-    };
-
-    initializeCarousel();
-
-    window.addEventListener('resize', () => {
-        // Consider debouncing or throttling this for performance
-        if (calculateAndSetSlideWidth() > 0) {
-            updateCarouselVisuals(); // Update position based on new width and current index
-        }
-    });
-});
-</script>
 {% endblock %}
