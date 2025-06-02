@@ -59,14 +59,14 @@ class Usuarios(db.Model, UserMixin):
     nombre = db.Column(db.String(100), nullable=False)
     contrasena_hash = db.Column(db.String(255), nullable=False)
     perfil = db.Column(db.Enum('voluntario', 'organizador', 'administrador', name='perfil_enum'), nullable=False)
-    estado_usuario = db.Column(db.Enum(EstadoUsuario), nullable=False, default=EstadoUsuario.ACTIVO) # Usando Enum de Python
+    estado_usuario = db.Column(db.Enum(EstadoUsuario, name='estado_usuario_enum'), nullable=False, default=EstadoUsuario.ACTIVO) # Usando Enum de Python
     fecha_registro = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
 
     # Campos opcionales en el registro inicial (se llenarán después)
     apellido = db.Column(db.String(100), nullable=True)
     celular = db.Column(db.String(9), unique=True, nullable=True)
     email = db.Column(db.String(150), unique=True, nullable=True)
-    direccion = db.Column(db.Text, nullable=True)
+    direccion = db.Column(db.String(255), nullable=True)
     fecha_nacimiento = db.Column(db.Date, nullable=True)
     genero = db.Column(db.Enum('masculino', 'femenino', name='genero_enum'))
 
@@ -145,7 +145,7 @@ class Actividades(db.Model):
     habilidades_requeridas = db.Column(db.Text)
     es_inclusiva = db.Column(db.Boolean, default=False)
     cupo_maximo = db.Column(db.Integer)
-    estado = db.Column(db.Enum(EstadoActividad, name='tipo_actividad_enum'), default=EstadoActividad.ABIERTO) # Usando Enum de Python
+    estado = db.Column(db.Enum(EstadoActividad, name='estado_actividad_enum_new'), default=EstadoActividad.ABIERTO) # Usando Enum de Python
     imagen = db.Column(db.String(255))
     compatibilidad = db.Column(db.DECIMAL(5, 2))
     etiqueta = db.Column(db.String(100))
