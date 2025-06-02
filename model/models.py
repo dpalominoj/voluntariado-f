@@ -59,29 +59,32 @@ actividad_facilidad_table = Table('actividad_facilidad', db.Model.metadata,
 class Usuarios(db.Model, UserMixin):
     __tablename__ = 'usuarios'
     id_usuario = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    DNI = db.Column(db.String(8), unique=True, nullable=True)
-    nombre = db.Column(db.String(100)) # Changed from nombre_usuario, removed nombre_completo
-    apellido = db.Column(db.String(100), nullable=True)
-    email = db.Column(db.String(150), unique=True, nullable=False) # Changed from correo_electronico
-    contrasena_hash = db.Column(db.String(255), nullable=False) # Changed from contrasena
-    celular = db.Column(db.String(9), nullable=True)
-    direccion = db.Column(db.Text, nullable=True)
-    fecha_nacimiento = db.Column(db.Date, nullable=True)
-    genero = db.Column(db.Enum('masculino', 'femenino', name='genero_enum'), nullable=True)
-    perfil = db.Column(db.Enum('voluntario', 'organizador', 'administrador', name='perfil_enum'), nullable=False) # Changed from rol
-    estado_usuario = db.Column(db.Enum('activo', 'inactivo', name='estado_usuario_enum'), nullable=True, default='activo')
-    fecha_registro = db.Column(db.DateTime, default=datetime.utcnow)
-    # Removed: nombre_usuario, correo_electronico, nombre_completo, foto_perfil, rol, fecha_creacion, ultima_actualizacion, activo
 
+    # Campos obligatorios en el registro inicial
+    DNI = db.Column(db.String(8), unique=True, nullable=False) # Obligatorio
+    nombre = db.Column(db.String(100), nullable=False)
+    contrasena_hash = db.Column(db.String(255), nullable=False)
+    perfil = db.Column(db.Enum('voluntario', 'organizador', 'administrador', name='perfil_enum'), nullable=False)
+    estado_usuario = db.Column(db.Enum(EstadoUsuario, name='estado_usuario_enum'), nullable=False, default=EstadoUsuario.ACTIVO) # Usando Enum de Python
+    fecha_registro = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+
+    # Campos opcionales en el registro inicial (se llenarán después)
+    apellido = db.Column(db.String(100), nullable=True)
+    celular = db.Column(db.String(9), unique=True, nullable=True)
+    email = db.Column(db.String(150), unique=True, nullable=True)
+    direccion = db.Column(db.String(255), nullable=True)
+    fecha_nacimiento = db.Column(db.Date, nullable=True)
+    genero = db.Column(db.Enum('masculino', 'femenino', name='genero_enum'))
+
+    # Relationships
     organizaciones = relationship("Organizaciones", secondary=usuario_organizacion_table, back_populates="usuarios")
     preferencias = relationship("Preferencias", secondary=usuarios_preferencia_table, back_populates="usuarios")
-    # Old discapacidades relationship removed, new one 'discapacidades_pivot' will be added
+    discapacidades_pivot = relationship("UsuarioDiscapacidad", back_populates="usuario", cascade="all, delete-orphan")
     inscripciones = relationship("Inscripciones", back_populates="usuario")
     notificaciones = relationship("Notificaciones", back_populates="usuario")
     feedback = relationship("Feedback", back_populates="usuario")
     recomendaciones = relationship("Recomendaciones", back_populates="usuario")
     interacciones_chatbot = relationship("InteraccionesChatbot", back_populates="usuario")
-    discapacidades_pivot = db.relationship("UsuarioDiscapacidad", back_populates="usuario", cascade="all, delete-orphan") # New relationship
 
     def set_password(self, password):
         self.contrasena_hash = generate_password_hash(password) # Updated to contrasena_hash
