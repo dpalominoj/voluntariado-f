@@ -1,29 +1,28 @@
 from flask_login import UserMixin
-from database.db import db
+from database.db import db  # Asegúrate que esto inicializa SQLAlchemy correctamente
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 import enum
-from sqlalchemy import Table
 
-# Association tables
-usuario_organizacion_table = Table('usuario_organizacion', db.Model.metadata,
-    Column('usuario_id', Integer, ForeignKey('usuarios.id_usuario'), primary_key=True),
-    Column('organizacion_id', Integer, ForeignKey('organizaciones.id_organizacion'), primary_key=True)
+# --- Tablas de asociación (usando db de Flask-SQLAlchemy) ---
+usuario_organizacion_table = db.Table('usuario_organizacion', db.metadata,
+    db.Column('usuario_id', db.Integer, db.ForeignKey('usuarios.id_usuario'), primary_key=True),
+    db.Column('organizacion_id', db.Integer, db.ForeignKey('organizaciones.id_organizacion'), primary_key=True)
 )
 
-usuarios_preferencia_table = Table('usuarios_preferencia', db.Model.metadata,
-    Column('usuario_id', Integer, ForeignKey('usuarios.id_usuario'), primary_key=True),
-    Column('preferencia_id', Integer, ForeignKey('preferencias.id_preferencia'), primary_key=True)
+usuarios_preferencia_table = db.Table('usuarios_preferencia', db.metadata,
+    db.Column('usuario_id', db.Integer, db.ForeignKey('usuarios.id_usuario'), primary_key=True),
+    db.Column('preferencia_id', db.Integer, db.ForeignKey('preferencias.id_preferencia'), primary_key=True)
 )
 
-actividad_discapacidad_table = Table('actividad_discapacidad', db.Model.metadata,
-    Column('actividad_id', Integer, ForeignKey('actividades.id_actividad'), primary_key=True),
-    Column('discapacidad_id', Integer, ForeignKey('discapacidades.id_discapacidad'), primary_key=True)
+actividad_discapacidad_table = db.Table('actividad_discapacidad', db.metadata,
+    db.Column('actividad_id', db.Integer, db.ForeignKey('actividades.id_actividad'), primary_key=True),
+    db.Column('discapacidad_id', db.Integer, db.ForeignKey('discapacidades.id_discapacidad'), primary_key=True)
 )
 
-actividad_facilidad_table = Table('actividad_facilidad', db.Model.metadata,
-    Column('actividad_id', Integer, ForeignKey('actividades.id_actividad'), primary_key=True),
-    Column('facilidad_id', Integer, ForeignKey('facilidad.id_facilidad'), primary_key=True)
+actividad_facilidad_table = db.Table('actividad_facilidad', db.metadata,
+    db.Column('actividad_id', db.Integer, db.ForeignKey('actividades.id_actividad'), primary_key=True),
+    db.Column('facilidad_id', db.Integer, db.ForeignKey('facilidad.id_facilidad'), primary_key=True)
 )
 
 # --- Definición de Enums ---
@@ -49,19 +48,20 @@ class TipoRecomendacion(enum.Enum):
     GRUPAL = "G"
     BUENAS_PRACTICAS = "BP"
 
+# --- Modelos ---
 class Usuarios(db.Model, UserMixin):
     __tablename__ = 'usuarios'
     id_usuario = db.Column(db.Integer, primary_key=True, autoincrement=True)
 
-    # Campos obligatorios en el registro inicial
+    # Campos obligatorios
     DNI = db.Column(db.String(8), unique=True, nullable=False)
     nombre = db.Column(db.String(100), nullable=False)
     contrasena_hash = db.Column(db.String(255), nullable=False)
     perfil = db.Column(db.Enum('voluntario', 'organizador', 'administrador', name='perfil_enum'), nullable=False)
-    estado_usuario = db.Column(db.Enum(EstadoUsuario, name='estado_usuario_enum'), nullable=False, default=EstadoUsuario.ACTIVO) # Usando Enum de Python
+    estado_usuario = db.Column(db.Enum(EstadoUsuario, name='estado_usuario_enum'), nullable=False, default=EstadoUsuario.ACTIVO)
     fecha_registro = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
 
-    # Campos opcionales en el registro inicial (se llenarán después)
+    # Campos opcionales
     apellido = db.Column(db.String(100), nullable=True)
     celular = db.Column(db.String(9), unique=True, nullable=True)
     email = db.Column(db.String(150), unique=True, nullable=True)
@@ -69,15 +69,15 @@ class Usuarios(db.Model, UserMixin):
     fecha_nacimiento = db.Column(db.Date, nullable=True)
     genero = db.Column(db.Enum('masculino', 'femenino', name='genero_enum'))
 
-    # Relationships
-    organizaciones = relationship("Organizaciones", secondary=usuario_organizacion_table, back_populates="usuarios")
-    preferencias = relationship("Preferencias", secondary=usuarios_preferencia_table, back_populates="usuarios")
-    discapacidades_pivot = relationship("UsuarioDiscapacidad", back_populates="usuario", cascade="all, delete-orphan")
-    inscripciones = relationship("Inscripciones", back_populates="usuario")
-    notificaciones = relationship("Notificaciones", back_populates="usuario")
-    feedback = relationship("Feedback", back_populates="usuario")
-    recomendaciones = relationship("Recomendaciones", back_populates="usuario")
-    interacciones_chatbot = relationship("InteraccionesChatbot", back_populates="usuario")
+    # Relaciones
+    organizaciones = db.relationship("Organizaciones", secondary=usuario_organizacion_table, back_populates="usuarios")
+    preferencias = db.relationship("Preferencias", secondary=usuarios_preferencia_table, back_populates="usuarios")
+    discapacidades_pivot = db.relationship("UsuarioDiscapacidad", back_populates="usuario", cascade="all, delete-orphan")
+    inscripciones = db.relationship("Inscripciones", back_populates="usuario")
+    notificaciones = db.relationship("Notificaciones", back_populates="usuario")
+    feedback = db.relationship("Feedback", back_populates="usuario")
+    recomendaciones = db.relationship("Recomendaciones", back_populates="usuario")
+    interacciones_chatbot = db.relationship("InteraccionesChatbot", back_populates="usuario")
 
     def set_password(self, password):
         self.contrasena_hash = generate_password_hash(password)
@@ -88,7 +88,6 @@ class Usuarios(db.Model, UserMixin):
     def get_id(self):
         return str(self.id_usuario)
 
-
 class Organizaciones(db.Model):
     __tablename__ = 'organizaciones'
     id_organizacion = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -98,10 +97,9 @@ class Organizaciones(db.Model):
     logo = db.Column(db.Text)
     fecha_registro = db.Column(db.DateTime, default=datetime.utcnow)
 
-    # Relationships
-    usuarios = relationship("Usuarios", secondary=usuario_organizacion_table, back_populates="organizaciones")
-    actividades = relationship("Actividades", back_populates="organizacion")
-
+    # Relaciones
+    usuarios = db.relationship("Usuarios", secondary=usuario_organizacion_table, back_populates="organizaciones")
+    actividades = db.relationship("Actividades", back_populates="organizacion")
 
 class Preferencias(db.Model):
     __tablename__ = 'preferencias'
@@ -109,29 +107,26 @@ class Preferencias(db.Model):
     nombre_corto = db.Column(db.String(50), unique=True)
     descripcion_detallada = db.Column(db.Text)
 
-    usuarios = relationship("Usuarios", secondary=usuarios_preferencia_table, back_populates="preferencias")
-
+    usuarios = db.relationship("Usuarios", secondary=usuarios_preferencia_table, back_populates="preferencias")
 
 class UsuarioDiscapacidad(db.Model):
     __tablename__ = 'usuario_discapacidad'
-    id_usuario = db.Column(db.Integer, ForeignKey('usuarios.id_usuario'), primary_key=True)
-    id_discapacidad = db.Column(db.Integer, ForeignKey('discapacidades.id_discapacidad'), primary_key=True)
+    id_usuario = db.Column(db.Integer, db.ForeignKey('usuarios.id_usuario'), primary_key=True)
+    id_discapacidad = db.Column(db.Integer, db.ForeignKey('discapacidades.id_discapacidad'), primary_key=True)
     gravedad = db.Column(db.Enum('leve', 'moderada', 'grave', name='gravedad_enum'))
     apoyo_requerido = db.Column(db.Enum('interprete', 'otros', name='apoyo_requerido_enum'))
 
-    usuario = relationship("Usuarios", back_populates="discapacidades_pivot")
-    discapacidad = relationship("Discapacidades", back_populates="usuarios_pivot")
-
+    usuario = db.relationship("Usuarios", back_populates="discapacidades_pivot")
+    discapacidad = db.relationship("Discapacidades", back_populates="usuarios_pivot")
 
 class Discapacidades(db.Model):
     __tablename__ = 'discapacidades'
     id_discapacidad = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    nombre = db.Column(db.Enum(TipoDiscapacidad), unique=True) # Usando Enum de Python
+    nombre = db.Column(db.Enum(TipoDiscapacidad), unique=True)
     descripcion = db.Column(db.Text)
 
-    usuarios_pivot = relationship("UsuarioDiscapacidad", back_populates="discapacidad", cascade="all, delete-orphan")
-    actividades = relationship("Actividades", secondary=actividad_discapacidad_table, back_populates="discapacidades")
-
+    usuarios_pivot = db.relationship("UsuarioDiscapacidad", back_populates="discapacidad", cascade="all, delete-orphan")
+    actividades = db.relationship("Actividades", secondary=actividad_discapacidad_table, back_populates="discapacidades")
 
 class Actividades(db.Model):
     __tablename__ = 'actividades'
@@ -144,31 +139,29 @@ class Actividades(db.Model):
     habilidades_requeridas = db.Column(db.Text)
     es_inclusiva = db.Column(db.Boolean, default=False)
     cupo_maximo = db.Column(db.Integer)
-    estado = db.Column(db.Enum(EstadoActividad, name='estado_actividad_enum_new'), default=EstadoActividad.ABIERTO) # Usando Enum de Python
+    estado = db.Column(db.Enum(EstadoActividad, name='estado_actividad_enum'), default=EstadoActividad.ABIERTO)
     imagen = db.Column(db.String(255))
-    compatibilidad = db.Column(db.DECIMAL(5, 2))
+    compatibilidad = db.Column(db.Numeric(5, 2))  # Corregido a Numeric
     etiqueta = db.Column(db.String(100))
-    id_organizacion = db.Column(db.Integer, ForeignKey('organizaciones.id_organizacion'))
+    id_organizacion = db.Column(db.Integer, db.ForeignKey('organizaciones.id_organizacion'))
 
-    # Relationships
-    organizacion = relationship("Organizaciones", back_populates="actividades")
-    discapacidades = relationship("Discapacidades", secondary=actividad_discapacidad_table, back_populates="actividades")
-    facilidades = relationship("Facilidad", secondary=actividad_facilidad_table, back_populates="actividades")
-    auditoria_actividad = relationship("AuditoriaActividad", back_populates="actividad")
-    inscripciones = relationship("Inscripciones", back_populates="actividad")
-
+    # Relaciones
+    organizacion = db.relationship("Organizaciones", back_populates="actividades")
+    discapacidades = db.relationship("Discapacidades", secondary=actividad_discapacidad_table, back_populates="actividades")
+    facilidades = db.relationship("Facilidad", secondary=actividad_facilidad_table, back_populates="actividades")
+    auditoria_actividad = db.relationship("AuditoriaActividad", back_populates="actividad")
+    inscripciones = db.relationship("Inscripciones", back_populates="actividad")
 
 class AuditoriaActividad(db.Model):
     __tablename__ = 'auditoria_actividad'
     id_auditoria = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    id_actividad = db.Column(db.Integer, ForeignKey('actividades.id_actividad'), nullable=False)
-    id_usuario = db.Column(db.Integer, ForeignKey('usuarios.id_usuario'))
+    id_actividad = db.Column(db.Integer, db.ForeignKey('actividades.id_actividad'), nullable=False)
+    id_usuario = db.Column(db.Integer, db.ForeignKey('usuarios.id_usuario'))
     IP_usuario = db.Column(db.String(45))
     fecha_registro = db.Column(db.DateTime, default=datetime.utcnow)
 
-    actividad = relationship("Actividades", back_populates="auditoria_actividad")
-    usuario = relationship("Usuarios")
-
+    actividad = db.relationship("Actividades", back_populates="auditoria_actividad")
+    usuario = db.relationship("Usuarios")
 
 class Facilidad(db.Model):
     __tablename__ = 'facilidad'
@@ -176,74 +169,67 @@ class Facilidad(db.Model):
     nombre_facilidad = db.Column(db.String(255), unique=True, nullable=False)
     descripcion = db.Column(db.String(255))
 
-    actividades = relationship("Actividades", secondary=actividad_facilidad_table, back_populates="facilidades")
-
+    actividades = db.relationship("Actividades", secondary=actividad_facilidad_table, back_populates="facilidades")
 
 class Inscripciones(db.Model):
     __tablename__ = 'inscripciones'
     id_inscripcion = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    id_usuario = db.Column(db.Integer, ForeignKey('usuarios.id_usuario'), nullable=False)
-    id_actividad = db.Column(db.Integer, ForeignKey('actividades.id_actividad'), nullable=False)
+    id_usuario = db.Column(db.Integer, db.ForeignKey('usuarios.id_usuario'), nullable=False)
+    id_actividad = db.Column(db.Integer, db.ForeignKey('actividades.id_actividad'), nullable=False)
     fecha_inscripcion = db.Column(db.DateTime, default=datetime.utcnow)
 
-    usuario = relationship("Usuarios", back_populates="inscripciones")
-    actividad = relationship("Actividades", back_populates="inscripciones")
-
+    usuario = db.relationship("Usuarios", back_populates="inscripciones")
+    actividad = db.relationship("Actividades", back_populates="inscripciones")
 
 class Notificaciones(db.Model):
     __tablename__ = 'notificaciones'
     id_notificacion = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    id_usuario = db.Column(db.Integer, ForeignKey('usuarios.id_usuario'), nullable=False)
+    id_usuario = db.Column(db.Integer, db.ForeignKey('usuarios.id_usuario'), nullable=False)
     mensaje = db.Column(db.Text, nullable=False)
     fecha_envio = db.Column(db.DateTime, default=datetime.utcnow)
     leida = db.Column(db.Boolean, default=False)
     prioridad = db.Column(db.Enum('alta', 'media', 'baja', name='prioridad_enum'))
 
-    usuario = relationship("Usuarios", back_populates="notificaciones")
-
+    usuario = db.relationship("Usuarios", back_populates="notificaciones")
 
 class Feedback(db.Model):
     __tablename__ = 'feedback'
     id_feedback = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    id_usuario = db.Column(db.Integer, ForeignKey('usuarios.id_usuario'), nullable=False)
-    id_actividad = db.Column(db.Integer, ForeignKey('actividades.id_actividad'))
+    id_usuario = db.Column(db.Integer, db.ForeignKey('usuarios.id_usuario'), nullable=False)
+    id_actividad = db.Column(db.Integer, db.ForeignKey('actividades.id_actividad'))
     puntuacion = db.Column(db.Integer)
     comentario = db.Column(db.Text)
     fecha = db.Column(db.DateTime, default=datetime.utcnow)
 
-    usuario = relationship("Usuarios", back_populates="feedback")
-    actividad = relationship("Actividades")
-
+    usuario = db.relationship("Usuarios", back_populates="feedback")
+    actividad = db.relationship("Actividades")
 
 class Recomendaciones(db.Model):
     __tablename__ = 'recomendaciones'
     id_recomendacion = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    id_usuario = db.Column(db.Integer, ForeignKey('usuarios.id_usuario'), nullable=False)
-    id_actividad = db.Column(db.Integer, ForeignKey('actividades.id_actividad'), nullable=False)
-    tipo_recomendacion = db.Column(db.Enum(TipoRecomendacion, name='tipo_recomendacion_enum')) # Usando Enum de Python
-   
+    id_usuario = db.Column(db.Integer, db.ForeignKey('usuarios.id_usuario'), nullable=False)
+    id_actividad = db.Column(db.Integer, db.ForeignKey('actividades.id_actividad'), nullable=False)
+    tipo_recomendacion = db.Column(db.Enum(TipoRecomendacion, name='tipo_recomendacion_enum'))
     descripcion = db.Column(db.Text)
     fecha = db.Column(db.DateTime, default=datetime.utcnow)
 
-    usuario = relationship("Usuarios", back_populates="recomendaciones")
-    actividad = relationship("Actividades")
-
+    usuario = db.relationship("Usuarios", back_populates="recomendaciones")
+    actividad = db.relationship("Actividades")
 
 class Tendencias(db.Model):
     __tablename__ = 'tendencias'
     id_tendencia = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    id_actividad = db.Column(db.Integer, ForeignKey('actividades.id_actividad'))
+    id_actividad = db.Column(db.Integer, db.ForeignKey('actividades.id_actividad'))
     cantidad_participantes = db.Column(db.Integer)
-    puntuacion_promedio = db.Column(db.DECIMAL(3,2))
+    puntuacion_promedio = db.Column(db.Numeric(3, 2))  # Corregido a Numeric
     fecha = db.Column(db.DateTime, default=datetime.utcnow)
-
 
 class InteraccionesChatbot(db.Model):
     __tablename__ = 'interacciones_chatbot'
     id_interaccion = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    id_usuario = db.Column(db.Integer, ForeignKey('usuarios.id_usuario'))
+    id_usuario = db.Column(db.Integer, db.ForeignKey('usuarios.id_usuario'))
     mensaje_usuario = db.Column(db.Text)
     respuesta_chatbot = db.Column(db.Text)
     fecha = db.Column(db.DateTime, default=datetime.utcnow)
 
-    usuario = relationship("Usuarios", back_populates="interacciones_chatbot")
+    usuario = db.relationship("Usuarios", back_populates="interacciones_chatbot")
