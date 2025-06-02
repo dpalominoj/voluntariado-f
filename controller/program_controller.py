@@ -11,7 +11,7 @@ def get_programs_compatibility():
     programs = []
 
     if current_user.is_anonymous:
-        programs = Actividades.query.filter(Actividades.estado != 'cerrado').all()
+        programs = Actividades.query.filter(Actividades.estado == 'abierto').all()
         # compatibility_scores remains {}
 
     elif current_user.is_authenticated:
@@ -49,10 +49,13 @@ def get_programs_compatibility():
                     print(f"Error calculating compatibility scores: {e}")
                     # compatibility_scores remains empty or you could set it to None or an error indicator
         else: # Authenticated but not a voluntario
-            programs = Actividades.query.filter(Actividades.estado != 'cerrado').all()
+            programs = Actividades.query.filter(Actividades.estado == 'abierto').all()
             # compatibility_scores remains {}
-    else: # Should not happen if is_anonymous or is_authenticated is always true for a user object
-        programs = Actividades.query.filter(Actividades.estado != 'cerrado').all()
+    # The 'else' case for when a user is neither anonymous nor authenticated should ideally not be reached
+    # if Flask-Login is correctly configured, as current_user should always be one or the other.
+    # However, to be safe, we can default to showing 'abierto' programs.
+    else:
+        programs = Actividades.query.filter(Actividades.estado == 'abierto').all()
         # compatibility_scores remains {}
 
     return programs, compatibility_scores
