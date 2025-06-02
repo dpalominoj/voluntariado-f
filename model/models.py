@@ -1,15 +1,33 @@
 from flask_login import UserMixin
 from database.db import db # Import db
 from werkzeug.security import generate_password_hash, check_password_hash
-
 from sqlalchemy import Column, Integer, String, Text, ForeignKey, DateTime, Enum, Boolean, DECIMAL, Table, func
-
 from sqlalchemy.orm import relationship
-
-# from sqlalchemy.ext.declarative import declarative_base # Removed unused import
 from datetime import datetime
+import enum
 
-# Base = declarative_base() # Removed
+# --- Definición de Enums ---
+class TipoDiscapacidad(enum.Enum):
+    AUDITIVA = "Auditiva"
+    VISUAL = "Visual"
+    MOTRIZ = "Motriz"
+
+class EstadoActividad(enum.Enum):
+    ABIERTO = "abierto"
+    CERRADO = "cerrado"
+    CANCELADA = "cancelada"
+    FINALIZADA = "finalizada"
+
+class EstadoUsuario(enum.Enum):
+    ACTIVO = "activo"
+    INACTIVO = "inactivo"
+    SUSPENDIDO = "suspendido"
+    BLOQUEADO = "bloqueado"
+
+class TipoRecomendacion(enum.Enum):
+    PERSONALIZADA = "P"
+    GRUPAL = "G"
+    BUENAS_PRACTICAS = "BP"
 
 # Association table for Usuarios and Organizaciones (many-to-many)
 usuario_organizacion_table = Table('usuario_organizacion', db.Model.metadata, # Changed Base.metadata to db.Model.metadata
