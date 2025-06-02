@@ -15,8 +15,8 @@ class TipoDiscapacidad(enum.Enum):
 class EstadoActividad(enum.Enum):
     ABIERTO = "abierto"
     CERRADO = "cerrado"
-    CANCELADA = "cancelada"
-    FINALIZADA = "finalizada"
+    #CANCELADA = "cancelada"
+    #FINALIZADA = "finalizada"
 
 class EstadoUsuario(enum.Enum):
     ACTIVO = "activo"
@@ -145,7 +145,7 @@ class Actividades(db.Model):
     habilidades_requeridas = db.Column(db.Text)
     es_inclusiva = db.Column(db.Boolean, default=False)
     cupo_maximo = db.Column(db.Integer)
-    estado = db.Column(db.Enum(EstadoActividad, name='estado_actividad_enum_new'), default=EstadoActividad.ABIERTO) # Usando Enum de Python
+    estado = db.Column(db.Enum(EstadoActividad, name='estado_actividad_enum'), default=EstadoActividad.ABIERTO) # Usando Enum de Python
     imagen = db.Column(db.String(255))
     compatibilidad = db.Column(db.DECIMAL(5, 2))
     etiqueta = db.Column(db.String(100))
