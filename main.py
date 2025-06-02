@@ -4,6 +4,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy import Column, Integer, String, Text, ForeignKey, DateTime, Enum, Boolean, DECIMAL, Table
 from sqlalchemy.orm import relationship
 from datetime import datetime
+import enum
 
 # Association tables
 usuario_organizacion_table = Table('usuario_organizacion', db.Model.metadata,
