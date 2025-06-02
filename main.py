@@ -1,6 +1,6 @@
 import os
-from flask import FlaskAdd commentMore actions
-from sqlalchemy import inspect # Added inspect
+from flask import Flask
+from sqlalchemy import inspect
 from database.db import db, init_app
 from controller.routes import main_bp
 from controller.auth_routes import auth_bp
