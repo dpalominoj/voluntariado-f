@@ -10,13 +10,13 @@ def get_programs_compatibility():
     if current_user.is_anonymous:
         # Scenario 1: Anonymous user
         # Show all programs with estado != 'cerrado'
-        programs = Actividades.query.filter(Actividades.estado != 'cerrado').all()
+        programs = Actividades.query.filter(Actividades.estado = 'abierto').all()
         # compatibility_scores remains {}
 
     elif current_user.is_authenticated:
         if current_user.perfil == 'voluntario':
             # Existing logic for volunteers: show programs with estado != 'cerrado' and calculate compatibility
-            programs = Actividades.query.filter(Actividades.estado != 'cerrado').all()
+            programs = Actividades.query.filter(Actividades.estado = 'abierto').all()
 
             user_disabilities = [udp.discapacidad.nombre for udp in current_user.discapacidades_pivot if udp.discapacidad and udp.discapacidad.nombre]
             user_interests = [pref.nombre_corto for pref in current_user.preferencias if pref.nombre_corto]
@@ -65,19 +65,19 @@ def get_programs_compatibility():
         elif current_user.perfil == 'administrador':
             # Authenticated 'administrador'
             # Show all programs with estado != 'cerrado'
-            programs = Actividades.query.filter(Actividades.estado != 'cerrado').all()
+            programs = Actividades.query.filter(Actividades.estado = 'abierto').all()
             # compatibility_scores remains {}
 
         else: # Other authenticated users (if any future roles are added)
             # Default for other authenticated roles: show 'abierto' programs or all non-closed programs
             # For now, let's align with showing all non-closed programs as a general rule.
-            programs = Actividades.query.filter(Actividades.estado != 'cerrado').all()
+            programs = Actividades.query.filter(Actividades.estado = 'abierto').all()
             # compatibility_scores remains {}
 
     else:
         # This case should ideally not be reached if Flask-Login is correctly configured.
         # Default to showing non-closed programs as a fallback.
-        programs = Actividades.query.filter(Actividades.estado != 'cerrado').all()
+        programs = Actividades.query.filter(Actividades.estado = 'abierto').all()
         # compatibility_scores remains {}
 
     return programs, compatibility_scores
