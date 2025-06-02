@@ -1,83 +1,249 @@
-import os
-from flask import Flask
-from sqlalchemy import inspect # Added inspect
-from database.db import db, init_app
-from controller.routes import main_bp
-from controller.auth_routes import auth_bp
-from controller.dashboard_routes import dashboard_bp
-from flask_login import LoginManager
-from flask_migrate import Migrate # Import Migrate
-from model.models import Usuarios # Changed User to Usuarios
-from database.datos_iniciales import seed_data # Added import for seed_data
+from flask_login import UserMixin
+from database.db import db
+from werkzeug.security import generate_password_hash, check_password_hash
+from sqlalchemy import Column, Integer, String, Text, ForeignKey, DateTime, Enum, Boolean, DECIMAL, Table
+from sqlalchemy.orm import relationship
+from datetime import datetime
+
+# Association tables
+usuario_organizacion_table = Table('usuario_organizacion', db.Model.metadata,
+    Column('usuario_id', Integer, ForeignKey('usuarios.id_usuario'), primary_key=True),
+    Column('organizacion_id', Integer, ForeignKey('organizaciones.id_organizacion'), primary_key=True)
+)
+
+usuarios_preferencia_table = Table('usuarios_preferencia', db.Model.metadata,
+    Column('usuario_id', Integer, ForeignKey('usuarios.id_usuario'), primary_key=True),
+    Column('preferencia_id', Integer, ForeignKey('preferencias.id_preferencia'), primary_key=True)
+)
+
+actividad_discapacidad_table = Table('actividad_discapacidad', db.Model.metadata,
+    Column('actividad_id', Integer, ForeignKey('actividades.id_actividad'), primary_key=True),
+    Column('discapacidad_id', Integer, ForeignKey('discapacidades.id_discapacidad'), primary_key=True)
+)
+
+actividad_facilidad_table = Table('actividad_facilidad', db.Model.metadata,
+    Column('actividad_id', Integer, ForeignKey('actividades.id_actividad'), primary_key=True),
+    Column('facilidad_id', Integer, ForeignKey('facilidad.id_facilidad'), primary_key=True)
+)
+
+# --- Definición de Enums ---
+class TipoDiscapacidad(enum.Enum):
+    AUDITIVA = "Auditiva"
+    VISUAL = "Visual"
+    MOTRIZ = "Motriz"
+
+class EstadoActividad(enum.Enum):
+    ABIERTO = "abierto"
+    CERRADO = "cerrado"
+    CANCELADA = "cancelada"
+    FINALIZADA = "finalizada"
+
+class EstadoUsuario(enum.Enum):
+    ACTIVO = "activo"
+    INACTIVO = "inactivo"
+    SUSPENDIDO = "suspendido"
+    BLOQUEADO = "bloqueado"
+
+class TipoRecomendacion(enum.Enum):
+    PERSONALIZADA = "P"
+    GRUPAL = "G"
+    BUENAS_PRACTICAS = "BP"
+
+class Usuarios(db.Model, UserMixin):
+    __tablename__ = 'usuarios'
+    id_usuario = db.Column(db.Integer, primary_key=True, autoincrement=True)
+
+    # Campos obligatorios en el registro inicial
+    DNI = db.Column(db.String(8), unique=True, nullable=False)
+    nombre = db.Column(db.String(100), nullable=False)
+    contrasena_hash = db.Column(db.String(255), nullable=False)
+    perfil = db.Column(db.Enum('voluntario', 'organizador', 'administrador', name='perfil_enum'), nullable=False)
+    estado_usuario = db.Column(db.Enum(EstadoUsuario), nullable=False, default=EstadoUsuario.ACTIVO) # Usando Enum de Python
+    fecha_registro = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+
+    # Campos opcionales en el registro inicial (se llenarán después)
+    apellido = db.Column(db.String(100), nullable=True)
+    celular = db.Column(db.String(9), unique=True, nullable=True)
+    email = db.Column(db.String(150), unique=True, nullable=True)
+    direccion = db.Column(db.Text, nullable=True)
+    fecha_nacimiento = db.Column(db.Date, nullable=True)
+    genero = db.Column(db.Enum('masculino', 'femenino', name='genero_enum'))
+
+    # Relationships
+    organizaciones = relationship("Organizaciones", secondary=usuario_organizacion_table, back_populates="usuarios")
+    preferencias = relationship("Preferencias", secondary=usuarios_preferencia_table, back_populates="usuarios")
+    discapacidades_pivot = relationship("UsuarioDiscapacidad", back_populates="usuario", cascade="all, delete-orphan")
+    inscripciones = relationship("Inscripciones", back_populates="usuario")
+    notificaciones = relationship("Notificaciones", back_populates="usuario")
+    feedback = relationship("Feedback", back_populates="usuario")
+    recomendaciones = relationship("Recomendaciones", back_populates="usuario")
+    interacciones_chatbot = relationship("InteraccionesChatbot", back_populates="usuario")
+
+    def set_password(self, password):
+        self.contrasena_hash = generate_password_hash(password)
+
+    def check_password(self, password):
+        return check_password_hash(self.contrasena_hash, password)
+
+    def get_id(self):
+        return str(self.id_usuario)
 
 
-app = Flask(__name__, instance_relative_config=True, template_folder='view/templates') # Enable instance folder
+class Organizaciones(db.Model):
+    __tablename__ = 'organizaciones'
+    id_organizacion = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    nombre_org = db.Column(db.String(255), unique=True, nullable=False)
+    descripcion_org = db.Column(db.Text)
+    direccion_fisica = db.Column(db.String(255))
+    logo = db.Column(db.Text)
+    fecha_registro = db.Column(db.DateTime, default=datetime.utcnow)
 
-# Configuration
-app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev_secret_key_replace_me_if_not_using_env_or_secrets')
-default_sqlite_uri = f"sqlite:///{os.path.join(app.instance_path, 'konectai.db')}"
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', default_sqlite_uri)
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
-# Ensure the instance folder exists for SQLite fallback
-try:
-    os.makedirs(app.instance_path)
-except OSError:
-    pass # Already exists or other error (Flask handles some of this)
-
-# Initialize extensions with the app instance
-init_app(app) # Initialize SQLAlchemy (from database.db)
-migrate = Migrate(app, db) # Initialize Flask-Migrate
-
-# Function to create tables if they don't exist
-def create_tables_if_not_exist(flask_app, db_instance):
-    with flask_app.app_context():
-        inspector = inspect(db_instance.engine)
-        # Check for a representative table, e.g., 'usuarios'
-        if not inspector.has_table(Usuarios.__tablename__):
-            db_instance.create_all()
-            print("Database tables created.")
-            return True # Tables were created
-        else:
-            print("Database tables already exist.")
-            return False # Tables already existed
-
-# Create tables if they don't exist and capture whether they were created
-tables_created = create_tables_if_not_exist(app, db)
-
-# Conditionally seed data if tables were just created
-if tables_created:
-    with app.app_context(): # Ensure app context for seeding
-        seed_data()
-        # The print message for seeding is handled within seed_data or can be added here
-        # print("Database seeded with initial data.")
+    # Relationships
+    usuarios = relationship("Usuarios", secondary=usuario_organizacion_table, back_populates="organizaciones")
+    actividades = relationship("Actividades", back_populates="organizacion")
 
 
-login_manager = LoginManager()
-login_manager.init_app(app)
-login_manager.login_view = 'auth.login' # Route name for the login page (blueprint_name.view_function_name)
-login_manager.login_message_category = 'info' # Flash message category
+class Preferencias(db.Model):
+    __tablename__ = 'preferencias'
+    id_preferencia = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    nombre_corto = db.Column(db.String(50), unique=True)
+    descripcion_detallada = db.Column(db.Text)
 
-@login_manager.user_loader
-def load_user(user_id):
-    return Usuarios.query.get(int(user_id))
+    usuarios = relationship("Usuarios", secondary=usuarios_preferencia_table, back_populates="preferencias")
 
-# Register Blueprints
-app.register_blueprint(main_bp)
-app.register_blueprint(auth_bp)
-app.register_blueprint(dashboard_bp) # Register the dashboard blueprint
 
-@app.cli.command('seed-db')
-def seed_db_command():
-    """Seeds the database with initial data."""
-    with app.app_context():
-        seed_data()
-    # The print statement is now inside seed_data() from datos_iniciales.py
-    # print('Database seeded with initial data.') # This can be removed or kept if preferred
+class UsuarioDiscapacidad(db.Model):
+    __tablename__ = 'usuario_discapacidad'
+    id_usuario = db.Column(db.Integer, ForeignKey('usuarios.id_usuario'), primary_key=True)
+    id_discapacidad = db.Column(db.Integer, ForeignKey('discapacidades.id_discapacidad'), primary_key=True)
+    gravedad = db.Column(db.Enum('leve', 'moderada', 'grave', name='gravedad_enum'))
+    apoyo_requerido = db.Column(db.Enum('interprete', 'otros', name='apoyo_requerido_enum'))
 
-# Call seed_data if tables were created by the function call above startup
-# This part is now handled above, after create_tables_if_not_exist is called.
+    usuario = relationship("Usuarios", back_populates="discapacidades_pivot")
+    discapacidad = relationship("Discapacidades", back_populates="usuarios_pivot")
 
-if __name__ == '__main__':
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host='0.0.0.0', port=port, debug=True)
+
+class Discapacidades(db.Model):
+    __tablename__ = 'discapacidades'
+    id_discapacidad = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    nombre = db.Column(db.Enum(TipoDiscapacidad), unique=True) # Usando Enum de Python
+    descripcion = db.Column(db.Text)
+
+    usuarios_pivot = relationship("UsuarioDiscapacidad", back_populates="discapacidad", cascade="all, delete-orphan")
+    actividades = relationship("Actividades", secondary=actividad_discapacidad_table, back_populates="discapacidades")
+
+
+class Actividades(db.Model):
+    __tablename__ = 'actividades'
+    id_actividad = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    nombre = db.Column(db.String(255))
+    descripcion = db.Column(db.Text)
+    fecha_actividad = db.Column(db.DateTime)
+    ubicacion = db.Column(db.String(255))
+    tipo = db.Column(db.Enum('presencial', 'virtual', name='tipo_actividad_enum'))
+    habilidades_requeridas = db.Column(db.Text)
+    es_inclusiva = db.Column(db.Boolean, default=False)
+    cupo_maximo = db.Column(db.Integer)
+    estado = db.Column(db.Enum(EstadoActividad, name='tipo_actividad_enum'), default=EstadoActividad.ABIERTO) # Usando Enum de Python
+    imagen = db.Column(db.String(255))
+    compatibilidad = db.Column(db.DECIMAL(5, 2))
+    etiqueta = db.Column(db.String(100))
+    id_organizacion = db.Column(db.Integer, ForeignKey('organizaciones.id_organizacion'))
+
+    # Relationships
+    organizacion = relationship("Organizaciones", back_populates="actividades")
+    discapacidades = relationship("Discapacidades", secondary=actividad_discapacidad_table, back_populates="actividades")
+    facilidades = relationship("Facilidad", secondary=actividad_facilidad_table, back_populates="actividades")
+    auditoria_actividad = relationship("AuditoriaActividad", back_populates="actividad")
+    inscripciones = relationship("Inscripciones", back_populates="actividad")
+
+
+class AuditoriaActividad(db.Model):
+    __tablename__ = 'auditoria_actividad'
+    id_auditoria = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    id_actividad = db.Column(db.Integer, ForeignKey('actividades.id_actividad'), nullable=False)
+    id_usuario = db.Column(db.Integer, ForeignKey('usuarios.id_usuario'))
+    IP_usuario = db.Column(db.String(45))
+    fecha_registro = db.Column(db.DateTime, default=datetime.utcnow)
+
+    actividad = relationship("Actividades", back_populates="auditoria_actividad")
+    usuario = relationship("Usuarios")
+
+
+class Facilidad(db.Model):
+    __tablename__ = 'facilidad'
+    id_facilidad = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    nombre_facilidad = db.Column(db.String(255), unique=True, nullable=False)
+    descripcion = db.Column(db.String(255))
+
+    actividades = relationship("Actividades", secondary=actividad_facilidad_table, back_populates="facilidades")
+
+
+class Inscripciones(db.Model):
+    __tablename__ = 'inscripciones'
+    id_inscripcion = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    id_usuario = db.Column(db.Integer, ForeignKey('usuarios.id_usuario'), nullable=False)
+    id_actividad = db.Column(db.Integer, ForeignKey('actividades.id_actividad'), nullable=False)
+    fecha_inscripcion = db.Column(db.DateTime, default=datetime.utcnow)
+
+    usuario = relationship("Usuarios", back_populates="inscripciones")
+    actividad = relationship("Actividades", back_populates="inscripciones")
+
+
+class Notificaciones(db.Model):
+    __tablename__ = 'notificaciones'
+    id_notificacion = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    id_usuario = db.Column(db.Integer, ForeignKey('usuarios.id_usuario'), nullable=False)
+    mensaje = db.Column(db.Text, nullable=False)
+    fecha_envio = db.Column(db.DateTime, default=datetime.utcnow)
+    leida = db.Column(db.Boolean, default=False)
+    prioridad = db.Column(db.Enum('alta', 'media', 'baja', name='prioridad_enum'))
+
+    usuario = relationship("Usuarios", back_populates="notificaciones")
+
+
+class Feedback(db.Model):
+    __tablename__ = 'feedback'
+    id_feedback = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    id_usuario = db.Column(db.Integer, ForeignKey('usuarios.id_usuario'), nullable=False)
+    id_actividad = db.Column(db.Integer, ForeignKey('actividades.id_actividad'))
+    puntuacion = db.Column(db.Integer)
+    comentario = db.Column(db.Text)
+    fecha = db.Column(db.DateTime, default=datetime.utcnow)
+
+    usuario = relationship("Usuarios", back_populates="feedback")
+    actividad = relationship("Actividades")
+
+
+class Recomendaciones(db.Model):
+    __tablename__ = 'recomendaciones'
+    id_recomendacion = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    id_usuario = db.Column(db.Integer, ForeignKey('usuarios.id_usuario'), nullable=False)
+    id_actividad = db.Column(db.Integer, ForeignKey('actividades.id_actividad'), nullable=False)
+    tipo_recomendacion = db.Column(db.Enum(TipoRecomendacion, name='tipo_recomendacion_enum')) # Usando Enum de Python
+   
+    descripcion = db.Column(db.Text)
+    fecha = db.Column(db.DateTime, default=datetime.utcnow)
+
+    usuario = relationship("Usuarios", back_populates="recomendaciones")
+    actividad = relationship("Actividades")
+
+
+class Tendencias(db.Model):
+    __tablename__ = 'tendencias'
+    id_tendencia = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    id_actividad = db.Column(db.Integer, ForeignKey('actividades.id_actividad'))
+    cantidad_participantes = db.Column(db.Integer)
+    puntuacion_promedio = db.Column(db.DECIMAL(3,2))
+    fecha = db.Column(db.DateTime, default=datetime.utcnow)
+
+
+class InteraccionesChatbot(db.Model):
+    __tablename__ = 'interacciones_chatbot'
+    id_interaccion = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    id_usuario = db.Column(db.Integer, ForeignKey('usuarios.id_usuario'))
+    mensaje_usuario = db.Column(db.Text)
+    respuesta_chatbot = db.Column(db.Text)
+    fecha = db.Column(db.DateTime, default=datetime.utcnow)
+
+    usuario = relationship("Usuarios", back_populates="interacciones_chatbot")
