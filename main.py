@@ -1,10 +1,9 @@
 from flask_login import UserMixin
 from database.db import db
 from werkzeug.security import generate_password_hash, check_password_hash
-from sqlalchemy import Column, Integer, String, Text, ForeignKey, DateTime, Enum, Boolean, DECIMAL, Table
-from sqlalchemy.orm import relationship
 from datetime import datetime
 import enum
+from sqlalchemy import Table
 
 # Association tables
 usuario_organizacion_table = Table('usuario_organizacion', db.Model.metadata,
