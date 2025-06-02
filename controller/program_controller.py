@@ -4,37 +4,55 @@ from services.prediction_service import get_compatibility_scores # Assuming this
 
 def get_programs_compatibility():
     """
-    Fetches all programs (Actividades) and calculates compatibility scores
-    for authenticated volunteer users.
+    Fetches programs (Actividades) based on user status and role,
+    and calculates compatibility scores for authenticated volunteer users.
     """
-    all_programs = Actividades.query.all()
     compatibility_scores = {}
+    programs = []
 
-    if current_user.is_authenticated and current_user.perfil == 'voluntario':
-        # Prepare user profile data (this might need adjustment based on your actual User model structure)
-        user_profile_data = {
-            'id': current_user.id_usuario,
-            'username': current_user.nombre, # Assuming 'nombre' is the username field
-            'interests': ['environment', 'education', 'animals'], # Example: replace with actual user interests if available
-            'skills': ['writing', 'gardening'] # Example: replace with actual user skills if available
-        }
+    if current_user.is_anonymous:
+        programs = Actividades.query.filter(Actividades.estado != 'cerrado').all()
+        # compatibility_scores remains {}
 
-        # Prepare program data for the service
-        program_data_for_service = []
-        for p in all_programs:
-            program_data_for_service.append({
-                'id': p.id_actividad,
-                'name': p.nombre,
-                'description': p.descripcion,
-                'category': p.etiqueta if p.etiqueta else (p.nombre.lower() if p.nombre else "") # Use etiqueta or fallback
-            })
+    elif current_user.is_authenticated:
+        if current_user.perfil == 'voluntario':
+            programs = Actividades.query.filter(Actividades.estado != 'cerrado').all()
 
-        if program_data_for_service:
-            try:
-                compatibility_scores = get_compatibility_scores(user_profile_data, program_data_for_service)
-            except Exception as e:
-                # Log the exception or handle it as needed
-                print(f"Error calculating compatibility scores: {e}")
-                # compatibility_scores remains empty or you could set it to None or an error indicator
+            # Prepare user profile data
+            user_disabilities = [udp.discapacidad.nombre for udp in current_user.discapacidades_pivot if udp.discapacidad and udp.discapacidad.nombre]
+            user_interests = [pref.nombre_corto for pref in current_user.preferencias if pref.nombre_corto]
 
-    return all_programs, compatibility_scores
+            user_profile_data = {
+                'id': current_user.id_usuario,
+                'username': current_user.nombre,
+                'interests': user_interests, # Using actual user interests
+                'skills': ['writing', 'gardening'], # Placeholder for skills
+                'disabilities': user_disabilities # Using actual user disabilities
+            }
+
+            # Prepare program data for the service
+            program_data_for_service = []
+            for p in programs: # Use filtered programs
+                program_data_for_service.append({
+                    'id': p.id_actividad,
+                    'name': p.nombre,
+                    'description': p.descripcion,
+                    # Use etiqueta or fallback to an empty string if nombre is None
+                    'category': p.etiqueta if p.etiqueta else (p.nombre.lower() if p.nombre else "")
+                })
+
+            if program_data_for_service:
+                try:
+                    compatibility_scores = get_compatibility_scores(user_profile_data, program_data_for_service)
+                except Exception as e:
+                    # Log the exception or handle it as needed
+                    print(f"Error calculating compatibility scores: {e}")
+                    # compatibility_scores remains empty or you could set it to None or an error indicator
+        else: # Authenticated but not a voluntario
+            programs = Actividades.query.filter(Actividades.estado != 'cerrado').all()
+            # compatibility_scores remains {}
+    else: # Should not happen if is_anonymous or is_authenticated is always true for a user object
+        programs = Actividades.query.filter(Actividades.estado != 'cerrado').all()
+        # compatibility_scores remains {}
+
+    return programs, compatibility_scores
