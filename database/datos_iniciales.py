@@ -92,7 +92,7 @@ def seed_data():
             {"DNI":"77889900", "nombre":"Luis", "apellido":"Mendoza", "email":"luis.mendoza@example.com", "password":"Hashed77", "celular":"933445566", "direccion":"Jr. Las Palmeras 123", "fecha_nacimiento":date(1998, 1, 25), "genero":"masculino", "perfil":"voluntario", "estado_usuario":"activo", "fecha_registro":datetime.now(peru_tz)},
             {"DNI":"88990011", "nombre":"Carmen", "apellido":"Diaz", "email":"carmen.diaz@example.com", "password":"Hashed88", "celular":"944556677", "direccion":"Calle Las Begonias 789", "fecha_nacimiento":date(1993, 9, 30), "genero":"femenino", "perfil":"voluntario", "estado_usuario":"activo", "fecha_registro":datetime.now(peru_tz)},
             {"DNI":"99001122", "nombre":"Pedro", "apellido":"Vargas", "email":"pedro.vargas@example.com", "password":"Hashed99", "celular":"955667788", "direccion":"Av. Los Incas 321", "fecha_nacimiento":date(1996, 6, 18), "genero":"masculino", "perfil":"voluntario", "estado_usuario":"activo", "fecha_registro":datetime.now(peru_tz)},
-            {"DNI":"00112233", "nombre":"Rosa", "apellido":"Chavez", "email":"rosa.chavez@example.com", "password":"Hashed00", "celular":"966778899", "direccion":"Jr. Union 654", "fecha_nacimiento":date(1991, 12, 3), "genero":"femenino", "perfil":"voluntario", "estado_usuario":"bloqueado", "fecha_registro":datetime.now(peru_tz)}
+            {"DNI":"00112233", "nombre":"Rosa", "apellido":"Chavez", "email":"rosa.chavez@example.com", "password":"Hashed00", "celular":"966778899", "direccion":"Jr. Union 654", "fecha_nacimiento":date(1991, 12, 3), "genero":"femenino", "perfil":"voluntario", "estado_usuario":"inactivo", "fecha_registro":datetime.now(peru_tz)}
         ]
 
         for data in usuarios_data:
