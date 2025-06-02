@@ -1,5 +1,6 @@
 import os
 from flask import Flask
+from sqlalchemy import inspect # Added inspect
 from database.db import db, init_app
 from controller.routes import main_bp
 from controller.auth_routes import auth_bp
@@ -28,6 +29,30 @@ except OSError:
 init_app(app) # Initialize SQLAlchemy (from database.db)
 migrate = Migrate(app, db) # Initialize Flask-Migrate
 
+# Function to create tables if they don't exist
+def create_tables_if_not_exist(flask_app, db_instance):
+    with flask_app.app_context():
+        inspector = inspect(db_instance.engine)
+        # Check for a representative table, e.g., 'usuarios'
+        if not inspector.has_table(Usuarios.__tablename__):
+            db_instance.create_all()
+            print("Database tables created.")
+            return True # Tables were created
+        else:
+            print("Database tables already exist.")
+            return False # Tables already existed
+
+# Create tables if they don't exist and capture whether they were created
+tables_created = create_tables_if_not_exist(app, db)
+
+# Conditionally seed data if tables were just created
+if tables_created:
+    with app.app_context(): # Ensure app context for seeding
+        seed_data()
+        # The print message for seeding is handled within seed_data or can be added here
+        # print("Database seeded with initial data.")
+
+
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'auth.login' # Route name for the login page (blueprint_name.view_function_name)
@@ -42,14 +67,6 @@ app.register_blueprint(main_bp)
 app.register_blueprint(auth_bp)
 app.register_blueprint(dashboard_bp) # Register the dashboard blueprint
 
-@app.cli.command('create-db')
-def create_db_command():
-    """Creates the database tables."""
-    with app.app_context():
-        import model.models # Ensure all models are imported
-        db.create_all()
-    print('Database tables created.')
-
 @app.cli.command('seed-db')
 def seed_db_command():
     """Seeds the database with initial data."""
@@ -57,6 +74,9 @@ def seed_db_command():
         seed_data()
     # The print statement is now inside seed_data() from datos_iniciales.py
     # print('Database seeded with initial data.') # This can be removed or kept if preferred
+
+# Call seed_data if tables were created by the function call above startup
+# This part is now handled above, after create_tables_if_not_exist is called.
 
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
