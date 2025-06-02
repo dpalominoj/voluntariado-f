@@ -15,8 +15,8 @@ class TipoDiscapacidad(enum.Enum):
 class EstadoActividad(enum.Enum):
     ABIERTO = "abierto"
     CERRADO = "cerrado"
-    #CANCELADA = "cancelada"
-    #FINALIZADA = "finalizada"
+    CANCELADA = "cancelada"
+    FINALIZADA = "finalizada"
 
 class EstadoUsuario(enum.Enum):
     ACTIVO = "activo"
@@ -60,7 +60,7 @@ class Usuarios(db.Model, UserMixin):
     nombre = db.Column(db.String(100), nullable=False)
     contrasena_hash = db.Column(db.String(255), nullable=False)
     perfil = db.Column(db.Enum('voluntario', 'organizador', 'administrador', name='perfil_enum'), nullable=False)
-    estado_usuario = db.Column(db.Enum(EstadoUsuario, name='estado_usuario_enum'), nullable=False, default=EstadoUsuario.ACTIVO) # Usando Enum de Python
+    estado_usuario = db.Column(db.Enum(EstadoUsuario, name='estado_usuario_enum', values_callable=lambda x: [e.value for e in x]), nullable=False, default=EstadoUsuario.ACTIVO) # Usando Enum de Python
     fecha_registro = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
 
     # Campos opcionales en el registro inicial (se llenarán después)
@@ -127,7 +127,7 @@ class UsuarioDiscapacidad(db.Model):
 class Discapacidades(db.Model):
     __tablename__ = 'discapacidades'
     id_discapacidad = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    nombre = db.Column(db.Enum(TipoDiscapacidad), unique=True) # Usando Enum de Python
+    nombre = db.Column(db.Enum(TipoDiscapacidad, values_callable=lambda x: [e.value for e in x]), unique=True) # Usando Enum de Python
     descripcion = db.Column(db.Text)
 
     usuarios_pivot = relationship("UsuarioDiscapacidad", back_populates="discapacidad", cascade="all, delete-orphan")
@@ -145,7 +145,7 @@ class Actividades(db.Model):
     habilidades_requeridas = db.Column(db.Text)
     es_inclusiva = db.Column(db.Boolean, default=False)
     cupo_maximo = db.Column(db.Integer)
-    estado = db.Column(db.Enum(EstadoActividad, name='estado_actividad_enum'), default=EstadoActividad.ABIERTO) # Usando Enum de Python
+    estado = db.Column(db.Enum(EstadoActividad, name='estado_actividad_enum', values_callable=lambda x: [e.value for e in x]), default=EstadoActividad.ABIERTO) # Usando Enum de Python
     imagen = db.Column(db.String(255))
     compatibilidad = db.Column(db.DECIMAL(5, 2))
     etiqueta = db.Column(db.String(100))
@@ -221,7 +221,7 @@ class Recomendaciones(db.Model):
     id_recomendacion = db.Column(db.Integer, primary_key=True, autoincrement=True)
     id_usuario = db.Column(db.Integer, ForeignKey('usuarios.id_usuario'), nullable=False)
     id_actividad = db.Column(db.Integer, ForeignKey('actividades.id_actividad'), nullable=False)
-    tipo_recomendacion = db.Column(db.Enum(TipoRecomendacion, name='tipo_recomendacion_enum')) # Usando Enum de Python
+    tipo_recomendacion = db.Column(db.Enum(TipoRecomendacion, name='tipo_recomendacion_enum', values_callable=lambda x: [e.value for e in x])) # Usando Enum de Python
    
     descripcion = db.Column(db.Text)
     fecha = db.Column(db.DateTime, default=datetime.utcnow)
