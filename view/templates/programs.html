@@ -28,27 +28,27 @@
                     <div class="flex-1 bg-white p-6 flex flex-col justify-between">
                         <div class="flex-1">
                             <p class="text-sm font-medium text-indigo-600">
-                                {{ program.organizer.username if program.organizer else "N/A" }}
+                                {{ program.organizador.nombre_org if program.organizador else "N/A" }}
                             </p>
-                            <a href="#" class="block mt-2"> {# Link to program details page, to be implemented #}
+                            <a href="#" class="block mt-2">
                                 <p class="text-xl font-semibold text-gray-900">
-                                    {{ program.name }}
+                                    {{ program.nombre }}
                                 </p>
                                 <p class="mt-3 text-base text-gray-500">
-                                    {{ program.description if program.description else "No description available." | truncate(150) }}
+                                    {{ (program.descripcion if program.descripcion else "No description available.") | truncate(150, True, '...', 0) }}
                                 </p>
                             </a>
                         </div>
-                        {% if program.id in compatibility_scores and compatibility_scores[program.id] is not none %}
+                        {% if program.id_actividad in compatibility_scores and compatibility_scores[program.id_actividad] is not none %}
                             <p class="mt-3 text-sm font-medium text-green-600">
-                                Your Compatibility: {{ compatibility_scores[program.id] }}%
+                                Your Compatibility: {{ "%.2f"|format(compatibility_scores[program.id_actividad]) }}%
                             </p>
                         {% endif %}
                         <div class="mt-6 flex items-center">
                             {# Placeholder for organizer avatar - could be added to user model #}
                             {# <div class="flex-shrink-0">
                                 <a href="#">
-                                    <span class="sr-only">{{ program.organizer.username if program.organizer else "N/A" }}</span>
+                                    <span class="sr-only">{{ program.organizador.nombre_org if program.organizador else "N/A" }}</span>
                                     <img class="h-10 w-10 rounded-full" src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" alt="">
                                 </a>
                             </div> #}
