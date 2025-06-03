@@ -13,6 +13,8 @@ from database.datos_iniciales import seed_data # Added import for seed_data
 
 
 app = Flask(__name__, instance_relative_config=True, template_folder='view/templates') # Enable instance folder
+app.static_folder = 'view/assets'
+app.static_url_path = '/assets'
 
 # Configuration
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev_secret_key_replace_me_if_not_using_env_or_secrets')

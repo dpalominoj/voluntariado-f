@@ -101,7 +101,7 @@
                     {{ form.acepto_politica(class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded") }}
                     <label for="{{ form.acepto_politica.id }}" class="cursor-pointer">
                         Acepto la 
-                            <a href="{{ url_for('.../documentos', filename='Politica_de_Privacidad.pdf') }}" target="_blank" rel="noopener noreferrer" class="text-indigo-600 underline hover:text-indigo-800">
+                            <a href="{{ url_for('static', filename='documentos/Politica_de_Privacidad.pdf') }}" target="_blank" rel="noopener noreferrer" class="text-indigo-600 underline hover:text-indigo-800">
                                 Política de Privacidad de Datos Personales
                             </a>
                     </label>
