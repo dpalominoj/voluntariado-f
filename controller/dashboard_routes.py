@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template
 from flask_login import login_required, current_user
+from model.models import UsuarioDiscapacidad, Discapacidades # Added imports
 
 dashboard_bp = Blueprint('user_dashboard', __name__, 
                          template_folder='../view/templates/dashboards',
@@ -24,4 +25,12 @@ def profile():
     """
     Displays the user's profile page.
     """
-    return render_template('profile.html', user=current_user, title="My Profile")
+    user_disabilities_data = []
+    if current_user.is_authenticated and hasattr(current_user, 'discapacidades_pivot'):
+        for disc_assoc in current_user.discapacidades_pivot:
+            user_disabilities_data.append({
+                'nombre': disc_assoc.discapacidad.nombre if disc_assoc.discapacidad else "No especificada",
+                'gravedad': disc_assoc.gravedad if disc_assoc.gravedad else "No especificada"
+            })
+
+    return render_template('profile.html', user=current_user, user_disabilities_data=user_disabilities_data, title="My Profile")

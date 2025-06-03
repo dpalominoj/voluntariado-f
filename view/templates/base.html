@@ -79,6 +79,7 @@
               'success': 'bg-green-100 border-green-500 text-green-700',
               'warning': 'bg-yellow-100 border-yellow-500 text-yellow-700',
               'danger': 'bg-red-100 border-red-500 text-red-700',
+              'error': 'bg-red-100 border-red-500 text-red-700', {# Added error to map to red #}
               'message': 'bg-gray-100 border-gray-500 text-gray-700'
             } %}
             {% set chosen_class = alert_classes.get(category, alert_classes['message']) %}
@@ -92,7 +93,7 @@
                   #}
                 </div>
                 <div class="flex-grow">
-                  <p class="font-bold">{{ category|capitalize }}</p>
+                  <p class="font-bold capitalize">{{ 'Error' if category == 'danger' else category|capitalize }}</p> {# Display 'Error' for 'danger' category, capitalize others #}
                   <p class="text-sm">{{ message }}</p>
                 </div>
                 <button @click="show = false" type="button" class="ml-auto -mx-1.5 -my-1.5 p-1.5 inline-flex h-8 w-8 items-center justify-center rounded-lg focus:ring-2 {{ chosen_class.replace('bg-', 'focus:ring-').replace('border-', 'hover:bg-').replace('100', '200').replace('text-', 'hover:text-') }}">
@@ -114,5 +115,15 @@
     {#{% block scripts %}#}
     {# Any page-specific scripts could go here #}
     {#{% endblock %}#}
+
+    <a href="{{ url_for('main.help_page') }}"
+       class="fixed bottom-6 right-6 bg-indigo-600 hover:bg-indigo-700 text-white p-4 rounded-full shadow-lg z-50 flex items-center justify-center"
+       aria-label="Help and Support">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.755 4 3.985 0 1.307-.486 2.498-1.336 3.28A7.493 7.493 0 0112 17.5c-.897 0-1.73-.297-2.433-.816l-.764-.625V15.5a1 1 0 00-1-1h-.5a1 1 0 00-1 1v2.158l-.623.624a3.007 3.007 0 00-1.09 2.158V21h14v-.258c0-.845-.414-1.632-1.09-2.158l-.624-.624V16.5a1 1 0 00-1-1h-.5a1 1 0 00-1 1v.039l.008.014c.005.009.012.019.02.03.052.066.114.136.186.213.145.157.312.304.498.438.228.164.48.304.752.408.27.102.556.157.858.157.976 0 1.83-.37 2.465-1.003.642-.64 1.035-1.503 1.035-2.488 0-2.758-2.246-4.986-5-4.986-2.044 0-3.754.977-4.46 2.486L8.228 9z" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6a3.5 3.5 0 100-7 3.5 3.5 0 000 7z" />
+        </svg>
+        <span class="sr-only">Help</span> {# For screen readers #}
+    </a>
   </body>
 </html>

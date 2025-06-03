@@ -1,9 +1,11 @@
-from flask_login import current_user
-from model.models import Actividades, Discapacidades # Make sure Usuarios is imported if needed for relationships
+from flask import flash, redirect, url_for
+from flask_login import current_user, login_required
+from model.models import Actividades, Discapacidades, Inscripciones, EstadoActividad # Make sure Usuarios is imported if needed for relationships
 from services.prediction_service import get_compatibility_scores
 from sqlalchemy.orm import aliased
+from database.db import db
 
-def get_programs_compatibility(tipo_filter=None, organizacion_filter=None, discapacidad_filter=None, estado_filter=None, inclusiva_filter=None):
+def get_programs_compatibility(tipo_filter=None, organizacion_filter=None, estado_filter=None, enfoque_inclusivo=None, etiqueta_filter=None):
     compatibility_scores = {}
     query = Actividades.query
 
@@ -34,13 +36,16 @@ def get_programs_compatibility(tipo_filter=None, organizacion_filter=None, disca
     if organizacion_filter: # This could override/narrow the organizer's own orgs if they use the filter
         query = query.filter(Actividades.id_organizacion == organizacion_filter)
 
-    if discapacidad_filter:
-        query = query.join(Actividades.discapacidades).filter(Discapacidades.id_discapacidad == discapacidad_filter)
+    # New logic for enfoque_inclusivo
+    if enfoque_inclusivo is not None and enfoque_inclusivo != '':
+        if enfoque_inclusivo == "solo_inclusivas":
+            query = query.filter(Actividades.es_inclusiva == True)
+        else: # Assumes enfoque_inclusivo is a disability name like "Visual", "Auditiva", etc.
+            query = query.join(Actividades.discapacidades).filter(Discapacidades.nombre == enfoque_inclusivo)
 
-    if inclusiva_filter is not None and inclusiva_filter != '':
-        # Assuming inclusiva_filter is 'true' or 'false' as a string
-        es_inclusiva_bool = inclusiva_filter.lower() == 'true'
-        query = query.filter(Actividades.es_inclusiva == es_inclusiva_bool)
+    # Filter by etiqueta (program preferences/tags)
+    if etiqueta_filter:
+        query = query.filter(Actividades.etiqueta.ilike(f"%{etiqueta_filter}%"))
 
     # Status filter logic
     if estado_filter:
@@ -104,3 +109,50 @@ def view_program_detail(program_id):
         flash('Programa no encontrado.', 'danger')
         return redirect(url_for('main.programs'))
     return render_template('program_detail.html', program=program, title=program.nombre)
+
+@program_bp.route('/<int:program_id>/enroll', methods=['POST'])
+@login_required
+def enroll_program(program_id):
+    program = Actividades.query.get_or_404(program_id)
+
+    # Validation: User profile
+    if current_user.perfil != 'voluntario':
+        flash("Solo los voluntarios pueden inscribirse.", "danger")
+        return redirect(url_for('main.programs')) # Or specific program detail page
+
+    # Validation: Program status
+    if program.estado != EstadoActividad.ABIERTO:
+        flash("Este programa no está abierto para inscripciones.", "danger")
+        return redirect(url_for('program.view_program_detail', program_id=program_id))
+
+    # Validation: Already enrolled
+    existing_inscription = Inscripciones.query.filter_by(
+        id_usuario=current_user.id_usuario,
+        id_actividad=program_id
+    ).first()
+    if existing_inscription:
+        flash("Ya estás inscrito en este programa.", "info")
+        return redirect(url_for('program.view_program_detail', program_id=program_id))
+
+    # Optional Validation: Program capacity (cupo_maximo)
+    if program.cupo_maximo is not None: # Ensure cupo_maximo is set
+        # Assuming 'inscripciones' is the backref from Actividades to Inscripciones
+        if len(program.inscripciones) >= program.cupo_maximo:
+            flash("El programa ha alcanzado su cupo máximo.", "danger")
+            return redirect(url_for('program.view_program_detail', program_id=program_id))
+
+    # All checks passed, create enrollment
+    try:
+        new_inscription = Inscripciones(
+            id_usuario=current_user.id_usuario,
+            id_actividad=program_id
+        )
+        db.session.add(new_inscription)
+        db.session.commit()
+        flash("¡Inscripción exitosa!", "success")
+    except Exception as e:
+        db.session.rollback()
+        flash(f"Error al procesar la inscripción: {str(e)}", "danger")
+        # Log the exception e for server-side diagnostics if needed
+
+    return redirect(url_for('program.view_program_detail', program_id=program_id))
