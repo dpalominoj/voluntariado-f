@@ -14,6 +14,66 @@
             </p>
         </div>
 
+        <!-- Filter Form -->
+        <form method="GET" action="{{ url_for('main.programs') }}" class="my-8 p-6 bg-white shadow rounded-lg">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div>
+                    <label for="tipo" class="block text-sm font-medium text-gray-700">Tipo de Programa</label>
+                    <select name="tipo" id="tipo" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                        <option value="">Todos</option>
+                        {% for t in tipos %}
+                        <option value="{{ t }}" {% if current_filters.get('tipo') == t %}selected{% endif %}>{{ t }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div>
+                    <label for="organizacion" class="block text-sm font-medium text-gray-700">Organización</label>
+                    <select name="organizacion" id="organizacion" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                        <option value="">Todas</option>
+                        {% for org in organizaciones %}
+                        <option value="{{ org.id_organizacion }}" {% if current_filters.get('organizacion') | string == org.id_organizacion | string %}selected{% endif %}>{{ org.nombre_org }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div>
+                    <label for="discapacidad" class="block text-sm font-medium text-gray-700">Enfoque de Discapacidad</label>
+                    <select name="discapacidad" id="discapacidad" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                        <option value="">Todas</option>
+                        {% for disc in discapacidades_filter_options %}
+                        <option value="{{ disc.id_discapacidad }}" {% if current_filters.get('discapacidad') | string == disc.id_discapacidad | string %}selected{% endif %}>{{ disc.nombre }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div>
+                    <label for="estado" class="block text-sm font-medium text-gray-700">Estado del Programa</label>
+                    <select name="estado" id="estado" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                        <option value="">Todos</option>
+                        {% for est in estados %}
+                        <option value="{{ est }}" {% if current_filters.get('estado') == est %}selected{% endif %}>{{ est }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div>
+                    <label for="es_inclusiva" class="block text-sm font-medium text-gray-700">Es Inclusiva</label>
+                    <select name="es_inclusiva" id="es_inclusiva" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                        <option value="">Cualquiera</option>
+                        <option value="true" {% if current_filters.get('es_inclusiva') == 'true' %}selected{% endif %}>Sí</option>
+                        <option value="false" {% if current_filters.get('es_inclusiva') == 'false' %}selected{% endif %}>No</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="mt-6 flex items-center">
+                <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Aplicar Filtros</button>
+                <a href="{{ url_for('main.programs') }}" class="ml-3 px-4 py-2 border border-gray-300 rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Limpiar Filtros</a>
+            </div>
+        </form>
+        <!-- End Filter Form -->
+
         {% if programs %}
             <div class="mt-12 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
                 {% for program in programs %}

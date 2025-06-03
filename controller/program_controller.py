@@ -1,84 +1,93 @@
 from flask_login import current_user
-from model.models import Actividades # Make sure Usuarios is imported if needed for relationships
+from model.models import Actividades, Discapacidades # Make sure Usuarios is imported if needed for relationships
 from services.prediction_service import get_compatibility_scores
 from sqlalchemy.orm import aliased
 
-def get_programs_compatibility():
+def get_programs_compatibility(tipo_filter=None, organizacion_filter=None, discapacidad_filter=None, estado_filter=None, inclusiva_filter=None):
     compatibility_scores = {}
-    programs = []
+    query = Actividades.query
 
-    if current_user.is_anonymous:
-        # Scenario 1: Anonymous user
-        # Show all programs with estado != 'cerrado'
-        programs = Actividades.query.filter(Actividades.estado == 'abierto').all()
-        # compatibility_scores remains {}
+    # Role-based pre-filtering and default status determination
+    apply_default_status_filter = True
+    default_status_is_abierto = True # Default to 'abierto'
 
-    elif current_user.is_authenticated:
-        if current_user.perfil == 'voluntario':
-            # Existing logic for volunteers: show programs with estado != 'cerrado' and calculate compatibility
-            programs = Actividades.query.filter(Actividades.estado == 'abierto').all()
-
-            user_disabilities = [udp.discapacidad.nombre for udp in current_user.discapacidades_pivot if udp.discapacidad and udp.discapacidad.nombre]
-            user_interests = [pref.nombre_corto for pref in current_user.preferencias if pref.nombre_corto]
-
-            user_profile_data = {
-                'id': current_user.id_usuario,
-                'username': current_user.nombre,
-                'interests': user_interests,
-                'skills': ['writing', 'gardening'], # Placeholder for skills
-                'disabilities': user_disabilities
-            }
-
-            program_data_for_service = []
-            for p in programs:
-                program_data_for_service.append({
-                    'id': p.id_actividad,
-                    'name': p.nombre,
-                    'description': p.descripcion,
-                    'category': p.etiqueta if p.etiqueta else (p.nombre.lower() if p.nombre else "")
-                })
-
-            if program_data_for_service:
-                try:
-                    compatibility_scores = get_compatibility_scores(user_profile_data, program_data_for_service)
-                except Exception as e:
-                    print(f"Error calculating compatibility scores: {e}")
-                    # compatibility_scores remains empty
-
-        elif current_user.perfil == 'organizador':
-            # Scenario 2: Authenticated 'organizador'
-            # Show programs linked to their organization(s) and estado != 'cerrado'
-
-            # Get organization IDs for the current organizer
+    if current_user.is_authenticated:
+        if current_user.perfil == 'organizador':
             organizer_org_ids = [org.id_organizacion for org in current_user.organizaciones]
-
             if organizer_org_ids:
-                programs = Actividades.query.filter(
-                    Actividades.id_organizacion.in_(organizer_org_ids),
-                    Actividades.estado != 'cerrado'
-                ).all()
+                query = query.filter(Actividades.id_organizacion.in_(organizer_org_ids))
+                # For organizers, default is to show their programs not 'cerrado' unless estado_filter specifies otherwise
+                default_status_is_abierto = False
             else:
-                # Organizer not linked to any organization, show no programs
-                programs = []
-            # compatibility_scores remains {}
+                # Organizer not linked to any organization, show no programs by default
+                # This will result in query.all() returning empty if no other filters are applied that broaden the scope.
+                query = query.filter(Actividades.id_actividad == -1) # No programs if not linked
 
-        elif current_user.perfil == 'administrador':
-            # Authenticated 'administrador'
-            # Show all programs with estado != 'cerrado'
-            programs = Actividades.query.filter(Actividades.estado == 'abierto').all()
-            # compatibility_scores remains {}
+        # For 'administrador', 'voluntario', or other authenticated users,
+        # the default is 'abierto' unless overridden by estado_filter.
+        # No specific pre-filters here beyond what filters below will handle.
 
-        else: # Other authenticated users (if any future roles are added)
-            # Default for other authenticated roles: show 'abierto' programs or all non-closed programs
-            # For now, let's align with showing all non-closed programs as a general rule.
-            programs = Actividades.query.filter(Actividades.estado == 'abierto').all()
-            # compatibility_scores remains {}
+    # Apply provided filters
+    if tipo_filter:
+        query = query.filter(Actividades.tipo == tipo_filter)
 
-    else:
-        # This case should ideally not be reached if Flask-Login is correctly configured.
-        # Default to showing non-closed programs as a fallback.
-        programs = Actividades.query.filter(Actividades.estado == 'abierto').all()
-        # compatibility_scores remains {}
+    if organizacion_filter: # This could override/narrow the organizer's own orgs if they use the filter
+        query = query.filter(Actividades.id_organizacion == organizacion_filter)
+
+    if discapacidad_filter:
+        query = query.join(Actividades.discapacidades).filter(Discapacidades.id_discapacidad == discapacidad_filter)
+
+    if inclusiva_filter is not None and inclusiva_filter != '':
+        # Assuming inclusiva_filter is 'true' or 'false' as a string
+        es_inclusiva_bool = inclusiva_filter.lower() == 'true'
+        query = query.filter(Actividades.es_inclusiva == es_inclusiva_bool)
+
+    # Status filter logic
+    if estado_filter:
+        query = query.filter(Actividades.estado == estado_filter)
+        apply_default_status_filter = False # User specified a status, so don't apply default
+    elif apply_default_status_filter:
+        if default_status_is_abierto:
+             # Anonymous users, volunteers, admins (by default), other authenticated users
+            query = query.filter(Actividades.estado == 'abierto')
+        elif current_user.is_authenticated and current_user.perfil == 'organizador':
+            # Organizers viewing their own programs, default to not 'cerrado'
+            query = query.filter(Actividades.estado != 'cerrado')
+        else:
+            # Fallback for anonymous or if something went wrong with role logic for status
+            query = query.filter(Actividades.estado == 'abierto')
+
+
+    programs = query.all()
+
+    # Compatibility scores calculation (only for volunteers and if programs are found)
+    if current_user.is_authenticated and current_user.perfil == 'voluntario' and programs:
+        user_disabilities = [udp.discapacidad.nombre for udp in current_user.discapacidades_pivot if udp.discapacidad and udp.discapacidad.nombre]
+        user_interests = [pref.nombre_corto for pref in current_user.preferencias if pref.nombre_corto]
+
+        user_profile_data = {
+            'id': current_user.id_usuario,
+            'username': current_user.nombre,
+            'interests': user_interests,
+            'skills': ['writing', 'gardening'], # Placeholder for skills
+            'disabilities': user_disabilities
+        }
+
+        program_data_for_service = []
+        for p in programs:
+            program_data_for_service.append({
+                'id': p.id_actividad,
+                'name': p.nombre,
+                'description': p.descripcion,
+                'category': p.etiqueta if p.etiqueta else (p.nombre.lower() if p.nombre else "")
+            })
+
+        if program_data_for_service:
+            try:
+                compatibility_scores = get_compatibility_scores(user_profile_data, program_data_for_service)
+            except Exception as e:
+                print(f"Error calculating compatibility scores: {e}")
+                # compatibility_scores remains empty
 
     return programs, compatibility_scores
 

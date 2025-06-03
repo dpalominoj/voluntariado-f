@@ -61,7 +61,7 @@ login_manager.login_message_category = 'info' # Flash message category
 
 @login_manager.user_loader
 def load_user(user_id):
-    return Usuarios.query.get(int(user_id))
+    return db.session.get(Usuarios, int(user_id))
 
 # Register Blueprints
 app.register_blueprint(main_bp)
