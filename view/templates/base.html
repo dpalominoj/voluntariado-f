@@ -19,7 +19,7 @@
         <div class="flex justify-between items-center">
           <a class="text-xl font-bold hover:text-gray-300" href="{{ url_for('main.home') }}">KONECTAi</a>
           <!-- Mobile menu button -->
-          <button @click="openMobileMenu = !openMobileMenu" type="button" class="md:hidden text-gray-300 hover:text-white focus:outline-none focus:text-white">
+          <button @click="openMobileMenu = !openMobileMenu" type="button" class="md:hidden text-white hover:text-gray-300 focus:outline-none focus:text-white">
             <svg class="h-6 w-6 fill-current" viewBox="0 0 24 24">
               <path x-show="!openMobileMenu" fill-rule="evenodd" clip-rule="evenodd" d="M4 6h16M4 12h16M4 18h16"></path>
               <path x-show="openMobileMenu" x-cloak fill-rule="evenodd" clip-rule="evenodd" d="M6.293 6.293a1 1 0 011.414 0L12 10.586l4.293-4.293a1 1 0 111.414 1.414L13.414 12l4.293 4.293a1 1 0 01-1.414 1.414L12 13.414l-4.293 4.293a1 1 0 01-1.414-1.414L10.586 12 6.293 7.707a1 1 0 010-1.414z"></path>
@@ -37,9 +37,19 @@
 
           <ul class="md:flex md:items-center flex-col md:flex-row md:space-x-4 mt-4 md:mt-0 md:ml-auto">
             {% if current_user.is_authenticated %}
+            <li class="mr-2"> {# Or ml-2 depending on placement relative to user menu #}
+              <button class="p-2 rounded-full text-white hover:text-gray-300 focus:outline-none focus:bg-gray-700" aria-label="Notifications">
+                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+                </svg>
+              </button>
+            </li>
             <li class="relative" x-data="{ openUserMenu: false }" @click.away="openUserMenu = false">
-              <button @click="openUserMenu = !openUserMenu" class="flex items-center w-full text-left py-2 px-3 text-gray-300 hover:bg-gray-700 hover:text-white rounded focus:outline-none">
-                {{ current_user.username }} ({{ current_user.role }})
+              <button @click="openUserMenu = !openUserMenu" class="flex items-center w-full text-left py-2 px-3 text-white hover:text-gray-300 rounded focus:outline-none focus:bg-gray-700">
+                <svg class="h-6 w-6 mr-2 inline-block" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                    <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path>
+                </svg>
+                {{ current_user.nombre }} ({{ current_user.perfil | capitalize }})
                 <svg class="h-5 w-5 ml-1 fill-current" viewBox="0 0 20 20"><path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"></path></svg>
               </button>
               <div x-show="openUserMenu" x-cloak class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 ring-1 ring-black ring-opacity-5">
