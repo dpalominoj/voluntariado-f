@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, redirect, url_for, flash
 from flask_login import login_user, logout_user, login_required, current_user
 from database.db import db
-from model.models import Usuarios
+from model.models import Usuarios, Discapacidades, Preferencias, UsuarioDiscapacidad
 from controller.forms import RegistrationForm, LoginForm
 
 auth_bp = Blueprint('auth', __name__,
@@ -14,14 +14,33 @@ def register():
     if current_user.is_authenticated:
         return redirect(url_for('main.home'))
     form = RegistrationForm()
+    form.discapacidades.choices = [(d.id_discapacidad, d.nombre.value if hasattr(d.nombre, 'value') else d.nombre) for d in Discapacidades.query.all()]
+    form.preferencias.choices = [(p.id_preferencia, p.nombre_corto) for p in Preferencias.query.all()]
     if form.validate_on_submit():
-        user = Usuarios(username=form.username.data,
-                    email=form.email.data,
-                    role=form.role.data)
+        user = Usuarios(
+            DNI=form.dni.data,
+            nombre=form.nombre.data,
+            perfil=form.perfil.data,
+            estado_usuario=form.estado_usuario.data
+        )
         user.set_password(form.password.data)
+
+        if form.discapacidades.data:
+            for discapacidad_id_str in form.discapacidades.data:
+                discapacidad_id = int(discapacidad_id_str)
+                user_discapacidad_assoc = UsuarioDiscapacidad(id_discapacidad=discapacidad_id)
+                user.discapacidades_pivot.append(user_discapacidad_assoc)
+
+        if form.preferencias.data:
+            for preferencia_id_str in form.preferencias.data:
+                preferencia_id = int(preferencia_id_str)
+                preferencia = Preferencias.query.get(preferencia_id)
+                if preferencia:
+                    user.preferencias.append(preferencia)
+
         db.session.add(user)
         db.session.commit()
-        flash('Congratulations, you are now a registered user! Please log in.', 'success')
+        flash('¡Felicidades, ahora eres un usuario registrado! Por favor Inicia Sesión.', 'success')
         return redirect(url_for('auth.login'))
     return render_template('register.html', title='Register', form=form)
 
@@ -31,15 +50,13 @@ def login():
         return redirect(url_for('main.home'))
     form = LoginForm()
     if form.validate_on_submit():
-        user = Usuarios.query.filter_by(email=form.email.data).first()
+        user = Usuarios.query.filter_by(DNI=form.dni.data).first()
         if user and user.check_password(form.password.data):
-            login_user(user) # 'remember=form.remember_me.data' can be added if you have a remember_me field
-            flash('Login successful!', 'success')
-            # next_page = request.args.get('next')
-            # return redirect(next_page) if next_page else redirect(url_for('main.home'))
-            return redirect(url_for('main.home')) # Or a dashboard page
+            login_user(user)
+            flash('¡Inicio de sesión exitoso!', 'success')
+            return redirect(url_for('main.home'))
         else:
-            flash('Login unsuccessful. Please check your email and password.', 'danger')
+            flash('Inicio de sesión fallido. Por favor, verifica tu DNI y contraseña.', 'danger')
     return render_template('login.html', title='Login', form=form)
 
 @auth_bp.route('/logout')
