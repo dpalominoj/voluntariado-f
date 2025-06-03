@@ -11,9 +11,9 @@ def dashboard():
     """
     Redirects user to the appropriate dashboard based on their role.
     """
-    if current_user.role == 'Admin':
+    if current_user.perfil == 'administrador':
         return render_template('admin_dashboard.html', title="Admin Dashboard")
-    elif current_user.role == 'Organizer':
+    elif current_user.perfil == 'organizador':
         return render_template('organizer_dashboard.html', title="Organizer Dashboard")
     else: # Default to Volunteer
         return render_template('volunteer_dashboard.html', title="Volunteer Dashboard")

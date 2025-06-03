@@ -81,3 +81,17 @@ def get_programs_compatibility():
         # compatibility_scores remains {}
 
     return programs, compatibility_scores
+
+from flask import Blueprint, render_template, redirect, url_for, flash
+
+program_bp = Blueprint('program', __name__,
+                           template_folder='../view/templates',
+                           url_prefix='/program')
+
+@program_bp.route('/<int:program_id>')
+def view_program_detail(program_id):
+    program = Actividades.query.get(program_id)
+    if not program:
+        flash('Programa no encontrado.', 'danger')
+        return redirect(url_for('main.programs'))
+    return render_template('program_detail.html', program=program, title=program.nombre)

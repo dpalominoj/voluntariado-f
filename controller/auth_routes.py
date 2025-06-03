@@ -17,6 +17,10 @@ def register():
     form.discapacidades.choices = [(d.id_discapacidad, d.nombre.value if hasattr(d.nombre, 'value') else d.nombre) for d in Discapacidades.query.all()]
     form.preferencias.choices = [(p.id_preferencia, p.nombre_corto) for p in Preferencias.query.all()]
     if form.validate_on_submit():
+        existing_user = Usuarios.query.filter_by(DNI=form.dni.data).first()
+        if existing_user:
+            flash('El DNI ingresado ya está registrado. Por favor, intente con otro.', 'danger')
+            return render_template('register.html', title='Register', form=form)
         user = Usuarios(
             DNI=form.dni.data,
             nombre=form.nombre.data,
@@ -54,7 +58,7 @@ def login():
         if user and user.check_password(form.password.data):
             login_user(user)
             flash('¡Inicio de sesión exitoso!', 'success')
-            return redirect(url_for('main.home'))
+            return redirect(url_for('user_dashboard.dashboard'))
         else:
             flash('Inicio de sesión fallido. Por favor, verifica tu DNI y contraseña.', 'danger')
     return render_template('login.html', title='Login', form=form)
@@ -63,5 +67,5 @@ def login():
 @login_required
 def logout():
     logout_user()
-    flash('You have been logged out.', 'info')
+    flash('Has cerrado sesión exitosamente.', 'info')
     return redirect(url_for('main.home'))

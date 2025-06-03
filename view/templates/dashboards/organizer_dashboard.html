@@ -1,19 +1,19 @@
 {% extends "dashboard.base.html" %}
 
-{% block title %}Organizer Dashboard - Panel - KONECTAi{% endblock %}
+{% block title %}Panel de Organizador - KONECTAi{% endblock %}
 
 {% block dashboard_sidebar_links %}
     <hr class="my-2 border-gray-200">
     <li>
         <a href="{{ url_for('user_dashboard.organizer_my_programs') if 'user_dashboard.organizer_my_programs' in get_flashed_messages(category_filter=['url_exists']) else '#' }}"
            class="block py-2.5 px-4 text-gray-700 hover:bg-indigo-100 hover:text-indigo-700 rounded-md text-sm transition-colors duration-150 {% if request.endpoint == 'user_dashboard.organizer_my_programs' %}bg-indigo-100 text-indigo-700 font-semibold{% endif %}">
-           My Programs
+           Mis Programas
         </a>
     </li>
     <li>
         <a href="{{ url_for('user_dashboard.organizer_create_program') if 'user_dashboard.organizer_create_program' in get_flashed_messages(category_filter=['url_exists']) else '#' }}"
            class="block py-2.5 px-4 text-gray-700 hover:bg-indigo-100 hover:text-indigo-700 rounded-md text-sm transition-colors duration-150 {% if request.endpoint == 'user_dashboard.organizer_create_program' %}bg-indigo-100 text-indigo-700 font-semibold{% endif %}">
-           Create Program
+           Crear Programa
         </a>
     </li>
     {# Add more organizer links as needed, e.g., Manage Volunteers #}
@@ -21,7 +21,7 @@
     <li>
         <a href="{{ url_for('user_dashboard.organizer_manage_volunteers') if 'user_dashboard.organizer_manage_volunteers' in get_flashed_messages(category_filter=['url_exists']) else '#' }}"
            class="block py-2.5 px-4 text-gray-700 hover:bg-indigo-100 hover:text-indigo-700 rounded-md text-sm transition-colors duration-150 {% if request.endpoint == 'user_dashboard.organizer_manage_volunteers' %}bg-indigo-100 text-indigo-700 font-semibold{% endif %}">
-           Manage Volunteers
+           Gestionar Voluntarios
         </a>
     </li>
     #}
@@ -29,28 +29,28 @@
 
 {% block dashboard_main_content %}
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8">
-        <h1 class="text-3xl font-bold text-gray-800 mb-4 sm:mb-0">Organizer Dashboard</h1>
+        <h1 class="text-3xl font-bold text-gray-800 mb-4 sm:mb-0">Panel de Organizador</h1>
         <a href="{{ url_for('user_dashboard.organizer_create_program') if 'user_dashboard.organizer_create_program' in get_flashed_messages(category_filter=['url_exists']) else '#' }}"
            class="inline-flex items-center px-6 py-3 border border-transparent shadow-sm text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-150">
             <svg class="-ml-1 mr-3 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                 <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
             </svg>
-            Create New Program
+            Crear Nuevo Programa
         </a>
     </div>
 
     <div class="bg-white p-6 rounded-lg shadow-md mb-8">
-        <h2 class="text-xl font-semibold text-gray-700 mb-2">Welcome, {{ current_user.username }}!</h2>
+        <h2 class="text-xl font-semibold text-gray-700 mb-2">¡Bienvenido, {{ current_user.nombre }}!</h2>
         <p class="text-gray-600">
-            As an Organizer, you can manage your programs, create new ones, and oversee activities and volunteers associated with your initiatives.
+            Como Organizador, puedes gestionar tus programas, crear nuevos y supervisar las actividades y voluntarios asociados con tus iniciativas.
         </p>
     </div>
 
     {# Placeholder for "My Programs" list/grid #}
     <div class="bg-white p-6 rounded-lg shadow-md mb-8">
-        <h3 class="text-xl font-semibold text-gray-700 mb-4">My Programs (Placeholder)</h3>
+        <h3 class="text-xl font-semibold text-gray-700 mb-4">Mis Programas (Marcador de posición)</h3>
         <p class="text-gray-600">
-            Your created programs will be listed here. You'll be able to view, edit, and manage applicants for each program.
+            Aquí se listarán los programas que has creado. Podrás ver, editar y gestionar los solicitantes para cada programa.
         </p>
         {# Example of how a program item might look in a list #}
         {#
@@ -71,9 +71,9 @@
 
     {# Placeholder for "Volunteer Management" or "Recent Applications" #}
     <div class="bg-white p-6 rounded-lg shadow-md">
-        <h3 class="text-xl font-semibold text-gray-700 mb-4">Volunteer Applications (Placeholder)</h3>
+        <h3 class="text-xl font-semibold text-gray-700 mb-4">Solicitudes de Voluntarios (Marcador de posición)</h3>
         <p class="text-gray-600">
-            Recent applications from volunteers for your programs will appear here.
+            Aquí aparecerán las solicitudes recientes de voluntarios para tus programas.
         </p>
     </div>
 

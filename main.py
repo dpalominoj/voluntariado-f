@@ -5,6 +5,7 @@ from database.db import db, init_app
 from controller.routes import main_bp
 from controller.auth_routes import auth_bp
 from controller.dashboard_routes import dashboard_bp
+from controller.program_controller import program_bp # Import program_bp
 from flask_login import LoginManager
 from flask_migrate import Migrate # Import Migrate
 from model.models import Usuarios # Changed User to Usuarios
@@ -66,6 +67,7 @@ def load_user(user_id):
 app.register_blueprint(main_bp)
 app.register_blueprint(auth_bp)
 app.register_blueprint(dashboard_bp) # Register the dashboard blueprint
+app.register_blueprint(program_bp) # Register the program blueprint
 
 @app.cli.command('seed-db')
 def seed_db_command():
