@@ -182,42 +182,42 @@ def seed_data():
                 "nombre":"Clases de lengua de señas", "descripcion":"Curso básico de lengua de señas peruana",
                 "fecha_actividad":datetime(2025, 2, 1, 18, 0), "ubicacion":"Online", "tipo":"virtual",
                 "habilidades_requeridas":"Ninguna", "es_inclusiva":True, "cupo_maximo":30, "estado":"abierto",
-                "imagen":"lengua_senas.jpg", "compatibilidad":"90.00", "etiqueta":"educación",
+                "imagen":"ninguno.jpg", "compatibilidad":"90.00", "etiqueta":"educación",
                 "organizacion_instance":org1, "facilidades_instances": [facilidad_interpretes] if facilidad_interpretes else []
             },
             {
                 "nombre":"Campaña de reforestación en Lomas de Lúcumo", "descripcion":"Jornada de plantación de árboles nativos y limpieza de senderos.",
                 "fecha_actividad":datetime(2025, 3, 22, 9, 0), "ubicacion":"Lomas de Lúcumo, Pachacamac, Lima", "tipo":"presencial",
                 "habilidades_requeridas":"Resistencia física básica, amor por la naturaleza.", "es_inclusiva":False, "cupo_maximo":50,
-                "estado":"abierto", "imagen":"reforestacion_lomas.jpg", "compatibilidad":"75.00", "etiqueta":"ambiente y sostenibilidad",
+                "estado":"abierto", "imagen":"reforestacion_accesible.jpg", "compatibilidad":"75.00", "etiqueta":"ambiente y sostenibilidad",
                 "organizacion_instance":org3, "facilidades_instances": [facilidad_rampas] if facilidad_rampas else []
             },
             {
                 "nombre":"Apoyo psicológico con señas a adolescentes", "descripcion":"Apoyo emocional a adolescentes en riesgo",
                 "fecha_actividad":datetime(2025, 3, 12, 10, 0), "ubicacion":"Huancayo, Perú", "tipo":"virtual",
                 "habilidades_requeridas":"conocimiento de señas", "es_inclusiva":True, "cupo_maximo":26, "estado":"abierto",
-                "imagen":"festival_deportivo.jpg", "compatibilidad":"87.00", "etiqueta":"niños y adolescentes",
+                "imagen":"ninguno.jpg", "compatibilidad":"87.00", "etiqueta":"niños y adolescentes",
                 "organizacion_instance":org4, "facilidades_instances": [facilidad_interpretes] if facilidad_interpretes else []
             },
             {
                 "nombre":"Taller de dibujo para niños con discapacidad", "descripcion":"Sesiones de arte inclusivo para niños",
                 "fecha_actividad":datetime(2025, 7, 1, 15, 0), "ubicacion":"Huancayo, Perú", "tipo":"presencial",
                 "habilidades_requeridas":"conocimiento de señas", "es_inclusiva":True, "cupo_maximo":15, "estado":"abierto",
-                "imagen":"festival_deportivo.jpg", "compatibilidad":"87.00", "etiqueta":"niños y adolescentes",
+                "imagen":"arte_urbano.jpg", "compatibilidad":"87.00", "etiqueta":"niños y adolescentes",
                 "organizacion_instance":org2, "facilidades_instances": [facilidad_interpretes] if facilidad_interpretes else []
             },
             {
-                "nombre":"Limpieza de parques urbanos", "descripcion":"Jornada de limpieza y mantenimiento de áreas verdes",
-                "fecha_actividad":datetime(2025, 6, 10, 9, 0), "ubicacion":"Huancayo, Perú", "tipo":"presencial",
+                "nombre":"Campaña de Limpieza Costera", "descripcion":"Recojo de residuos sólidos para proteger el ecosistema marino",
+                "fecha_actividad":datetime(2025, 6, 10, 9, 0), "ubicacion":"Lima, Perú", "tipo":"presencial",
                 "habilidades_requeridas":"amor por la naturaleza", "es_inclusiva":True, "cupo_maximo":15, "estado":"abierto",
-                "imagen":"festival_deportivo.jpg", "compatibilidad":"87.00", "etiqueta":"Ambiente y sostenibilidad",
+                "imagen":"limpieza_costera.jpg", "compatibilidad":"87.00", "etiqueta":"Ambiente y sostenibilidad",
                 "organizacion_instance":org1, "facilidades_instances": [facilidad_interpretes] if facilidad_interpretes else []
             },
             {
-                "nombre":"Charlas virtuales sobre sostenibilidad", "descripcion":"Charlas online acerca de prácticas sostenibles",
-                "fecha_actividad":datetime(2025, 8, 5, 18, 0), "ubicacion":"Huancayo, Perú", "tipo":"virtual",
-                "habilidades_requeridas":"amor por la naturaleza", "es_inclusiva":True, "cupo_maximo":10, "estado":"abierto",
-                "imagen":"festival_deportivo.jpg", "compatibilidad":"87.00", "etiqueta":"Ambiente y sostenibilidad",
+                "nombre":"Tutorías Escolares en Zonas Rurales", "descripcion":"Reforzamiento escolar en comunidades rurales",
+                "fecha_actividad":datetime(2025, 8, 5, 18, 0), "ubicacion":"Huancayo, Perú", "tipo":"presencial",
+                "habilidades_requeridas":"docente de nivel primario", "es_inclusiva":False, "cupo_maximo":3, "estado":"abierto",
+                "imagen":"tutorias_rurales.jpg", "compatibilidad":"87.00", "etiqueta":"Ambiente y sostenibilidad",
                 "organizacion_instance":org3, "facilidades_instances": [facilidad_interpretes] if facilidad_interpretes else []
             },
             {
