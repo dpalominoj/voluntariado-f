@@ -17,9 +17,9 @@ def programs():
     # Get filter values from request arguments
     tipo_filter = request.args.get('tipo', None)
     organizacion_filter = request.args.get('organizacion', None)
-    discapacidad_filter = request.args.get('discapacidad', None)
     estado_filter = request.args.get('estado', None)
-    inclusiva_filter = request.args.get('es_inclusiva', None)
+    enfoque_inclusivo_filter = request.args.get('enfoque_inclusivo', None) # New filter
+    etiqueta_filter_value = request.args.get('etiqueta', None) # New etiqueta filter
 
     # Fetch data for filter dropdowns
     tipos = [r[0] for r in db.session.query(Actividades.tipo).distinct().all() if r[0]] # Ensure not None
@@ -31,9 +31,9 @@ def programs():
     all_programs, compatibility_scores = get_programs_compatibility(
         tipo_filter=tipo_filter,
         organizacion_filter=organizacion_filter,
-        discapacidad_filter=discapacidad_filter,
         estado_filter=estado_filter,
-        inclusiva_filter=inclusiva_filter
+        enfoque_inclusivo=enfoque_inclusivo_filter, # Pass the new filter
+        etiqueta_filter=etiqueta_filter_value # Pass the new etiqueta filter
     )
 
     return render_template('programs.html',

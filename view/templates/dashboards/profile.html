@@ -39,6 +39,34 @@
         </div>
     </div>
 
+    {# Mis Discapacidades y Preferencias de Apoyo Card #}
+    <div class="mt-8 bg-white shadow-md rounded-lg overflow-hidden">
+        <div class="px-4 py-5 sm:px-6 border-b border-gray-200">
+            <h3 class="text-xl leading-6 font-semibold text-gray-900">
+                Mis Discapacidades y Preferencias de Apoyo
+            </h3>
+            <p class="mt-1 max-w-2xl text-sm text-gray-500">
+                Información sobre tus discapacidades registradas.
+            </p>
+        </div>
+        <div class="border-t border-gray-200 px-4 py-5 sm:p-0">
+            {% if user_disabilities_data %}
+                <dl class="sm:divide-y sm:divide-gray-200">
+                    {% for item in user_disabilities_data %}
+                    <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                        <dt class="text-sm font-medium text-gray-500">Discapacidad: {{ item.nombre }}</dt>
+                        <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">Severidad: {{ item.gravedad }}</dd>
+                    </div>
+                    {% endfor %}
+                </dl>
+            {% else %}
+                <div class="px-4 py-5 sm:px-6">
+                    <p class="text-sm text-gray-600">No has registrado ninguna discapacidad.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
     {# Role-Specific Activity Card #}
     {% if user.perfil == 'voluntario' or user.perfil == 'organizador' %}
     <div class="mt-8 bg-white shadow-md rounded-lg overflow-hidden">

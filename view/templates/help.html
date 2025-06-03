@@ -68,20 +68,72 @@
             <div class="text-center">
                  <h3 class="text-2xl font-semibold text-gray-900">¿Necesitas más Ayuda? ¡Chatea con Nosotros!</h3>
             </div>
-            <div id="chatbot-container" class="mt-6 h-96 bg-gray-100 border border-gray-300 rounded-lg shadow-sm flex items-center justify-center">
-                <div class="text-center p-8">
-                    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg>
-                    <h4 class="mt-2 text-lg font-medium text-gray-700">Soporte por Chat Interactivo</h4>
-                    <p class="mt-1 text-sm text-gray-500">
-                        Nuestro chatbot estará disponible aquí pronto para ayudarte con tus preguntas.
-                    </p>
-                    <p class="mt-1 text-xs text-gray-400">
-                        (Pendiente de integración con n8n o un servicio de chat similar)
-                    </p>
-                </div>
+            {# Modified section for n8n chat widget #}
+            <div id="n8n-chat-widget-container" class="mt-6 bg-gray-100 p-4 rounded-md min-h-[300px] flex flex-col justify-center items-center border border-gray-300 shadow-sm">
+                <!-- TODO: Embed n8n Chat Widget Here -->
+                <p class="text-center text-gray-600">
+                    El Asistente Virtual está casi listo.
+                </p>
+                <p class="text-center text-red-500 font-semibold mt-2">
+                    Integración del Chatbot pendiente: El código del widget de n8n (URL/snippet) necesita ser añadido aquí.
+                </p>
+                <p class="text-center text-sm text-gray-500 mt-1">
+                    (Esta sección mostrará la interfaz de chat interactiva.)
+                </p>
             </div>
             <p class="mt-4 text-sm text-gray-500 text-center">Nuestro chatbot puede ayudar a responder preguntas comunes. Si no puede ayudarte, te guiará sobre cómo contactar a nuestro equipo de soporte.</p>
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+{# {{ super() }} #} {# Uncomment if base.html defines a 'scripts' block and you want to extend it #}
+<script>
+    (function() { // IIFE to avoid polluting global scope
+        // TODO: n8n Chat Widget Initialization Script will go here.
+        // This script should be provided by n8n or your chat widget solution.
+        // It will likely target the 'n8n-chat-widget-container' div.
+        console.log("Attempting to initialize n8n chat widget placeholder...");
+
+        const chatContainer = document.getElementById('n8n-chat-widget-container');
+        if (!chatContainer) {
+            console.error("Chat widget container 'n8n-chat-widget-container' not found.");
+            return;
+        }
+
+        // Example of how you might pass user data if needed by your widget:
+        let widgetConfig = {
+            context: 'help_page'
+            // Add other default configurations here
+        };
+
+        {% if current_user.is_authenticated %}
+        // User is authenticated, pass their ID and profile.
+        widgetConfig.userId = "{{ current_user.id_usuario }}";
+        widgetConfig.userProfile = "{{ current_user.perfil }}";
+        // Potentially add other user-specific data if your widget supports it
+        // widgetConfig.userName = "{{ current_user.nombre }}";
+        // widgetConfig.userEmail = "{{ current_user.email }}";
+
+        console.log("User is authenticated. Prepared widget config:", widgetConfig);
+        {% else %}
+        // User is not authenticated.
+        console.log("User is not authenticated. Prepared widget config:", widgetConfig);
+        {% endif %}
+
+        // --- Placeholder for actual n8n widget initialization ---
+        // Replace this with the actual script provided by n8n or your chat solution.
+        // Example (this is purely illustrative):
+        // if (typeof YourN8NWidget !== 'undefined') {
+        //     YourN8NWidget.init(chatContainer, widgetConfig);
+        // } else {
+        //    console.warn("YourN8NWidget script not loaded. Chat cannot be initialized.");
+        //    // The placeholder text in the div will remain visible.
+        // }
+        // For now, we just log the config that would be used.
+        console.log("Placeholder: n8n widget would be initialized with config:", widgetConfig);
+
+    })();
+</script>
 {% endblock %}

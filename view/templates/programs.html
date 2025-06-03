@@ -38,11 +38,14 @@
                 </div>
 
                 <div>
-                    <label for="discapacidad" class="block text-sm font-medium text-gray-700">Enfoque de Discapacidad</label>
-                    <select name="discapacidad" id="discapacidad" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
-                        <option value="">Todas</option>
+                    <label for="enfoque_inclusivo" class="block text-sm font-medium text-gray-700">Enfoque Inclusivo</label>
+                    <select name="enfoque_inclusivo" id="enfoque_inclusivo" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                        <option value="" {% if not current_filters.get('enfoque_inclusivo') %}selected{% endif %}>Cualquiera</option>
+                        <option value="solo_inclusivas" {% if current_filters.get('enfoque_inclusivo') == 'solo_inclusivas' %}selected{% endif %}>Sí (Solo Programas Inclusivos)</option>
                         {% for disc in discapacidades_filter_options %}
-                        <option value="{{ disc.id_discapacidad }}" {% if current_filters.get('discapacidad') | string == disc.id_discapacidad | string %}selected{% endif %}>{{ disc.nombre }}</option>
+                        <option value="{{ disc.nombre }}" {% if current_filters.get('enfoque_inclusivo') == disc.nombre %}selected{% endif %}>
+                            {{ disc.nombre }}
+                        </option>
                         {% endfor %}
                     </select>
                 </div>
@@ -58,18 +61,25 @@
                 </div>
 
                 <div>
-                    <label for="es_inclusiva" class="block text-sm font-medium text-gray-700">Es Inclusiva</label>
-                    <select name="es_inclusiva" id="es_inclusiva" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
-                        <option value="">Cualquiera</option>
-                        <option value="true" {% if current_filters.get('es_inclusiva') == 'true' %}selected{% endif %}>Sí</option>
-                        <option value="false" {% if current_filters.get('es_inclusiva') == 'false' %}selected{% endif %}>No</option>
-                    </select>
+                    <label for="etiqueta" class="block text-sm font-medium text-gray-700">Preferencias (Etiquetas)</label>
+                    <input type="text" name="etiqueta" id="etiqueta" value="{{ current_filters.get('etiqueta', '') }}" class="mt-1 block w-full pl-3 pr-3 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
                 </div>
+
             </div>
 
             <div class="mt-6 flex items-center">
-                <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Aplicar Filtros</button>
-                <a href="{{ url_for('main.programs') }}" class="ml-3 px-4 py-2 border border-gray-300 rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Limpiar Filtros</a>
+                <button type="submit" class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L13 10.414V15a1 1 0 01-.293.707l-2 2A1 1 0 019 17v-6.586L4.293 6.707A1 1 0 014 6V3z" clip-rule="evenodd" />
+                    </svg>
+                    Aplicar Filtros
+                </button>
+                <a href="{{ url_for('main.programs') }}" class="ml-3 inline-flex items-center px-4 py-2 border border-gray-300 rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm1.135 9.865A5.002 5.002 0 0014.001 13H11a1 1 0 010-2h5a1 1 0 011 1v5a1 1 0 01-1 1v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 111.885-.666z" clip-rule="evenodd" />
+                    </svg>
+                    Limpiar Filtros
+                </a>
             </div>
         </form>
         <!-- End Filter Form -->
@@ -113,10 +123,17 @@
                                 </a>
                             </div> #}
                             <div class="ml-auto flex space-x-3">
-                                {% if current_user.is_authenticated and current_user.perfil == 'voluntario' %}
-                                <a href="#" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
-                                    Inscribirse
-                                </a>
+                                {% if current_user.is_authenticated %}
+                                    {% if current_user.perfil == 'voluntario' %}
+                                        <form method="POST" action="{{ url_for('program.enroll_program', program_id=program.id_actividad) }}">
+                                            <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">Inscribirse</button>
+                                        </form>
+                                    {% else %}
+                                        <button type="button" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-gray-400 bg-gray-200 cursor-not-allowed" disabled>Solo voluntarios</button>
+                                        {# Alternatively, use: <span class="text-sm text-gray-500">Solo los voluntarios pueden inscribirse.</span> #}
+                                    {% endif %}
+                                {% else %}
+                                    <a href="{{ url_for('auth.register') }}" onclick="alert('Por favor, créate una cuenta para inscribirte');" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">Inscribirse (Crear Cuenta)</a>
                                 {% endif %}
                                 <a href="{{ url_for('program.view_program_detail', program_id=program.id_actividad) }}" class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                                     Ver Detalles
