@@ -16,10 +16,10 @@
 
         <!-- Filter Form -->
         <form method="GET" action="{{ url_for('main.programs') }}" class="my-8 p-6 bg-white shadow rounded-lg md:flex md:justify-between md:items-start">
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-4 md:flex-grow">
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 md:flex-grow">
                 <div>
                     <label for="tipo" class="block text-sm font-medium text-gray-700">Tipo de Programa</label>
-                    <select name="tipo" id="tipo" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                    <select name="tipo" id="tipo" class="mt-1 block w-full pl-3 pr-3 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
                         <option value="">Todos</option>
                         {% for t in tipos %}
                         <option value="{{ t }}" {% if current_filters.get('tipo') == t %}selected{% endif %}>{{ t }}</option>
@@ -61,7 +61,7 @@
                 </div>
 
                 <div>
-                    <label for="etiqueta" class="block text-sm font-medium text-gray-700">Preferencias (Etiquetas)</label>
+                    <label for="etiqueta" class="block text-sm font-medium text-gray-700">Preferencias</label>
                     <input type="text" name="etiqueta" id="etiqueta" value="{{ current_filters.get('etiqueta', '') }}" class="mt-1 block w-full pl-3 pr-3 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
                 </div>
 
