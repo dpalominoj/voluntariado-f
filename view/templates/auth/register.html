@@ -99,6 +99,13 @@
 
                 <div class="flex items-center">
                     {{ form.acepto_politica(class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded") }}
+                    <label for="{{ form.acepto_politica.id }}" class="cursor-pointer">
+                        Acepto la 
+                            <a href="{{ url_for('.../documentos', filename='Politica_de_Privacidad.pdf') }}" target="_blank" rel="noopener noreferrer" class="text-indigo-600 underline hover:text-indigo-800">
+                                Política de Privacidad de Datos Personales
+                            </a>
+                    </label>
+                    <p class="text-gray-500 mt-1">Al marcar esta casilla, confirmas que has leído y aceptas nuestros términos.</p>
                     {{ form.acepto_politica.label(class="ml-2 block text-sm text-gray-700") }}
                     {% if form.acepto_politica.errors %}
                         {% for error in form.acepto_politica.errors %}
