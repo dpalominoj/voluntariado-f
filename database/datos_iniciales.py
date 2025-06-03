@@ -2,7 +2,6 @@ from datetime import datetime, date, timezone, timedelta
 from werkzeug.security import generate_password_hash
 from database.db import db
 from model.models import Usuarios, Organizaciones, Preferencias, Discapacidades, Facilidad, Actividades, UsuarioDiscapacidad
-# Note: UsuarioPreferencia is not a model, it's handled by M2M relationship directly.
 
 # Define peru_tz
 peru_tz = timezone(timedelta(hours=-5))
@@ -77,6 +76,8 @@ def seed_data():
         # Fetch organizations first if they exist, to link organizers
         org1 = Organizaciones.query.filter_by(id_organizacion=1).first()
         org2 = Organizaciones.query.filter_by(id_organizacion=2).first()
+        org3 = Organizaciones.query.filter_by(id_organizacion=3).first()
+        org4 = Organizaciones.query.filter_by(id_organizacion=4).first()
 
         usuarios_data = [
             # Administrador
@@ -104,12 +105,6 @@ def seed_data():
                 usuario.organizaciones.append(org_instance)
             db.session.add(usuario)
         db.session.commit() # Commit users to get IDs
-
-        # Asignar discapacidades a los voluntarios
-        # User IDs are assumed based on the order of insertion if not querying them back.
-        # For robustness, it's better to query users by a unique field like DNI or email.
-        # This is a simplified assignment assuming IDs 4-10 for the specified volunteers.
-        # Similarly for discapacidades, assuming IDs 1, 2, 3.
 
         # Fetching users and discapacidades to be sure
         user_elena = Usuarios.query.filter_by(email="elena@email.com").first()
@@ -167,6 +162,7 @@ def seed_data():
     if Actividades.query.count() == 0:
         # Fetch organizations and facilidades to link them
         org1 = Organizaciones.query.filter_by(id_organizacion=1).first()
+        org2 = Organizaciones.query.filter_by(id_organizacion=2).first()
         org3 = Organizaciones.query.filter_by(id_organizacion=3).first()
         org4 = Organizaciones.query.filter_by(id_organizacion=4).first()
 
@@ -229,7 +225,7 @@ def seed_data():
                 "fecha_actividad":datetime(2025, 9, 3, 9, 0), "ubicacion":"Huancayo, Perú", "tipo":"presencial",
                 "habilidades_requeridas":"Resistencia física básica", "es_inclusiva":True, "cupo_maximo":10, "estado":"abierto",
                 "imagen":"festival_deportivo.jpg", "compatibilidad":"87.00", "etiqueta":"Deporte y recreación",
-                "organizacion_instance":org2, "facilidades_instances": [facilidad_interpretes] if facilidad_interpretes else []
+                "organizacion_instance":org2, "facilidades_instances": [facilidad_rampas] if facilidad_interpretes else []
             }            
         ]
         for data in actividades_data:
