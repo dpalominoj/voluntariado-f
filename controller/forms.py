@@ -1,22 +1,28 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, SelectField
-from wtforms.validators import DataRequired, Email, EqualTo, Length
+from wtforms import StringField, PasswordField, SubmitField, SelectField, SelectMultipleField, BooleanField
+from wtforms.validators import DataRequired, Email, EqualTo, Length, Optional
 
 class RegistrationForm(FlaskForm):
-    username = StringField('Username', 
-                           validators=[DataRequired(), Length(min=2, max=20)])
-    email = StringField('Email',
-                        validators=[DataRequired(), Email()])
-    password = PasswordField('Password', validators=[DataRequired(), Length(min=6)])
-    confirm_password = PasswordField('Confirm Password',
+    dni = StringField('DNI',
+                           validators=[DataRequired(), Length(min=8, max=8)])
+    nombre = StringField('Nombre',
+                        validators=[DataRequired(), Length(min=2, max=100)])
+    password = PasswordField('Contraseña', validators=[DataRequired(), Length(min=6)])
+    confirm_password = PasswordField('Confirmar Contraseña',
                                      validators=[DataRequired(), EqualTo('password')])
-    role = SelectField('Role', 
-                       choices=[('Volunteer', 'Volunteer'), ('Organizer', 'Organizer')],
+    perfil = SelectField('Perfil',
+                       choices=[('voluntario', 'Voluntario'), ('organizador', 'Organizador'), ('administrador', 'Administrador')],
                        validators=[DataRequired()])
-    submit = SubmitField('Sign Up')
+    estado_usuario = SelectField('Estado',
+                                 choices=[('activo', 'Activo'), ('inactivo', 'Inactivo'), ('suspendido', 'Suspendido'), ('bloqueado', 'Bloqueado')],
+                                 validators=[DataRequired()], default='activo')
+    discapacidades = SelectMultipleField('Discapacidades', validators=[Optional()])
+    preferencias = SelectMultipleField('Preferencias', validators=[Optional()])
+    acepto_politica = BooleanField('Acepto la política de privacidad', validators=[DataRequired(message="Debe aceptar la política de privacidad.")])
+    submit = SubmitField('Registrarse')
 
 class LoginForm(FlaskForm):
-    email = StringField('Email',
-                        validators=[DataRequired(), Email()])
-    password = PasswordField('Password', validators=[DataRequired()])
+    dni = StringField('DNI',
+                        validators=[DataRequired(), Length(min=8, max=8)])
+    password = PasswordField('Contraseña', validators=[DataRequired()])
     submit = SubmitField('Login')

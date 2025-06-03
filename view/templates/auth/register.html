@@ -6,7 +6,7 @@
 <div class="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
     <div class="sm:mx-auto sm:w-full sm:max-w-md">
         <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Create your new account
+            Crea tu nueva cuenta
         </h2>
     </div>
 
@@ -16,28 +16,28 @@
                 {{ form.hidden_tag() }}
 
                 <div>
-                    {{ form.username.label(class="block text-sm font-medium text-gray-700 mb-1") }}
-                    {{ form.username(class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" + (" border-red-500" if form.username.errors else ""), placeholder="Your Username") }}
-                    {% if form.username.errors %}
+                    {{ form.dni.label(class="block text-sm font-medium text-gray-700 mb-1") }}
+                    {{ form.dni(class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" + (" border-red-500" if form.dni.errors else ""), placeholder="Tu DNI (8 dígitos)") }}
+                    {% if form.dni.errors %}
                         <div class="mt-1">
-                            {% for error in form.username.errors %}<span class="text-xs text-red-500">{{ error }}</span>{% endfor %}
+                            {% for error in form.dni.errors %}<span class="text-xs text-red-500">{{ error }}</span>{% endfor %}
                         </div>
                     {% endif %}
                 </div>
 
                 <div>
-                    {{ form.email.label(class="block text-sm font-medium text-gray-700 mb-1") }}
-                    {{ form.email(class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" + (" border-red-500" if form.email.errors else ""), placeholder="you@example.com") }}
-                    {% if form.email.errors %}
+                    {{ form.nombre.label(class="block text-sm font-medium text-gray-700 mb-1") }}
+                    {{ form.nombre(class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" + (" border-red-500" if form.nombre.errors else ""), placeholder="Tu nombre completo") }}
+                    {% if form.nombre.errors %}
                         <div class="mt-1">
-                            {% for error in form.email.errors %}<span class="text-xs text-red-500">{{ error }}</span>{% endfor %}
+                            {% for error in form.nombre.errors %}<span class="text-xs text-red-500">{{ error }}</span>{% endfor %}
                         </div>
                     {% endif %}
                 </div>
 
                 <div>
                     {{ form.password.label(class="block text-sm font-medium text-gray-700 mb-1") }}
-                    {{ form.password(class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" + (" border-red-500" if form.password.errors else ""), placeholder="Password") }}
+                    {{ form.password(class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" + (" border-red-500" if form.password.errors else ""), placeholder="Contraseña") }}
                     {% if form.password.errors %}
                         <div class="mt-1">
                             {% for error in form.password.errors %}<span class="text-xs text-red-500">{{ error }}</span>{% endfor %}
@@ -47,7 +47,7 @@
 
                 <div>
                     {{ form.confirm_password.label(class="block text-sm font-medium text-gray-700 mb-1") }}
-                    {{ form.confirm_password(class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" + (" border-red-500" if form.confirm_password.errors else ""), placeholder="Confirm Password") }}
+                    {{ form.confirm_password(class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" + (" border-red-500" if form.confirm_password.errors else ""), placeholder="Confirmar Contraseña") }}
                     {% if form.confirm_password.errors %}
                         <div class="mt-1">
                             {% for error in form.confirm_password.errors %}<span class="text-xs text-red-500">{{ error }}</span>{% endfor %}
@@ -56,12 +56,54 @@
                 </div>
 
                 <div>
-                    {{ form.role.label(class="block text-sm font-medium text-gray-700 mb-1") }}
-                    {{ form.role(class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" + (" border-red-500" if form.role.errors else "")) }}
-                    {% if form.role.errors %}
+                    {{ form.perfil.label(class="block text-sm font-medium text-gray-700 mb-1") }}
+                    {{ form.perfil(class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" + (" border-red-500" if form.perfil.errors else "")) }}
+                    {% if form.perfil.errors %}
                         <div class="mt-1">
-                            {% for error in form.role.errors %}<span class="text-xs text-red-500">{{ error }}</span>{% endfor %}
+                            {% for error in form.perfil.errors %}<span class="text-xs text-red-500">{{ error }}</span>{% endfor %}
                         </div>
+                    {% endif %}
+                </div>
+
+                <div>
+                    {{ form.estado_usuario.label(class="block text-sm font-medium text-gray-700 mb-1") }}
+                    {{ form.estado_usuario(class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" + (" border-red-500" if form.estado_usuario.errors else "")) }}
+                    {% if form.estado_usuario.errors %}
+                        <div class="mt-1">
+                            {% for error in form.estado_usuario.errors %}<span class="text-xs text-red-500">{{ error }}</span>{% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div>
+                    {{ form.discapacidades.label(class="block text-sm font-medium text-gray-700 mb-1") }}
+                    {{ form.discapacidades(class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" + (" border-red-500" if form.discapacidades.errors else ""), multiple="multiple") }}
+                    <p class="mt-1 text-xs text-gray-500">Opcional. Mantén presionada la tecla Ctrl (o Cmd en Mac) para seleccionar varias opciones.</p>
+                    {% if form.discapacidades.errors %}
+                        <div class="mt-1">
+                            {% for error in form.discapacidades.errors %}<span class="text-xs text-red-500">{{ error }}</span>{% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div>
+                    {{ form.preferencias.label(class="block text-sm font-medium text-gray-700 mb-1") }}
+                    {{ form.preferencias(class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" + (" border-red-500" if form.preferencias.errors else ""), multiple="multiple") }}
+                    <p class="mt-1 text-xs text-gray-500">Opcional. Mantén presionada la tecla Ctrl (o Cmd en Mac) para seleccionar varias opciones.</p>
+                    {% if form.preferencias.errors %}
+                        <div class="mt-1">
+                            {% for error in form.preferencias.errors %}<span class="text-xs text-red-500">{{ error }}</span>{% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="flex items-center">
+                    {{ form.acepto_politica(class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded") }}
+                    {{ form.acepto_politica.label(class="ml-2 block text-sm text-gray-700") }}
+                    {% if form.acepto_politica.errors %}
+                        {% for error in form.acepto_politica.errors %}
+                            <span class="text-xs text-red-500 ml-2">{{ error }}</span>
+                        {% endfor %}
                     {% endif %}
                 </div>
 
@@ -77,15 +119,15 @@
                     </div>
                     <div class="relative flex justify-center text-sm">
                         <span class="px-2 bg-white text-gray-500">
-                            Or
+                            O
                         </span>
                     </div>
                 </div>
                 <div class="mt-6 text-center">
                     <p class="text-sm text-gray-600">
-                        Already have an account?
+                        ¿Ya tienes una cuenta?
                         <a href="{{ url_for('auth.login') }}" class="font-medium text-indigo-600 hover:text-indigo-500">
-                            Sign In
+                            Inicia Sesión
                         </a>
                     </p>
                 </div>
