@@ -202,7 +202,35 @@ def seed_data():
                 "habilidades_requeridas":"conocimiento de señas", "es_inclusiva":True, "cupo_maximo":26, "estado":"abierto",
                 "imagen":"festival_deportivo.jpg", "compatibilidad":"87.00", "etiqueta":"niños y adolescentes",
                 "organizacion_instance":org4, "facilidades_instances": [facilidad_interpretes] if facilidad_interpretes else []
-            }
+            },
+            {
+                "nombre":"Taller de dibujo para niños con discapacidad", "descripcion":"Sesiones de arte inclusivo para niños",
+                "fecha_actividad":datetime(2025, 7, 1, 15, 0), "ubicacion":"Huancayo, Perú", "tipo":"presencial",
+                "habilidades_requeridas":"conocimiento de señas", "es_inclusiva":True, "cupo_maximo":15, "estado":"abierto",
+                "imagen":"festival_deportivo.jpg", "compatibilidad":"87.00", "etiqueta":"niños y adolescentes",
+                "organizacion_instance":org2, "facilidades_instances": [facilidad_interpretes] if facilidad_interpretes else []
+            },
+            {
+                "nombre":"Limpieza de parques urbanos", "descripcion":"Jornada de limpieza y mantenimiento de áreas verdes",
+                "fecha_actividad":datetime(2025, 6, 10, 9, 0), "ubicacion":"Huancayo, Perú", "tipo":"presencial",
+                "habilidades_requeridas":"amor por la naturaleza", "es_inclusiva":True, "cupo_maximo":15, "estado":"abierto",
+                "imagen":"festival_deportivo.jpg", "compatibilidad":"87.00", "etiqueta":"Ambiente y sostenibilidad",
+                "organizacion_instance":org1, "facilidades_instances": [facilidad_interpretes] if facilidad_interpretes else []
+            },
+            {
+                "nombre":"Charlas virtuales sobre sostenibilidad", "descripcion":"Charlas online acerca de prácticas sostenibles",
+                "fecha_actividad":datetime(2025, 8, 5, 18, 0), "ubicacion":"Huancayo, Perú", "tipo":"virtual",
+                "habilidades_requeridas":"amor por la naturaleza", "es_inclusiva":True, "cupo_maximo":10, "estado":"abierto",
+                "imagen":"festival_deportivo.jpg", "compatibilidad":"87.00", "etiqueta":"Ambiente y sostenibilidad",
+                "organizacion_instance":org3, "facilidades_instances": [facilidad_interpretes] if facilidad_interpretes else []
+            },
+            {
+                "nombre":"Jornada deportiva inclusiva", "descripcion":"Actividades deportivas inclusivas para voluntarios",
+                "fecha_actividad":datetime(2025, 9, 3, 9, 0), "ubicacion":"Huancayo, Perú", "tipo":"presencial",
+                "habilidades_requeridas":"Resistencia física básica", "es_inclusiva":True, "cupo_maximo":10, "estado":"abierto",
+                "imagen":"festival_deportivo.jpg", "compatibilidad":"87.00", "etiqueta":"Deporte y recreación",
+                "organizacion_instance":org2, "facilidades_instances": [facilidad_interpretes] if facilidad_interpretes else []
+            }            
         ]
         for data in actividades_data:
             org_instance = data.pop("organizacion_instance", None)
