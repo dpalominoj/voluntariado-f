@@ -37,12 +37,10 @@ def get_programs_compatibility(tipo_filter=None, organizacion_filter=None, estad
         query = query.filter(Actividades.id_organizacion == organizacion_filter)
 
     # New logic for enfoque_inclusivo
-    # enfoque_inclusivo will be a string like "Visual", "Auditiva" from TipoDiscapacidad enum values,
-    # or empty if "Cualquiera" was selected.
     if enfoque_inclusivo and enfoque_inclusivo != '':
         # This means a specific disability name is selected for filtering.
         query = query.join(actividad_discapacidad_table, Actividades.id_actividad == actividad_discapacidad_table.c.actividad_id) \
-                     .join(Discapacidades, actividad_discapacidad_table.c.id_discapacidad == Discapacidades.id_discapacidad) \
+                     .join(Discapacidades, actividad_discapacidad_table.c.discapacidad_id == Discapacidades.id_discapacidad) \
                      .filter(Discapacidades.nombre == enfoque_inclusivo)
         # Add the following line to ensure only Actividades entities are returned
         query = query.with_entities(Actividades)
