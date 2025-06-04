@@ -1,6 +1,12 @@
 from datetime import datetime, date, timezone, timedelta
 from werkzeug.security import generate_password_hash
 from database.db import db
+from model.models import Usuarios, Organizaciones, Preferencias, Discapacidades, Facilidad, Actividades, UsuarioDiscapacidad, Inscripciones, EstadoActividad
+import random
+++++++++++++
+from datetime import datetime, date, timezone, timedelta
+from werkzeug.security import generate_password_hash
+from database.db import db
 from model.models import Usuarios, Organizaciones, Preferencias, Discapacidades, Facilidad, Actividades, UsuarioDiscapacidad
 
 # Define peru_tz
@@ -31,7 +37,7 @@ def seed_data():
                 logo="🌿",
                 fecha_registro=datetime(2025, 2, 5, 9, 0),
             ),
-             Organizaciones( # Changed to Organizaciones
+             Organizaciones(
                 nombre_org="Corazones Unidos por la Infancia",
                 descripcion_org="Asociación que trabaja por el bienestar y desarrollo de niños en situación de riesgo.",
                 direccion_fisica="Av. Los Niños 321, Trujillo",
@@ -42,38 +48,37 @@ def seed_data():
         db.session.add_all(organizaciones)
 
     # Crea discapacidades
-    if Discapacidades.query.count() == 0: # Changed to Discapacidades
+    if Discapacidades.query.count() == 0: 
         discapacidades = [
-            Discapacidades(nombre="Auditiva", descripcion="Dificultad o imposibilidad de usar el sentido del oído"), # Changed to Discapacidades
-            Discapacidades(nombre="Visual", descripcion="Dificultad o imposibilidad de usar el sentido de la vista"), # Changed to Discapacidades
-            Discapacidades(nombre="Motriz", descripcion="Dificultad o imposibilidad de moverse o desplazarse") # Changed to Discapacidades
+            Discapacidades(nombre="Auditiva", descripcion="Dificultad o imposibilidad de usar el sentido del oído"), 
+            Discapacidades(nombre="Visual", descripcion="Dificultad o imposibilidad de usar el sentido de la vista"), 
+            Discapacidades(nombre="Motriz", descripcion="Dificultad o imposibilidad de moverse o desplazarse") 
         ]
         db.session.add_all(discapacidades)
 
     # Crea preferencias
-    if Preferencias.query.count() == 0: # Changed to Preferencias
+    if Preferencias.query.count() == 0: 
         preferencias = [
-            Preferencias(nombre_corto="Niños y Adolescentes", descripcion_detallada="Trabajar con niños y adolescentes"), # Changed to Preferencias
-            Preferencias(nombre_corto="Educación y formación", descripcion_detallada="Actividades educativas"), # Changed to Preferencias
-            Preferencias(nombre_corto="Ambiente y sostenibilidad", descripcion_detallada="Actividades ambientales"), # Changed to Preferencias
-            Preferencias(nombre_corto="Deporte y recreación", descripcion_detallada="Actividades deportivas") # Changed to Preferencias
+            Preferencias(nombre_corto="Niños y Adolescentes", descripcion_detallada="Trabajar con niños y adolescentes"), 
+            Preferencias(nombre_corto="Educación y formación", descripcion_detallada="Actividades educativas"), 
+            Preferencias(nombre_corto="Ambiente y sostenibilidad", descripcion_detallada="Actividades ambientales"), 
+            Preferencias(nombre_corto="Deporte y recreación", descripcion_detallada="Actividades deportivas") 
         ]
         db.session.add_all(preferencias)
 
     # Crea facilidades para actividades
-    if Facilidad.query.count() == 0: # Changed to Facilidad
-        facilidades = [ # Renamed variable
-            Facilidad(nombre_facilidad="Rampas", descripcion="Acceso con rampas para sillas de ruedas"), # Changed to Facilidad
-            Facilidad(nombre_facilidad="Intérpretes", descripcion="Intérpretes de lengua de señas disponibles"), # Changed to Facilidad
-            Facilidad(nombre_facilidad="Material braille", descripcion="Material disponible en sistema braille"), # Changed to Facilidad
-            Facilidad(nombre_facilidad="Materiales en audio", descripcion="Material accesible en audio"), # Changed to Facilidad
-            Facilidad(nombre_facilidad="Otros", descripcion="Otros") # Changed to Facilidad
+    if Facilidad.query.count() == 0: 
+        facilidades = [ 
+            Facilidad(nombre_facilidad="Rampas", descripcion="Acceso con rampas para sillas de ruedas"), 
+            Facilidad(nombre_facilidad="Intérpretes", descripcion="Intérpretes de lengua de señas disponibles"), 
+            Facilidad(nombre_facilidad="Material braille", descripcion="Material disponible en sistema braille"), 
+            Facilidad(nombre_facilidad="Materiales en audio", descripcion="Material accesible en audio"), 
+            Facilidad(nombre_facilidad="Otros", descripcion="Otros o ninguno") 
         ]
-        db.session.add_all(facilidades) # Updated variable
+        db.session.add_all(facilidades)
 
     # Crea usuarios
-    if Usuarios.query.count() == 0: # Changed to Usuarios
-        # Fetch organizations first if they exist, to link organizers
+    if Usuarios.query.count() == 0:
         org1 = Organizaciones.query.filter_by(id_organizacion=1).first()
         org2 = Organizaciones.query.filter_by(id_organizacion=2).first()
 
@@ -84,7 +89,7 @@ def seed_data():
             {"DNI":"87654321", "nombre":"Ana", "apellido":"García", "email":"ana.garcia@inclusionperu.org", "password":"Hashed87", "celular":"912345678", "direccion":"Calle Secundaria 456", "fecha_nacimiento":date(1992, 8, 20), "genero":"femenino", "perfil":"organizador", "estado_usuario":"activo", "fecha_registro":datetime.now(peru_tz), "org_instance": org1},
             # Organizador 2
             {"DNI":"78223344", "nombre":"Carlos", "apellido":"Lopez", "email":"carlos.lopez@manossolidarias.org", "password":"Hashed78", "celular":"923456789", "direccion":"Av. Libertad 789", "fecha_nacimiento":date(1985, 3, 10), "genero":"masculino", "perfil":"organizador", "estado_usuario":"activo", "fecha_registro":datetime.now(peru_tz), "org_instance": org2},
-            # Voluntarios (tiene_discapacidad will be handled by creating UsuarioDiscapacidad entries)
+            # Voluntarios
             {"DNI":"44556677", "nombre":"Elena", "apellido":"Rojas", "email":"elena@email.com", "password":"Hashed44", "celular":"987654334", "direccion":"Jr. Cusco 3031", "fecha_nacimiento":date(1988, 4, 27), "genero":"femenino", "perfil":"voluntario", "estado_usuario":"activo", "fecha_registro":datetime.now(peru_tz)},
             {"DNI":"55667788", "nombre":"Javier", "apellido":"Paredes", "email":"javier.paredes@example.com", "password":"Hashed55", "celular":"998877665", "direccion":"Calle Los Pinos 450", "fecha_nacimiento":date(1995, 11, 5), "genero":"masculino", "perfil":"voluntario", "estado_usuario":"activo", "fecha_registro":datetime.now(peru_tz)},
             {"DNI":"66778899", "nombre":"Sofia", "apellido":"Castro", "email":"sofia.castro@example.com", "password":"Hashed66", "celular":"911223344", "direccion":"Av. El Sol 987", "fecha_nacimiento":date(2000, 7, 12), "genero":"femenino", "perfil":"voluntario", "estado_usuario":"activo", "fecha_registro":datetime.now(peru_tz)},
@@ -102,7 +107,7 @@ def seed_data():
             if org_instance and usuario.perfil == 'organizador':
                 usuario.organizaciones.append(org_instance)
             db.session.add(usuario)
-        db.session.commit() # Commit users to get IDs
+        db.session.commit()
 
         # Fetching users and discapacidades to be sure
         user_elena = Usuarios.query.filter_by(email="elena@email.com").first()
@@ -111,7 +116,7 @@ def seed_data():
         user_luis = Usuarios.query.filter_by(email="luis.mendoza@example.com").first()
         user_carmen = Usuarios.query.filter_by(email="carmen.diaz@example.com").first()
         user_pedro = Usuarios.query.filter_by(email="pedro.vargas@example.com").first()
-        user_rosa = Usuarios.query.filter_by(email="rosa.chavez@example.com").first() # This was user ID 10
+        user_rosa = Usuarios.query.filter_by(email="rosa.chavez@example.com").first()
 
         disc_auditiva = Discapacidades.query.filter_by(nombre="Auditiva").first()
         disc_visual = Discapacidades.query.filter_by(nombre="Visual").first()
@@ -129,7 +134,7 @@ def seed_data():
             db.session.add(UsuarioDiscapacidad(id_usuario=user_carmen.id_usuario, id_discapacidad=disc_visual.id_discapacidad, gravedad="leve", apoyo_requerido="otros"))
         if user_pedro and disc_motriz:
             db.session.add(UsuarioDiscapacidad(id_usuario=user_pedro.id_usuario, id_discapacidad=disc_motriz.id_discapacidad, gravedad="grave", apoyo_requerido="otros"))
-        if user_rosa and disc_motriz: # Assuming Rosa is the 10th user in the original list (index 9)
+        if user_rosa and disc_motriz:
             db.session.add(UsuarioDiscapacidad(id_usuario=user_rosa.id_usuario, id_discapacidad=disc_motriz.id_discapacidad, gravedad="moderada", apoyo_requerido="otros"))
 
         # Asignar preferencias a usuarios
@@ -151,14 +156,11 @@ def seed_data():
         if user_sofia and pref_ambiente: user_sofia.preferencias.append(pref_ambiente)
         if user_luis and pref_ninos: user_luis.preferencias.append(pref_ninos)
         if user_carmen and pref_deporte: user_carmen.preferencias.append(pref_deporte)
-        if user_pedro and pref_deporte: user_pedro.preferencias.append(pref_deporte) # Original: user 9, pref 4
-        if user_rosa and pref_edu: user_rosa.preferencias.append(pref_edu)      # Original: user 10, pref 2
-
-        # No need to db.session.add for M2M appends handled by SQLAlchemy's association proxy or collection append
+        if user_pedro and pref_deporte: user_pedro.preferencias.append(pref_deporte)
+        if user_rosa and pref_edu: user_rosa.preferencias.append(pref_edu)
 
     # Crear actividades
     if Actividades.query.count() == 0:
-        # Fetch organizations and facilidades to link them
         org1 = Organizaciones.query.filter_by(id_organizacion=1).first()
         org2 = Organizaciones.query.filter_by(id_organizacion=2).first()
         org3 = Organizaciones.query.filter_by(id_organizacion=3).first()
@@ -215,7 +217,7 @@ def seed_data():
                 "nombre":"Tutorías Escolares en Zonas Rurales", "descripcion":"Reforzamiento escolar en comunidades rurales",
                 "fecha_actividad":datetime(2025, 8, 5, 18, 0), "ubicacion":"Huancayo, Perú", "tipo":"presencial",
                 "habilidades_requeridas":"docente de nivel primario", "es_inclusiva":False, "cupo_maximo":3, "estado":"abierto",
-                "imagen":"tutorias_rurales.jpg", "compatibilidad":"87.00", "etiqueta":"Ambiente y sostenibilidad",
+                "imagen":"tutorias_rurales.jpg", "compatibilidad":"87.00", "etiqueta":"Educación y formación",
                 "organizacion_instance":org3, "facilidades_instances": [facilidad_interpretes] if facilidad_interpretes else []
             },
             {
@@ -223,23 +225,80 @@ def seed_data():
                 "fecha_actividad":datetime(2025, 9, 3, 9, 0), "ubicacion":"Huancayo, Perú", "tipo":"presencial",
                 "habilidades_requeridas":"Resistencia física básica", "es_inclusiva":True, "cupo_maximo":10, "estado":"abierto",
                 "imagen":"festival_deportivo.jpg", "compatibilidad":"87.00", "etiqueta":"Deporte y recreación",
-                "organizacion_instance":org2, "facilidades_instances": [facilidad_rampas] if facilidad_interpretes else []
+                "organizacion_instance":org2, "facilidades_instances": [facilidad_rampas] if facilidad_rampas else []
             }            
         ]
         for data in actividades_data:
             org_instance = data.pop("organizacion_instance", None)
             facilidades_instances = data.pop("facilidades_instances", [])
-
             actividad = Actividades(**data)
-
             if org_instance:
-                actividad.organizacion = org_instance # Assign instance directly
-
+                actividad.organizacion = org_instance
             if facilidades_instances:
                 for fac in facilidades_instances:
                     actividad.facilidades.append(fac)
             db.session.add(actividad)
 
-    # Commit changes
-    db.session.commit() # Commit after all data seeding
+    # Crear inscripciones
+    if Inscripciones.query.count() == 0:
+        # voluntarios especificos
+        user_elena = Usuarios.query.filter_by(email="elena@email.com").first()
+        user_javier = Usuarios.query.filter_by(email="javier.paredes@example.com").first()
+        user_sofia = Usuarios.query.filter_by(email="sofia.castro@example.com").first()
+        user_luis = Usuarios.query.filter_by(email="luis.mendoza@example.com").first()
+        user_carmen = Usuarios.query.filter_by(email="carmen.diaz@example.com").first()
+        user_pedro = Usuarios.query.filter_by(email="pedro.vargas@example.com").first()
+        # actividades especificas
+        act_lectura = Actividades.query.filter_by(nombre="Taller de lectura inclusiva").first()
+        act_senas = Actividades.query.filter_by(nombre="Clases de lengua de señas").first()
+        act_reforestacion = Actividades.query.filter_by(nombre="Campaña de reforestación en Lomas de Lúcumo").first()
+        act_apoyo_psico = Actividades.query.filter_by(nombre="Apoyo psicológico con señas a adolescentes").first()
+        act_dibujo = Actividades.query.filter_by(nombre="Taller de dibujo para niños con discapacidad").first()
+        act_limpieza = Actividades.query.filter_by(nombre="Campaña de Limpieza Costera").first()
+        act_tutorias = Actividades.query.filter_by(nombre="Tutorías Escolares en Zonas Rurales").first()
+        act_deportiva = Actividades.query.filter_by(nombre="Jornada deportiva inclusiva").first()
+
+        predefined_inscriptions = []
+        if user_elena and act_lectura: predefined_inscriptions.append({'user': user_elena, 'activity': act_lectura})
+        if user_elena and act_senas: predefined_inscriptions.append({'user': user_elena, 'activity': act_senas})        
+        if user_javier and act_reforestacion: predefined_inscriptions.append({'user': user_javier, 'activity': act_reforestacion})        
+        if user_sofia and act_apoyo_psico: predefined_inscriptions.append({'user': user_sofia, 'activity': act_apoyo_psico})
+        if user_sofia and act_dibujo: predefined_inscriptions.append({'user': user_sofia, 'activity': act_dibujo})
+        if user_sofia and act_limpieza: predefined_inscriptions.append({'user': user_sofia, 'activity': act_limpieza})
+        if user_luis and act_tutorias: predefined_inscriptions.append({'user': user_luis, 'activity': act_tutorias})
+        if user_luis and act_deportiva: predefined_inscriptions.append({'user': user_luis, 'activity': act_deportiva})
+        if user_carmen and act_lectura: predefined_inscriptions.append({'user': user_carmen, 'activity': act_lectura})
+        if user_carmen and act_reforestacion: predefined_inscriptions.append({'user': user_carmen, 'activity': act_reforestacion})
+        if user_pedro and act_senas: predefined_inscriptions.append({'user': user_pedro, 'activity': act_senas})
+        if user_pedro and act_apoyo_psico: predefined_inscriptions.append({'user': user_pedro, 'activity': act_apoyo_psico})
+
+        if predefined_inscriptions:
+            for item in predefined_inscriptions:
+                user = item['user']
+                activity = item['activity']
+                
+                # revisa duplicados
+                existe_inscripcion = Inscripciones.query.filter_by(
+                    id_usuario=user.id_usuario,
+                    id_actividad=activity.id_actividad
+                ).first()
+                
+                if not existe_inscripcion:
+                    inscripcion = Inscripciones(
+                        id_usuario=user.id_usuario,
+                        id_actividad=activity.id_actividad,
+                        fecha_inscripcion=datetime.now(peru_tz),
+                        estado_inscripcion='confirmada' 
+                    )
+                    db.session.add(inscripcion)
+            
+            try:
+                db.session.commit()
+            except Exception as e:
+                db.session.rollback()
+                print(f"Error al agregar inscripciones iniciales: {e}")
+        else:
+            print("No se pudieron agregar inscripciones predefinidas")
+    # Guardar Commit
+    db.session.commit()
     print("Datos iniciales agregados a la base de datos.")
