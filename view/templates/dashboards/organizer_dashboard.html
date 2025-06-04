@@ -63,19 +63,23 @@
     {# Display Created Programs #}
     <div class="bg-white p-6 rounded-lg shadow-md mb-8">
         <h3 class="text-xl font-semibold text-gray-700 mb-4">Mis Programas Creados</h3>
-        {% if created_programs %}
+        {% if created_programs_con_prediccion %}
             <ul class="divide-y divide-gray-200 -mx-6"> {# Negative margin to extend divider if parent has padding p-6 #}
-                {% for program in created_programs %}
+                {% for item in created_programs_con_prediccion %}
                 <li class="p-4 hover:bg-gray-50 sm:px-6">
                     <div class="flex items-center justify-between">
                         <div class="truncate">
-                            <p class="text-md font-medium text-indigo-600 truncate">{{ program.nombre }}</p>
-                            <p class="text-sm text-gray-500">Organización: {{ program.organizacion.nombre_org if program.organizacion else 'N/A' }}</p>
-                            <p class="text-sm text-gray-500">Fecha Actividad: {{ program.fecha_actividad.strftime('%d/%m/%Y') if program.fecha_actividad else 'N/A' }} | Estado: <span class="font-semibold">{{ program.estado.value | capitalize if program.estado else 'N/A' }}</span></p>
-                            <p class="text-sm text-gray-500">Cupo: {{ program.cupo_maximo if program.cupo_maximo is not none else 'N/A' }} | Es Inclusiva: {{ 'Sí' if program.es_inclusiva else 'No' }}</p>
+                            <p class="text-md font-medium text-indigo-600 truncate">
+                                {{ item.actividad.nombre }}
+                                <span title="{{ item.texto_indicador }}" class="ml-2 text-xl">{{ item.indicador }}</span>
+                            </p>
+                            <p class="text-sm text-gray-500">Organización: {{ item.actividad.organizacion.nombre_org if item.actividad.organizacion else 'N/A' }}</p>
+                            <p class="text-sm text-gray-500">Fecha Actividad: {{ item.actividad.fecha_actividad.strftime('%d/%m/%Y') if item.actividad.fecha_actividad else 'N/A' }} | Estado: <span class="font-semibold">{{ item.actividad.estado.value | capitalize if item.actividad.estado else 'N/A' }}</span></p>
+                            <p class="text-sm text-gray-500">Cupo: {{ item.actividad.cupo_maximo if item.actividad.cupo_maximo is not none else 'N/A' }} | Es Inclusiva: {{ 'Sí' if item.actividad.es_inclusiva else 'No' }}</p>
+                            <p class="text-xs text-gray-400 mt-1">Predicción: {{ item.texto_indicador }}</p> {# Displaying text also directly for clarity #}
                         </div>
                         <div class="ml-2 flex-shrink-0">
-                            <a href="{{ url_for('program.view_program_detail', program_id=program.id_actividad) }}" class="px-3 py-1 text-sm font-semibold text-indigo-700 bg-indigo-100 rounded-full hover:bg-indigo-200 mb-2 block text-center">Ver</a>
+                            <a href="{{ url_for('program.view_program_detail', program_id=item.actividad.id_actividad) }}" class="px-3 py-1 text-sm font-semibold text-indigo-700 bg-indigo-100 rounded-full hover:bg-indigo-200 mb-2 block text-center">Ver</a>
                             <a href="#" class="px-3 py-1 text-sm font-semibold text-blue-700 bg-blue-100 rounded-full hover:bg-blue-200 block text-center">Editar</a> {# Placeholder #}
                         </div>
                     </div>
@@ -83,7 +87,55 @@
                 {% endfor %}
             </ul>
         {% else %}
-            <p class="text-gray-600">No has creado ningún programa todavía.</p>
+            <p class="text-gray-600">No has creado ningún programa todavía o no hay predicciones disponibles.</p> {# Modified else text slightly #}
+        {% endif %}
+    </div>
+
+    {# Model Prediction Details Section #}
+    <div class="bg-white p-6 rounded-lg shadow-md mb-8">
+        <h3 class="text-xl font-semibold text-gray-700 mb-4">Detalles del Modelo de Predicción de Participación</h3>
+        {% set first_item_with_metrics = none %}
+        {% if actividades_con_prediccion %}
+            {% for item in actividades_con_prediccion %}
+                {% if item.metricas and item.tree_dot_file and not first_item_with_metrics %}
+                    {% set first_item_with_metrics = item %}
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+
+        {% if first_item_with_metrics %}
+            <div class="space-y-2">
+                <div>
+                    <h4 class="text-md font-medium text-gray-600">Métricas del Modelo</h4>
+                    <p class="text-sm text-gray-500">Precisión (Accuracy) en el conjunto de prueba:
+                        <span class="font-semibold">
+                        {% if first_item_with_metrics.metricas.accuracy is number %}
+                            {{ first_item_with_metrics.metricas.accuracy | round(3) }}
+                        {% else %}
+                            {{ first_item_with_metrics.metricas.accuracy }} {# Display as is if not a number, e.g. "N/A" or error string #}
+                        {% endif %}
+                        </span>
+                    </p>
+                    <p class="text-xs text-gray-400 italic">Nota: Las métricas se basan en la última ejecución del modelo durante la carga de esta página, utilizando datos históricos disponibles hasta ese momento. El modelo se re-entrena con cada solicitud de predicción.</p>
+                </div>
+
+                {% if first_item_with_metrics.tree_dot_file %}
+                <div>
+                    <h4 class="text-md font-medium text-gray-600">Visualización del Árbol de Decisión (Primer Árbol del Bosque Aleatorio)</h4>
+                    <p class="text-sm text-gray-500">Se ha generado un archivo DOT para la visualización del árbol:
+                       <code class="text-xs bg-gray-100 p-1 rounded">{{ first_item_with_metrics.tree_dot_file }}</code>.
+                    </p>
+                    <p class="text-sm text-gray-500 mt-1">Para convertir este archivo .dot a una imagen (e.g., PNG) usando Graphviz, puedes ejecutar el siguiente comando en tu terminal (si tienes Graphviz instalado):
+                       <br><code class="text-xs bg-gray-100 p-1 rounded">dot -Tpng {{ first_item_with_metrics.tree_dot_file }} -o tree.png && xdg-open tree.png</code>
+                    </p>
+                    <p class="text-xs text-gray-400 italic mt-1">La visualización representa uno de los árboles del modelo RandomForest. El archivo <code>{{ first_item_with_metrics.tree_dot_file }}</code> se guarda en el directorio raíz de la aplicación en el servidor.</p>
+                </div>
+                {% else %}
+                    <p class="text-sm text-gray-500">No se generó archivo de visualización del árbol (Graphviz podría no estar disponible o no se generó el árbol para esta predicción).</p>
+                {% endif %}
+            </div>
+        {% else %}
+            <p class="text-sm text-gray-500">No hay detalles del modelo de predicción disponibles. Esto puede ocurrir si no hay actividades creadas, si las actividades existentes no tienen suficientes datos para el entrenamiento del modelo, o si hubo un error en la generación de la predicción.</p>
         {% endif %}
     </div>
 

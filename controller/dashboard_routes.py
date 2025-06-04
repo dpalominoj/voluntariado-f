@@ -1,8 +1,8 @@
 from flask import Blueprint, render_template, flash, redirect, url_for
 from flask_login import login_required, current_user
-from model.models import UsuarioDiscapacidad, Discapacidades, Inscripciones, Actividades, Usuarios # Added imports
+from model.models import UsuarioDiscapacidad, Discapacidades, Inscripciones, Actividades, Usuarios, EstadoActividad # Added EstadoActividad
 from database.db import db # Added import
-from services.recommendation_service import generate_user_based_recommendations, get_top_recommended_activities
+from services.recommendation_service import generate_user_based_recommendations, get_top_recommended_activities, predecir_participacion # Added predecir_participacion
 
 dashboard_bp = Blueprint('user_dashboard', __name__, 
                          template_folder='../view/templates/dashboards',
@@ -20,16 +20,49 @@ def dashboard():
         return render_template('admin_dashboard.html', title="Admin Dashboard", total_users=total_users, total_programs=total_programs)
     elif current_user.perfil == 'organizador':
         organizer_org_ids = [org.id_organizacion for org in current_user.organizaciones]
-        created_programs = []
+        created_programs_query = []
         if organizer_org_ids:
-            created_programs = Actividades.query.filter(Actividades.id_organizacion.in_(organizer_org_ids)) \
+            created_programs_query = Actividades.query.filter(Actividades.id_organizacion.in_(organizer_org_ids)) \
                                                .order_by(Actividades.fecha_actividad.desc()) \
                                                .all()
-        member_organizations = current_user.organizaciones
+
+        actividades_con_prediccion = []
+        for actividad in created_programs_query:
+            prediction_output = predecir_participacion(actividad.id_actividad)
+
+            prob = -1 # Default if no probability available
+            indicator = '⚪'
+            indicator_text = 'Predicción no disponible'
+
+            if prediction_output and 'error' not in prediction_output and 'probabilidad' in prediction_output :
+                prob = prediction_output['probabilidad']
+                if prob is None: # Handles cases where predecir_participacion might return None for prob
+                    indicator = '⚪'
+                    indicator_text = 'Probabilidad no calculada (ej. datos insuficientes)'
+                elif prob < 0.3:
+                    indicator = '🔴'
+                    indicator_text = f"Baja participación (Prob: {prob:.2f})"
+                elif prob < 0.7:
+                    indicator = '🟠'
+                    indicator_text = f"Participación moderada (Prob: {prob:.2f})"
+                else:
+                    indicator = '🟢'
+                    indicator_text = f"Alta participación (Prob: {prob:.2f})"
+            elif prediction_output and 'error' in prediction_output:
+                 indicator_text = prediction_output['error']
+            elif prediction_output and 'info' in prediction_output: # Case for insufficient data without error
+                indicator_text = prediction_output['info']
+
+
+            actividades_con_prediccion.append({
+                'actividad': actividad,
+                'indicador': indicator,
+                'texto_indicador': indicator_text,
+                'metricas': prediction_output.get('metricas') if prediction_output else None,
+                'tree_dot_file': prediction_output.get('tree_dot_file') if prediction_output else None
+            })
 
         member_organizations = current_user.organizaciones
-
-        # generate_user_based_recommendations() # REMOVED: This will be triggered manually by a button
 
         # Fetch Top Recommended Activities - this part remains
         print("Organizer dashboard: Fetching top recommended activities.")
@@ -39,7 +72,7 @@ def dashboard():
 
         return render_template('organizer_dashboard.html',
                                title="Organizer Dashboard",
-                               created_programs=created_programs,
+                               created_programs_con_prediccion=actividades_con_prediccion, # Pass new list
                                member_organizations=member_organizations,
                                recommended_activities=recommended_activities)
     elif current_user.perfil == 'voluntario':
@@ -48,7 +81,47 @@ def dashboard():
                             .filter(Inscripciones.id_usuario == current_user.id_usuario) \
                             .order_by(Inscripciones.fecha_inscripcion.desc()) \
                             .all()
-        return render_template('volunteer_dashboard.html', title="Volunteer Dashboard", user_enrollments=user_enrollments)
+
+        actividades_abiertas = Actividades.query.filter_by(estado=EstadoActividad.ABIERTO).all()
+        actividades_abiertas_con_prediccion = []
+
+        for actividad in actividades_abiertas:
+            prediction_output = predecir_participacion(actividad.id_actividad)
+
+            prob = -1 # Default if no probability available
+            indicator = '⚪'
+            indicator_text = 'Predicción no disponible'
+
+            if prediction_output and 'error' not in prediction_output and 'probabilidad' in prediction_output:
+                prob = prediction_output['probabilidad']
+                if prob is None:
+                    indicator = '⚪'
+                    indicator_text = 'Probabilidad no calculada (ej. datos insuficientes)'
+                elif prob < 0.3:
+                    indicator = '🔴'
+                    indicator_text = f"Baja participación (Prob: {prob:.2f})"
+                elif prob < 0.7:
+                    indicator = '🟠'
+                    indicator_text = f"Participación moderada (Prob: {prob:.2f})"
+                else:
+                    indicator = '🟢'
+                    indicator_text = f"Alta participación (Prob: {prob:.2f})"
+            elif prediction_output and 'error' in prediction_output:
+                 indicator_text = prediction_output['error']
+            elif prediction_output and 'info' in prediction_output: # Case for insufficient data without error
+                indicator_text = prediction_output['info']
+
+            actividades_abiertas_con_prediccion.append({
+                'actividad': actividad,
+                'indicador': indicator,
+                'texto_indicador': indicator_text
+                # Not passing metrics or tree_dot_file to volunteer dashboard for now
+            })
+
+        return render_template('volunteer_dashboard.html',
+                               title="Volunteer Dashboard",
+                               user_enrollments=user_enrollments,
+                               actividades_abiertas_con_prediccion=actividades_abiertas_con_prediccion)
     else: # Should not happen with defined roles
         flash("Perfil de usuario no reconocido.", "warning")
         return redirect(url_for('main.home'))

@@ -1,209 +1,214 @@
-from model.models import Inscripciones, Usuarios, Actividades, Recomendaciones, TipoRecomendacion, db
+# TODO: Consider renaming this file to prediction_service.py as its role has shifted
+# from recommendations to participation prediction.
+
+"""
+Service module for predicting activity participation levels.
+
+This module provides functions to:
+- Extract features for a given activity (`obtener_features`).
+- Train a RandomForest model and predict the probability of high participation
+  for a specific activity (`predecir_participacion`).
+"""
+
+from model.models import Inscripciones, Actividades, db # Removed: Usuarios, Recomendaciones, TipoRecomendacion
 import pandas as pd
-from sklearn.metrics.pairwise import cosine_similarity
-from sqlalchemy import func
+# from sklearn.metrics.pairwise import cosine_similarity # Removed
+# from sqlalchemy import func, create_engine # Removed func, create_engine
+# from sqlalchemy.orm import sessionmaker # Removed sessionmaker
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.tree import export_graphviz
+from sklearn.model_selection import train_test_split
+# from database.datos_iniciales import seed_data # For initial data, if needed during setup
 
-def generate_user_based_recommendations(target_user_id=None):
+# Note: 'Usuarios' was removed from model.models import as it's not used in the remaining functions.
+# 'create_engine', 'sessionmaker', 'cosine_similarity', 'func' were also removed as they are no longer used.
+
+def obtener_features(actividad_id):
     """
-    Generates user-based collaborative filtering recommendations.
-    If target_user_id is provided, generates for that specific user.
-    Otherwise, potentially for all users (currently focused on target_user_id).
+    Obtiene y calcula características (features) de una actividad específica.
+
+    Estas características se utilizan como entrada para el modelo de predicción
+    de participación.
+
+    Args:
+        actividad_id (int): El ID de la actividad para la cual obtener features.
+
+    Returns:
+        dict or None: Un diccionario con las siguientes características:
+            - "current_inscriptions" (int): Número actual de inscritos.
+            - "cupo_maximo" (int): Capacidad máxima de la actividad.
+            - "historico_similar" (float): Placeholder para participación histórica
+                                           en actividades similares (actualmente 0.5).
+            - "habilidades_voluntarios" (int): Placeholder para el nivel/cantidad
+                                               de habilidades de voluntarios
+                                               requeridas/disponibles (actualmente 3).
+        Retorna None si la actividad no se encuentra.
     """
-    print("Starting user-based recommendation generation...")
+    actividad = Actividades.query.get(actividad_id)
+    if not actividad:
+        print(f"Actividad con ID {actividad_id} no encontrada.")
+        return None
 
-    # Fetch Data
-    all_inscriptions_tuples = db.session.query(Inscripciones.id_usuario, Inscripciones.id_actividad).all()
-    if not all_inscriptions_tuples:
-        print("No inscriptions data found. Cannot generate recommendations.")
-        return
+    cupo_maximo = actividad.cupo_maximo
+    current_inscriptions = Inscripciones.query.filter_by(id_actividad=actividad_id).count()
 
-    print(f"Fetched {len(all_inscriptions_tuples)} inscriptions from the database.")
+    # Placeholder features - to be replaced with more sophisticated logic
+    historico_similar = 0.5  # Average historical participation
+    habilidades_voluntarios = 3  # Average skill level or count
 
-    # Create User-Item Matrix
-    df_inscriptions = pd.DataFrame(all_inscriptions_tuples, columns=['user_id', 'item_id'])
-    user_item_matrix = pd.crosstab(df_inscriptions['user_id'], df_inscriptions['item_id'])
+    features = {
+        "current_inscriptions": current_inscriptions,
+        "cupo_maximo": cupo_maximo,
+        "historico_similar": historico_similar,
+        "habilidades_voluntarios": habilidades_voluntarios
+    }
+    return features
 
-    if user_item_matrix.empty:
-        print("User-item matrix is empty after processing inscriptions.")
-        return
+def predecir_participacion(actividad_id):
+    """
+    Predice la probabilidad de alta participación para una actividad específica.
 
-    print("User-item matrix created successfully:")
-    print(user_item_matrix.head())
+    El proceso incluye:
+    1. Obtener características para la actividad objetivo.
+    2. Preparar datos de entrenamiento:
+        - Obtener características para todas las actividades históricas.
+        - Crear una variable objetivo ('y') basada en un proxy:
+          Se considera 'alta participación' (1) si la ocupación actual
+          (inscripciones / cupo_maximo) es >= 60%, de lo contrario 'baja' (0).
+          Esta es una simplificación y podría necesitar ajustes.
+    3. Manejar datos insuficientes (si hay menos de 10 muestras o solo una clase,
+       devuelve una predicción por defecto).
+    4. Entrenar un modelo RandomForestClassifier con los datos históricos.
+       El modelo se re-entrena con cada llamada a esta función.
+    5. Generar una predicción de probabilidad para la actividad objetivo.
+    6. Opcionalmente, exportar una visualización del primer árbol del modelo
+       a un archivo .dot (si Graphviz está disponible).
+    7. Calcular métricas básicas (accuracy) sobre un conjunto de prueba.
 
-    # Calculate Cosine Similarity
-    user_similarity_matrix = cosine_similarity(user_item_matrix)
-    user_similarity_df = pd.DataFrame(user_similarity_matrix, index=user_item_matrix.index, columns=user_item_matrix.index)
+    Args:
+        actividad_id (int): El ID de la actividad para la cual predecir la participación.
 
-    print("User similarity matrix calculated successfully:")
-    print(user_similarity_df.head())
+    Returns:
+        dict: Un diccionario conteniendo:
+            - 'probabilidad' (float): La probabilidad predicha de alta participación (clase 1).
+                                     Puede ser una probabilidad por defecto si el modelo no se entrena.
+            - 'metricas' (dict or str): Un diccionario con métricas como 'accuracy',
+                                        o un string indicando por qué no se calcularon
+                                        (e.g., "No training data", "Insufficient data for training").
+            - 'tree_dot_file' (str or None): Nombre del archivo .dot generado para la visualización
+                                             del árbol (e.g., "tree.dot"), o None si no se generó.
+            - 'error' (str, opcional): Un mensaje de error si ocurrió un problema crítico.
+            - 'info' (str, opcional): Un mensaje informativo, especialmente si se devuelve
+                                     una predicción por defecto debido a datos insuficientes.
+    """
+    print(f"Iniciando predicción de participación para actividad_id: {actividad_id}")
 
-    users_to_process = [target_user_id] if target_user_id else user_item_matrix.index
+    # 1. Obtener features para la actividad específica que queremos predecir
+    target_activity_features_dict = obtener_features(actividad_id)
+    if target_activity_features_dict is None:
+        print(f"No se pudieron obtener features para la actividad {actividad_id}. Abortando.")
+        return {"error": "Activity features not found."}
 
-    if target_user_id and target_user_id not in user_item_matrix.index:
-        print(f"Target user ID {target_user_id} not found in the user-item matrix. No recommendations can be generated for this user.")
-        return
-
-    print(f"Processing recommendations for user(s): {users_to_process}")
-
-    for user_id in users_to_process:
-        print(f"\nGenerating recommendations for user_id: {user_id}")
-
-        # Get top N similar users (e.g., N=5), excluding the user itself
-        N = 5
-        # Ensure user_id is in similarity dataframe columns before proceeding
-        if user_id not in user_similarity_df.columns:
-            print(f"User ID {user_id} not found in similarity matrix columns. Skipping.")
-            continue
-
-        # Get similarity scores for the current user, sort them, and exclude self
-        user_similarities = user_similarity_df[user_id].sort_values(ascending=False)
-
-        # Filter out users with similarity score of 0 or less, and also exclude self
-        # Self is typically at index 0 with score 1.0 after sorting
-        similar_users_filtered = user_similarities[user_similarities > 0][1:] # Exclude self (index 0) and scores <= 0
-
-        # Take top N from the filtered list
-        similar_users = similar_users_filtered.head(N).index
-
-        print(f"Top {N} similar users (with score > 0) for {user_id}: {list(similar_users)}")
-
-        if not list(similar_users):
-            print(f"No users with similarity > 0 found for user {user_id}. Skipping recommendation generation for this user.")
-            continue
-
-        # Get activities the user_id has participated in
-        participated_activities = user_item_matrix.loc[user_id][user_item_matrix.loc[user_id] > 0].index
-        print(f"User {user_id} participated in activities: {list(participated_activities)}")
-
-        for similar_user_id in similar_users:
-            print(f"Processing similar user: {similar_user_id}")
-
-            # Get activities the similar_user participated in
-            similar_user_activities = user_item_matrix.loc[similar_user_id][user_item_matrix.loc[similar_user_id] > 0].index
-            print(f"Similar user {similar_user_id} participated in: {list(similar_user_activities)}")
-
-            # Find new recommendations (activities similar user did, but target user didn't)
-            new_recommendations = similar_user_activities.difference(participated_activities)
-            print(f"New potential recommendations from {similar_user_id} for {user_id}: {list(new_recommendations)}")
-
-            for activity_id in new_recommendations:
-                # Store in Recomendaciones table
-                existing_rec = Recomendaciones.query.filter_by(
-                    id_usuario=user_id,
-                    id_actividad=activity_id,
-                    tipo_recomendacion=TipoRecomendacion.PERSONALIZADA
-                ).first()
-
-                if not existing_rec:
-                    recommendation_score = user_similarity_df.loc[user_id, similar_user_id]
-
-                    new_rec_entry = Recomendaciones(
-                        id_usuario=user_id,
-                        id_actividad=activity_id,
-                        tipo_recomendacion=TipoRecomendacion.PERSONALIZADA,
-                        score=recommendation_score, # Store score in the new field
-                        descripcion="Generated by user-based collaborative filtering" # New description
-                    )
-                    db.session.add(new_rec_entry)
-                    print(f"Stored recommendation: User {user_id}, Activity {activity_id}, Score: {recommendation_score:.4f}, Desc: {new_rec_entry.descripcion}")
-                else:
-                    print(f"Recommendation already exists for User {user_id}, Activity {activity_id}. Skipping.")
-
+    # Convertir las features de la actividad específica a DataFrame para la predicción
+    # Asegurar el orden de las columnas sea el mismo que el usado en el entrenamiento
+    feature_names = ['current_inscriptions', 'cupo_maximo', 'historico_similar', 'habilidades_voluntarios']
     try:
-        db.session.commit()
-        print("Successfully committed recommendations to the database.")
+        target_activity_df = pd.DataFrame([target_activity_features_dict], columns=feature_names)
     except Exception as e:
-        db.session.rollback()
-        print(f"Error committing recommendations to database: {e}")
+        print(f"Error al crear DataFrame para actividad específica: {e}")
+        return {"error": "Failed to create DataFrame for target activity."}
 
-    print("User-based recommendation generation finished.")
 
-def get_recommendations_for_user(user_id, limit=10):
-    """
-    Retrieves stored recommendations for a specific user.
+    # 2. Preparar datos de entrenamiento del histórico de actividades
+    all_activities = Actividades.query.all()
+    if not all_activities:
+        print("No hay actividades en la base de datos para entrenar el modelo.")
+        return {"probabilidad": 0.5, "metricas": "No training data", "tree_dot_file": None, "info": "Default prediction due to no activities."}
 
-    Args:
-        user_id (int): The ID of the user for whom to fetch recommendations.
-        limit (int): The maximum number of recommendations to return.
+    X_data = []
+    y_data = []
 
-    Returns:
-        list: A list of recommended activity IDs, ordered by score (descending).
-    """
-    print(f"Fetching recommendations for user_id: {user_id} with limit: {limit}")
+    print(f"Procesando {len(all_activities)} actividades para datos de entrenamiento.")
+    for activity in all_activities:
+        features_dict = obtener_features(activity.id_actividad)
+        if features_dict:
+            X_data.append(features_dict)
+            # Definir target 'y': 1 si ocupación >= 60%, else 0
+            if features_dict['cupo_maximo'] > 0:
+                ocupacion = features_dict['current_inscriptions'] / features_dict['cupo_maximo']
+                y_data.append(1 if ocupacion >= 0.6 else 0)
+            else:
+                y_data.append(0) # Si cupo_maximo es 0, participación baja
 
-    recommendations = Recomendaciones.query.filter_by(
-        id_usuario=user_id,
-        tipo_recomendacion=TipoRecomendacion.PERSONALIZADA
-    ).order_by(
-        Recomendaciones.score.desc() # Order by the new numeric score field
-    ).limit(limit).all()
+    if not X_data:
+        print("No se pudieron extraer features para ninguna actividad de entrenamiento.")
+        return {"probabilidad": 0.5, "metricas": "No training data", "tree_dot_file": None, "info": "Default prediction due to no feature data."}
 
-    if not recommendations:
-        print(f"No recommendations found for user {user_id}.")
-        return []
+    X_df = pd.DataFrame(X_data, columns=feature_names)
+    y_series = pd.Series(y_data)
 
-    # Extract activity IDs
-    # Scores are now directly in rec.score and sorted by the database.
-    # No need to parse from description.
+    # 3. Manejar datos insuficientes para el entrenamiento
+    MIN_SAMPLES_FOR_TRAINING = 10 # Umbral mínimo de muestras
+    if len(X_df) < MIN_SAMPLES_FOR_TRAINING or len(y_series.unique()) < 2:
+        print(f"Datos insuficientes para entrenar el modelo. Muestras: {len(X_df)}, Clases: {len(y_series.unique()) if X_data else 0}.")
+        # Devolver una predicción por defecto si no se puede entrenar
+        # La probabilidad podría basarse en la media de 'y_data' si hay datos, o 0.5 si no.
+        default_proba = y_series.mean() if len(y_series) > 0 and len(y_series.unique()) == 1 else 0.5
+        return {"probabilidad": default_proba,
+                "metricas": "Insufficient data for training",
+                "tree_dot_file": None,
+                "info": f"Default prediction. Samples: {len(X_df)}, Classes: {len(y_series.unique()) if X_data else 0}"}
 
-    recommended_activity_ids = [rec.id_actividad for rec in recommendations]
+    print(f"Datos de entrenamiento preparados: {X_df.shape[0]} muestras.")
 
-    print(f"Returning {len(recommended_activity_ids)} recommendations for user {user_id}: {recommended_activity_ids}")
-    return recommended_activity_ids
+    # 4. Entrenar el modelo
+    try:
+        X_train, X_test, y_train, y_test = train_test_split(X_df, y_series, test_size=0.2, random_state=42, stratify=y_series if len(y_series.unique()) > 1 else None)
+        modelo = RandomForestClassifier(random_state=42, class_weight='balanced') # class_weight puede ayudar con desbalanceo
+        modelo.fit(X_train, y_train)
+        print("Modelo RandomForestClassifier entrenado exitosamente.")
+    except Exception as e:
+        print(f"Error durante el entrenamiento del modelo: {e}")
+        # Podríamos devolver una predicción basada en la media si el entrenamiento falla
+        return {"probabilidad": y_series.mean(), "metricas": f"Training error: {e}", "tree_dot_file": None, "info": "Default prediction due to training error."}
 
-def get_top_recommended_activities(limit=10):
-    """
-    Retrieves the top N most frequently recommended activities.
-    These are activities that appear most often in the PERSONALIZADA recommendations
-    across all users.
+    # 5. Generar predicción para la actividad específica
+    try:
+        # Asegurar que target_activity_df tenga las mismas columnas y en el mismo orden que X_df
+        target_activity_df = target_activity_df[X_df.columns]
+        proba = modelo.predict_proba(target_activity_df)[0][1] # Probabilidad de la clase '1' (alta participación)
+        print(f"Predicción de probabilidad para actividad {actividad_id}: {proba}")
+    except Exception as e:
+        print(f"Error durante la predicción para la actividad {actividad_id}: {e}")
+        return {"error": f"Prediction error: {e}"}
 
-    Args:
-        limit (int): The maximum number of top activities to return.
 
-    Returns:
-        list: A list of Actividades objects that are most frequently recommended.
-    """
-    print(f"Fetching top {limit} recommended activities...")
+    # 6. Exportar visualización de un árbol de decisión (opcional)
+    tree_dot_file_path = 'tree.dot'
+    try:
+        estimator = modelo.estimators_[0] # Selecciona el primer árbol del bosque
+        export_graphviz(estimator, out_file=tree_dot_file_path,
+                        feature_names=X_df.columns,
+                        class_names=['Baja', 'Alta'], # Asumiendo 0: Baja, 1: Alta
+                        rounded=True, proportion=False, precision=2, filled=True)
+        print(f"Visualización del árbol de decisión guardada en: {tree_dot_file_path}")
+    except Exception as e:
+        print(f"Error al exportar el árbol de decisión: {e}. Graphviz podría no estar instalado.")
+        tree_dot_file_path = None # Indicar que no se pudo generar
 
-    top_activities_data = db.session.query(
-        Recomendaciones.id_actividad,
-        func.count(Recomendaciones.id_actividad).label('recommendation_count')
-    ).filter(
-        Recomendaciones.tipo_recomendacion == TipoRecomendacion.PERSONALIZADA
-    ).group_by(
-        Recomendaciones.id_actividad
-    ).order_by(
-        func.count(Recomendaciones.id_actividad).desc()
-    ).limit(limit).all()
+    # 7. Calcular métricas (ejemplo básico de accuracy)
+    try:
+        accuracy = modelo.score(X_test, y_test)
+        metricas = {"accuracy": accuracy}
+        print(f"Métricas del modelo: {metricas}")
+    except Exception as e:
+        print(f"Error al calcular métricas: {e}")
+        metricas = {"accuracy": "Error calculating metrics"}
 
-    if not top_activities_data:
-        print("No recommended activities found.")
-        return []
 
-    print(f"Top activities data (id, count): {top_activities_data}")
-
-    activity_ids = [data.id_actividad for data in top_activities_data]
-
-    if not activity_ids:
-        print("No activity IDs extracted from top_activities_data.")
-        return []
-
-    top_activities_objects = Actividades.query.filter(Actividades.id_actividad.in_(activity_ids)).all()
-
-    # Optional: Re-order these objects based on the recommendation_count,
-    # as the .in_() query doesn't preserve the order from top_activities_data.
-    # Create a mapping from id to count for sorting.
-    activity_id_to_count_map = {data.id_actividad: data.recommendation_count for data in top_activities_data}
-
-    # Sort the activity objects based on the recommendation_count
-    # Python's sort is stable, so if counts are equal, original relative order (if any) is maintained.
-    # However, the order from Actividades.query is not guaranteed.
-    # To ensure order from `top_activities_data` (which is by count desc):
-    sorted_top_activities_objects = sorted(
-        top_activities_objects,
-        key=lambda act: activity_id_to_count_map.get(act.id_actividad, 0),
-        reverse=True
-    )
-
-    print(f"Returning {len(sorted_top_activities_objects)} Actividades objects.")
-    return sorted_top_activities_objects
+    # 8. Retornar resultados
+    return {
+        'probabilidad': proba,
+        'metricas': metricas,
+        'tree_dot_file': tree_dot_file_path
+    }
