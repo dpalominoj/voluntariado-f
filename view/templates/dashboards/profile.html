@@ -59,7 +59,7 @@
                             Severidad: {{ item.gravedad }}
                             {% if item.preferencias %}
                                 <div class="mt-2">
-                                    <dt class="text-sm font-medium text-gray-500">Preferencias:</dt>
+                                    <p class="text-sm font-medium text-gray-500">Preferencias:</p>
                                     <ul class="list-disc pl-5">
                                         {% for pref in item.preferencias %}
                                             <li class="text-sm text-gray-900">{{ pref.nombre_corto }}</li>
