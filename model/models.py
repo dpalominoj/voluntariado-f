@@ -185,6 +185,7 @@ class Inscripciones(db.Model):
     id_inscripcion = db.Column(db.Integer, primary_key=True, autoincrement=True)
     id_usuario = db.Column(db.Integer, ForeignKey('usuarios.id_usuario'), nullable=False)
     id_actividad = db.Column(db.Integer, ForeignKey('actividades.id_actividad'), nullable=False)
+    estado_inscripcion = db.Column(db.String(50), default='confirmada')
     fecha_inscripcion = db.Column(db.DateTime, default=datetime.utcnow)
 
     usuario = relationship("Usuarios", back_populates="inscripciones")
