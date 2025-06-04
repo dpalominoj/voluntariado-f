@@ -39,20 +39,18 @@
         </div>
     </div>
 
-    {# Mis Discapacidades y Preferencias de Apoyo Card #}
+    {# Mis Discapacidades y Preferencias #}
     <div class="mt-8 bg-white shadow-md rounded-lg overflow-hidden">
         <div class="px-4 py-5 sm:px-6 border-b border-gray-200">
             <h3 class="text-xl leading-6 font-semibold text-gray-900">
-                Mis Discapacidades y Preferencias de Apoyo
+                Mis Discapacidades y Preferencias
             </h3>
             <p class="mt-1 max-w-2xl text-sm text-gray-500">
                 Información sobre tus discapacidades y preferencias de apoyo registradas.
             </p>
         </div>
-        <div class="border-t border-gray-200 px-4 py-5 sm:px-6"> {# Use consistent padding #}
-            {# Section for Disabilities #}
-            <div class="mb-6"> {# Increased bottom margin #}
-                <h4 class="text-md font-semibold text-gray-800 mb-3">Discapacidades Registradas:</h4> {# Clearer title #}
+        <div class="border-t border-gray-200 px-4 py-5 sm:px-6">
+            <div class="mb-6">
                 {% if user_disabilities_data and user_disabilities_data|length > 0 %}
                     {% for item in user_disabilities_data %}
                     <div class="p-3 mb-2 bg-gray-50 rounded-md shadow-sm"> {# Light background and subtle shadow for each item #}
@@ -64,17 +62,14 @@
                     <p class="text-sm text-gray-600 italic">No has registrado ninguna discapacidad.</p>
                 {% endif %}
             </div>
-
-            {# Section for Support Preferences #}
             <div>
-                <h4 class="text-md font-semibold text-gray-800 mb-3">Preferencias Generales de Apoyo:</h4> {# Clearer title #}
                 {% if user_preferences and user_preferences|length > 0 %}
                     <div class="p-3 bg-gray-50 rounded-md shadow-sm">
                         <span class="font-medium text-gray-700">Preferencias:</span>
                         <span class="text-gray-900">{{ user_preferences|map(attribute='nombre_corto')|join(', ') }}</span>
                     </div>
                 {% else %}
-                    <p class="text-sm text-gray-600 italic">No has registrado ninguna preferencia de apoyo.</p>
+                    <p class="text-sm text-gray-600 italic">No has registrado ninguna preferencia.</p>
                 {% endif %}
             </div>
         </div>
