@@ -6,8 +6,8 @@ from controller.forms import RegistrationForm, LoginForm
 
 auth_bp = Blueprint('auth', __name__,
                     template_folder='../view/templates/auth',
-                    static_folder='../view/static', # if you have auth-specific static files
-                    url_prefix='/auth') # Optional: prefix all routes in this blueprint with /auth
+                    static_folder='../view/static',
+                    url_prefix='/auth')
 
 @auth_bp.route('/register', methods=['GET', 'POST'])
 def register():
