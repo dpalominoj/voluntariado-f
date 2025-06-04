@@ -76,16 +76,14 @@ def seed_data():
         # Fetch organizations first if they exist, to link organizers
         org1 = Organizaciones.query.filter_by(id_organizacion=1).first()
         org2 = Organizaciones.query.filter_by(id_organizacion=2).first()
-        org3 = Organizaciones.query.filter_by(id_organizacion=3).first()
-        org4 = Organizaciones.query.filter_by(id_organizacion=4).first()
 
         usuarios_data = [
             # Administrador
             {"DNI":"12345678", "nombre":"Dany", "apellido":"Palomino", "email":"admin@konectai.com", "password":"Hashed12", "celular":"987654321", "direccion":"Av. Principal 123", "fecha_nacimiento":date(1980, 5, 15), "genero":"masculino", "perfil":"administrador", "estado_usuario":"activo", "fecha_registro":datetime.now(peru_tz)},
             # Organizador 1
-            {"DNI":"87654321", "nombre":"Ana", "apellido":"García", "email":"ana.garcia@inclusionperu.org", "password":"Hashed23", "celular":"912345678", "direccion":"Calle Secundaria 456", "fecha_nacimiento":date(1992, 8, 20), "genero":"femenino", "perfil":"organizador", "estado_usuario":"activo", "fecha_registro":datetime.now(peru_tz), "org_instance": org1},
+            {"DNI":"87654321", "nombre":"Ana", "apellido":"García", "email":"ana.garcia@inclusionperu.org", "password":"Hashed87", "celular":"912345678", "direccion":"Calle Secundaria 456", "fecha_nacimiento":date(1992, 8, 20), "genero":"femenino", "perfil":"organizador", "estado_usuario":"activo", "fecha_registro":datetime.now(peru_tz), "org_instance": org1},
             # Organizador 2
-            {"DNI":"11223344", "nombre":"Carlos", "apellido":"Lopez", "email":"carlos.lopez@manossolidarias.org", "password":"Hashed34", "celular":"923456789", "direccion":"Av. Libertad 789", "fecha_nacimiento":date(1985, 3, 10), "genero":"masculino", "perfil":"organizador", "estado_usuario":"activo", "fecha_registro":datetime.now(peru_tz), "org_instance": org2},
+            {"DNI":"78223344", "nombre":"Carlos", "apellido":"Lopez", "email":"carlos.lopez@manossolidarias.org", "password":"Hashed78", "celular":"923456789", "direccion":"Av. Libertad 789", "fecha_nacimiento":date(1985, 3, 10), "genero":"masculino", "perfil":"organizador", "estado_usuario":"activo", "fecha_registro":datetime.now(peru_tz), "org_instance": org2},
             # Voluntarios (tiene_discapacidad will be handled by creating UsuarioDiscapacidad entries)
             {"DNI":"44556677", "nombre":"Elena", "apellido":"Rojas", "email":"elena@email.com", "password":"Hashed44", "celular":"987654334", "direccion":"Jr. Cusco 3031", "fecha_nacimiento":date(1988, 4, 27), "genero":"femenino", "perfil":"voluntario", "estado_usuario":"activo", "fecha_registro":datetime.now(peru_tz)},
             {"DNI":"55667788", "nombre":"Javier", "apellido":"Paredes", "email":"javier.paredes@example.com", "password":"Hashed55", "celular":"998877665", "direccion":"Calle Los Pinos 450", "fecha_nacimiento":date(1995, 11, 5), "genero":"masculino", "perfil":"voluntario", "estado_usuario":"activo", "fecha_registro":datetime.now(peru_tz)},
