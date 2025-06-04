@@ -53,8 +53,9 @@
                 <svg class="h-5 w-5 ml-1 fill-current" viewBox="0 0 20 20"><path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"></path></svg>
               </button>
               <div x-show="openUserMenu" x-cloak class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 ring-1 ring-black ring-opacity-5">
-                <a href="{{ url_for('user_dashboard.dashboard') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Panel</a>
+                <a href="{{ url_for('user_dashboard.dashboard') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Mi Panel</a>
                 <a href="{{ url_for('user_dashboard.profile') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Perfil</a>
+                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Configuración</a>
                 <hr class="border-t border-gray-200 my-1">
                 <a href="{{ url_for('auth.logout') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Cerrar Sesión</a>
               </div>

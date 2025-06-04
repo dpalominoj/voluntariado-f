@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request
 from flask_login import current_user # Import current_user
-from model.models import Usuarios, Organizaciones, Discapacidades, Actividades, EstadoActividad
+from model.models import Usuarios, Organizaciones, Discapacidades, Actividades, EstadoActividad, Preferencias
 from database.db import db
 from controller.program_controller import get_programs_compatibility # Import the new function
 
@@ -26,6 +26,7 @@ def programs():
     organizaciones = Organizaciones.query.order_by(Organizaciones.nombre_org).all()
     discapacidades = Discapacidades.query.order_by(Discapacidades.nombre).all()
     estados = [e.value for e in EstadoActividad]
+    preferencias_filter_options = Preferencias.query.order_by(Preferencias.nombre_corto).all()
 
     # Call get_programs_compatibility with filter values
     all_programs, compatibility_scores = get_programs_compatibility(
@@ -33,7 +34,8 @@ def programs():
         organizacion_filter=organizacion_filter,
         estado_filter=estado_filter,
         enfoque_inclusivo=enfoque_inclusivo_filter, # Pass the new filter
-        etiqueta_filter=etiqueta_filter_value # Pass the new etiqueta filter
+        etiqueta_filter=etiqueta_filter_value, # Pass the new etiqueta filter
+        preferencia_filter=request.args.get('preferencia', None)
     )
 
     return render_template('programs.html',
@@ -42,6 +44,7 @@ def programs():
                            tipos=tipos,
                            organizaciones=organizaciones,
                            discapacidades_filter_options=discapacidades, # Renamed to avoid clash
+                           preferencias_filter_options=preferencias_filter_options,
                            estados=estados,
                            current_filters=request.args)
 

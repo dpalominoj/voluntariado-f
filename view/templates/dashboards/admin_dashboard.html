@@ -5,7 +5,7 @@
 {% block dashboard_sidebar_links %}
     <hr class="my-2 border-gray-200">
     <li>
-        <a href="{{ url_for('user_dashboard.admin_manage_users') if 'user_dashboard.admin_manage_users' in get_flashed_messages(category_filter=['url_exists']) else '#' }}"
+        <a href="{{ url_for('user_dashboard.admin_manage_users') }}"
            class="block py-2.5 px-4 text-gray-700 hover:bg-indigo-100 hover:text-indigo-700 rounded-md text-sm transition-colors duration-150 {% if request.endpoint == 'user_dashboard.admin_manage_users' %}bg-indigo-100 text-indigo-700 font-semibold{% endif %}">
            Gestionar Usuarios
         </a>
@@ -47,11 +47,11 @@
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
         <div class="bg-white p-6 rounded-lg shadow-md">
             <h3 class="text-lg font-medium text-gray-700">Total de Usuarios</h3>
-            <p class="text-3xl font-semibold text-gray-900 mt-2">No disponible</p> {# Replace N/A with actual data later #}
+            <p class="text-3xl font-semibold text-gray-900 mt-2">{{ total_users if total_users is not none else 'N/A' }}</p>
         </div>
         <div class="bg-white p-6 rounded-lg shadow-md">
             <h3 class="text-lg font-medium text-gray-700">Total de Programas</h3>
-            <p class="text-3xl font-semibold text-gray-900 mt-2">No disponible</p> {# Replace N/A with actual data later #}
+            <p class="text-3xl font-semibold text-gray-900 mt-2">{{ total_programs if total_programs is not none else 'N/A' }}</p>
         </div>
         <div class="bg-white p-6 rounded-lg shadow-md">
             <h3 class="text-lg font-medium text-gray-700">Aprobaciones Pendientes</h3>
