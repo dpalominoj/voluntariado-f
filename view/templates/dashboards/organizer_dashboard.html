@@ -46,27 +46,45 @@
         </p>
     </div>
 
-    {# Placeholder for "My Programs" list/grid #}
+    {# Display Organizer's Organizations #}
     <div class="bg-white p-6 rounded-lg shadow-md mb-8">
-        <h3 class="text-xl font-semibold text-gray-700 mb-4">Mis Programas (Marcador de posición)</h3>
-        <p class="text-gray-600">
-            Aquí se listarán los programas que has creado. Podrás ver, editar y gestionar los solicitantes para cada programa.
-        </p>
-        {# Example of how a program item might look in a list #}
-        {#
-        <div class="mt-4 border-t border-gray-200 pt-4">
-            <div class="flex justify-between items-center">
-                <div>
-                    <h4 class="text-lg font-medium text-indigo-700">Community Garden Project</h4>
-                    <p class="text-sm text-gray-500">Volunteers needed for planting and maintenance.</p>
-                </div>
-                <div>
-                    <a href="#" class="text-sm text-indigo-600 hover:text-indigo-900 mr-3">Edit</a>
-                    <a href="#" class="text-sm text-red-600 hover:text-red-900">Delete</a>
-                </div>
-            </div>
-        </div>
-        #}
+        <h3 class="text-xl font-semibold text-gray-700 mb-4">Mis Organizaciones</h3>
+        {% if member_organizations %}
+            <ul class="list-disc pl-5 space-y-1">
+                {% for org in member_organizations %}
+                    <li class="text-sm text-gray-900">{{ org.nombre_org }}</li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="text-gray-600">No estás asociado a ninguna organización.</p>
+        {% endif %}
+    </div>
+
+    {# Display Created Programs #}
+    <div class="bg-white p-6 rounded-lg shadow-md mb-8">
+        <h3 class="text-xl font-semibold text-gray-700 mb-4">Mis Programas Creados</h3>
+        {% if created_programs %}
+            <ul class="divide-y divide-gray-200 -mx-6"> {# Negative margin to extend divider if parent has padding p-6 #}
+                {% for program in created_programs %}
+                <li class="p-4 hover:bg-gray-50 sm:px-6">
+                    <div class="flex items-center justify-between">
+                        <div class="truncate">
+                            <p class="text-md font-medium text-indigo-600 truncate">{{ program.nombre }}</p>
+                            <p class="text-sm text-gray-500">Organización: {{ program.organizacion.nombre_org if program.organizacion else 'N/A' }}</p>
+                            <p class="text-sm text-gray-500">Fecha Actividad: {{ program.fecha_actividad.strftime('%d/%m/%Y') if program.fecha_actividad else 'N/A' }} | Estado: <span class="font-semibold">{{ program.estado.value | capitalize if program.estado else 'N/A' }}</span></p>
+                            <p class="text-sm text-gray-500">Cupo: {{ program.cupo_maximo if program.cupo_maximo is not none else 'N/A' }} | Es Inclusiva: {{ 'Sí' if program.es_inclusiva else 'No' }}</p>
+                        </div>
+                        <div class="ml-2 flex-shrink-0">
+                            <a href="{{ url_for('program.view_program_detail', program_id=program.id_actividad) }}" class="px-3 py-1 text-sm font-semibold text-indigo-700 bg-indigo-100 rounded-full hover:bg-indigo-200 mb-2 block text-center">Ver</a>
+                            <a href="#" class="px-3 py-1 text-sm font-semibold text-blue-700 bg-blue-100 rounded-full hover:bg-blue-200 block text-center">Editar</a> {# Placeholder #}
+                        </div>
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="text-gray-600">No has creado ningún programa todavía.</p>
+        {% endif %}
     </div>
 
     {# Placeholder for "Volunteer Management" or "Recent Applications" #}

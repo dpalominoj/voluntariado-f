@@ -41,7 +41,7 @@
                     <label for="enfoque_inclusivo" class="block text-sm font-medium text-gray-700">Enfoque Inclusivo</label>
                     <select name="enfoque_inclusivo" id="enfoque_inclusivo" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
                         <option value="" {% if not current_filters.get('enfoque_inclusivo') %}selected{% endif %}>Cualquiera</option>
-                        <option value="solo_inclusivas" {% if current_filters.get('enfoque_inclusivo') == 'solo_inclusivas' %}selected{% endif %}>Sí (Solo Programas Inclusivos)</option>
+                        <option value="solo_inclusivas" {% if current_filters.get('enfoque_inclusivo') == 'solo_inclusivas' %}selected{% endif %}>Programas Inclusivos (General)</option>
                         {% for disc in discapacidades_filter_options %}
                         <option value="{{ disc.nombre.value }}" {% if current_filters.get('enfoque_inclusivo') == disc.nombre.value %}selected{% endif %}>
                             {{ disc.nombre.value }}
@@ -61,8 +61,13 @@
                 </div>
 
                 <div>
-                    <label for="etiqueta" class="block text-sm font-medium text-gray-700">Preferencias</label>
-                    <input type="text" name="etiqueta" id="etiqueta" value="{{ current_filters.get('etiqueta', '') }}" class="mt-1 block w-full pl-3 pr-3 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                    <label for="preferencia" class="block text-sm font-medium text-gray-700">Preferencias</label>
+                    <select name="preferencia" id="preferencia" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                        <option value="">Todas</option>
+                        {% for pref in preferencias_filter_options %}
+                        <option value="{{ pref.id_preferencia }}" {% if current_filters.get('preferencia') | string == pref.id_preferencia | string %}selected{% endif %}>{{ pref.nombre_corto }}</option>
+                        {% endfor %}
+                    </select>
                 </div>
 
             </div>

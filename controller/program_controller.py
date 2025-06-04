@@ -1,11 +1,11 @@
 from flask import flash, redirect, url_for
 from flask_login import current_user, login_required
-from model.models import Actividades, Discapacidades, Inscripciones, EstadoActividad # Make sure Usuarios is imported if needed for relationships
+from model.models import Actividades, Discapacidades, Inscripciones, EstadoActividad, Preferencias, actividad_discapacidad_table # Make sure Usuarios is imported if needed for relationships
 from services.prediction_service import get_compatibility_scores
 from sqlalchemy.orm import aliased
 from database.db import db
 
-def get_programs_compatibility(tipo_filter=None, organizacion_filter=None, estado_filter=None, enfoque_inclusivo=None, etiqueta_filter=None):
+def get_programs_compatibility(tipo_filter=None, organizacion_filter=None, estado_filter=None, enfoque_inclusivo=None, etiqueta_filter=None, preferencia_filter=None):
     compatibility_scores = {}
     query = Actividades.query
 
@@ -37,15 +37,26 @@ def get_programs_compatibility(tipo_filter=None, organizacion_filter=None, estad
         query = query.filter(Actividades.id_organizacion == organizacion_filter)
 
     # New logic for enfoque_inclusivo
-    if enfoque_inclusivo is not None and enfoque_inclusivo != '':
+    if enfoque_inclusivo and enfoque_inclusivo != '': # Ensure it's not None or empty
         if enfoque_inclusivo == "solo_inclusivas":
             query = query.filter(Actividades.es_inclusiva == True)
-        else: # Assumes enfoque_inclusivo is a disability name like "Visual", "Auditiva", etc.
-            query = query.join(Actividades.discapacidades).filter(Discapacidades.nombre == enfoque_inclusivo)
+        # enfoque_inclusivo will be a string like "Visual", "Auditiva" from TipoDiscapacidad enum values.
+        # This value comes from `disc.nombre.value` in the template.
+        else: # This is a specific disability name
+            query = query.filter(Actividades.es_inclusiva == True) \
+                         .join(actividad_discapacidad_table, Actividades.id_actividad == actividad_discapacidad_table.c.id_actividad) \
+                         .join(Discapacidades, actividad_discapacidad_table.c.id_discapacidad == Discapacidades.id_discapacidad) \
+                         .filter(Discapacidades.nombre == enfoque_inclusivo)
 
     # Filter by etiqueta (program preferences/tags)
-    if etiqueta_filter:
+    if etiqueta_filter: # This is the old text search for etiqueta
         query = query.filter(Actividades.etiqueta.ilike(f"%{etiqueta_filter}%"))
+
+    # New filter by Preferencia ID
+    if preferencia_filter and preferencia_filter.isdigit(): # Check if it's a valid ID
+        pref = Preferencias.query.get(int(preferencia_filter))
+        if pref and pref.nombre_corto:
+            query = query.filter(Actividades.etiqueta == pref.nombre_corto)
 
     # Status filter logic
     if estado_filter:
