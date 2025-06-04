@@ -49,33 +49,34 @@
                 Información sobre tus discapacidades y preferencias de apoyo registradas.
             </p>
         </div>
-        <div class="border-t border-gray-200 px-4 py-5 sm:p-0">
-            {% if user_disabilities_data %}
-                <dl class="sm:divide-y sm:divide-gray-200">
+        <div class="border-t border-gray-200 px-4 py-5 sm:px-6"> {# Use consistent padding #}
+            {# Section for Disabilities #}
+            <div class="mb-6"> {# Increased bottom margin #}
+                <h4 class="text-md font-semibold text-gray-800 mb-3">Discapacidades Registradas:</h4> {# Clearer title #}
+                {% if user_disabilities_data and user_disabilities_data|length > 0 %}
                     {% for item in user_disabilities_data %}
-                    <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                        <dt class="text-sm font-medium text-gray-500">Discapacidad: {{ item.nombre }}</dt>
-                        <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                            Severidad: {{ item.gravedad }}
-                            {% if item.preferencias %}
-                                <div class="mt-2">
-                                    <p class="text-sm font-medium text-gray-500">Preferencias:</p>
-                                    <ul class="list-disc pl-5">
-                                        {% for pref in item.preferencias %}
-                                            <li class="text-sm text-gray-900">{{ pref.nombre_corto }}</li>
-                                        {% endfor %}
-                                    </ul>
-                                </div>
-                            {% endif %}
-                        </dd>
+                    <div class="p-3 mb-2 bg-gray-50 rounded-md shadow-sm"> {# Light background and subtle shadow for each item #}
+                        <span class="font-medium text-gray-700">Discapacidad:</span> <span class="text-gray-900">{{ item.nombre }}</span>
+                        <span class="ml-6 font-medium text-gray-700">Severidad:</span> <span class="text-gray-900">{{ item.gravedad }}</span>
                     </div>
                     {% endfor %}
-                </dl>
-            {% else %}
-                <div class="px-4 py-5 sm:px-6">
-                    <p class="text-sm text-gray-600">No has registrado ninguna discapacidad.</p>
-                </div>
-            {% endif %}
+                {% else %}
+                    <p class="text-sm text-gray-600 italic">No has registrado ninguna discapacidad.</p>
+                {% endif %}
+            </div>
+
+            {# Section for Support Preferences #}
+            <div>
+                <h4 class="text-md font-semibold text-gray-800 mb-3">Preferencias Generales de Apoyo:</h4> {# Clearer title #}
+                {% if user_preferences and user_preferences|length > 0 %}
+                    <div class="p-3 bg-gray-50 rounded-md shadow-sm">
+                        <span class="font-medium text-gray-700">Preferencias:</span>
+                        <span class="text-gray-900">{{ user_preferences|map(attribute='nombre_corto')|join(', ') }}</span>
+                    </div>
+                {% else %}
+                    <p class="text-sm text-gray-600 italic">No has registrado ninguna preferencia de apoyo.</p>
+                {% endif %}
+            </div>
         </div>
     </div>
 
