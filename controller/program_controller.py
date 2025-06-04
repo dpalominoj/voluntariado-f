@@ -1,7 +1,8 @@
 from flask import flash, redirect, url_for
 from flask_login import current_user, login_required
 from model.models import Actividades, Discapacidades, Inscripciones, EstadoActividad, Preferencias, actividad_discapacidad_table # Make sure Usuarios is imported if needed for relationships
-from services.prediction_service import get_compatibility_scores, generate_user_based_recommendations
+from services.compatibility_service import get_compatibility_scores
+from services.recommendation_service import generate_user_based_recommendations
 from sqlalchemy.orm import aliased
 from database.db import db
 

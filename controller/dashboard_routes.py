@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, flash, redirect, url_for
 from flask_login import login_required, current_user
 from model.models import UsuarioDiscapacidad, Discapacidades, Inscripciones, Actividades, Usuarios # Added imports
 from database.db import db # Added import
-from services.prediction_service import generate_user_based_recommendations, get_top_recommended_activities
+from services.recommendation_service import generate_user_based_recommendations, get_top_recommended_activities
 
 dashboard_bp = Blueprint('user_dashboard', __name__, 
                          template_folder='../view/templates/dashboards',
