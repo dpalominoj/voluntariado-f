@@ -85,19 +85,33 @@ def dashboard():
         actividades_abiertas = Actividades.query.filter_by(estado=EstadoActividad.ABIERTO).all()
         actividades_abiertas_con_prediccion = []
 
-        # Prepare user profile and activities for compatibility scoring
+        # Prepare user profile for compatibility scoring
+        user_disabilities = []
+        if hasattr(current_user, 'discapacidades_pivot'):
+            user_disabilities = [
+                udp.discapacidad.nombre.value
+                for udp in current_user.discapacidades_pivot
+                if udp.discapacidad and udp.discapacidad.nombre
+            ]
+
         user_profile = {
             'id': current_user.id_usuario,
-            'interests': [p.nombre_corto for p in current_user.preferencias]
+            'username': current_user.nombre, # Added
+            'interests': [p.nombre_corto for p in current_user.preferencias],
+            'skills': ['writing', 'gardening'], # Added placeholder
+            'disabilities': user_disabilities # Added
         }
 
+        # Prepare activities for compatibility scoring
         programs_or_activities_for_compatibility = []
         for actividad in actividades_abiertas:
-            programs_or_activities_for_compatibility.append({
+            item_data = {
                 'id': actividad.id_actividad,
                 'name': actividad.nombre,
-                'category': actividad.etiqueta if hasattr(actividad, 'etiqueta') else ''
-            })
+                'description': actividad.descripcion if actividad.descripcion else '', # Added
+                'category': actividad.etiqueta if actividad.etiqueta else (actividad.nombre.lower() if actividad.nombre else "") # Adjusted category logic
+            }
+            programs_or_activities_for_compatibility.append(item_data)
 
         compatibility_scores = {} # Default to empty dict
         if user_profile and programs_or_activities_for_compatibility: # Ensure inputs are not empty
