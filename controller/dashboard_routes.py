@@ -2,6 +2,7 @@ from flask import Blueprint, render_template, flash, redirect, url_for
 from flask_login import login_required, current_user
 from model.models import UsuarioDiscapacidad, Discapacidades, Inscripciones, Actividades, Usuarios # Added imports
 from database.db import db # Added import
+from services.prediction_service import generate_user_based_recommendations, get_top_recommended_activities
 
 dashboard_bp = Blueprint('user_dashboard', __name__, 
                          template_folder='../view/templates/dashboards',
@@ -25,10 +26,22 @@ def dashboard():
                                                .order_by(Actividades.fecha_actividad.desc()) \
                                                .all()
         member_organizations = current_user.organizaciones
+
+        member_organizations = current_user.organizaciones
+
+        # generate_user_based_recommendations() # REMOVED: This will be triggered manually by a button
+
+        # Fetch Top Recommended Activities - this part remains
+        print("Organizer dashboard: Fetching top recommended activities.")
+        recommended_activities = get_top_recommended_activities(limit=10)
+
+        print(f"Organizer Dashboard: Displaying {len(recommended_activities)} recommended activities.") # For logging
+
         return render_template('organizer_dashboard.html',
                                title="Organizer Dashboard",
                                created_programs=created_programs,
-                               member_organizations=member_organizations)
+                               member_organizations=member_organizations,
+                               recommended_activities=recommended_activities)
     elif current_user.perfil == 'voluntario':
         user_enrollments = db.session.query(Inscripciones, Actividades) \
                             .join(Actividades, Inscripciones.id_actividad == Actividades.id_actividad) \
@@ -82,3 +95,24 @@ def admin_manage_users():
 
     all_users = Usuarios.query.order_by(Usuarios.id_usuario).all()
     return render_template('admin_manage_users.html', users=all_users, title="Gestionar Usuarios")
+
+@dashboard_bp.route('/organizer/trigger-recommendations', methods=['POST'])
+@login_required
+def trigger_organizer_recommendations():
+    # Ensure the user is an organizer
+    if current_user.perfil != 'organizador':
+        flash("Acceso no autorizado.", "danger")
+        return redirect(url_for('main.home')) # Or some other appropriate redirect
+
+    try:
+        print(f"Organizer {current_user.id_usuario} manually triggered recommendation generation.")
+        # Call the function to generate recommendations for all relevant users
+        generate_user_based_recommendations()
+        flash("Se han actualizado las recomendaciones de actividades para los usuarios.", "success")
+        print("Recommendation generation completed successfully after manual trigger.")
+    except Exception as e:
+        print(f"Error during manually triggered recommendation generation: {e}")
+        flash(f"Ocurrió un error al generar las recomendaciones: {str(e)}", "danger") # Use str(e) for safer flashing
+        # Log the full error e for debugging if necessary
+
+    return redirect(url_for('user_dashboard.dashboard')) # Redirect back to the organizer dashboard

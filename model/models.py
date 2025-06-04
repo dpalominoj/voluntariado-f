@@ -222,8 +222,8 @@ class Recomendaciones(db.Model):
     id_usuario = db.Column(db.Integer, ForeignKey('usuarios.id_usuario'), nullable=False)
     id_actividad = db.Column(db.Integer, ForeignKey('actividades.id_actividad'), nullable=False)
     tipo_recomendacion = db.Column(db.Enum(TipoRecomendacion, name='tipo_recomendacion_enum', values_callable=lambda x: [e.value for e in x])) # Usando Enum de Python
-   
-    descripcion = db.Column(db.Text)
+    score = db.Column(db.DECIMAL(5, 4), nullable=True)
+    descripcion = db.Column(db.Text, nullable=True) # Ensure nullable
     fecha = db.Column(db.DateTime, default=datetime.utcnow)
 
     usuario = relationship("Usuarios", back_populates="recomendaciones")
