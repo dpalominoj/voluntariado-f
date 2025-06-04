@@ -97,21 +97,24 @@
                     {% endif %}
                 </div>
 
-                <div class="flex items-center">
-                    {{ form.acepto_politica(class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded") }}
-                    <label for="{{ form.acepto_politica.id }}" class="cursor-pointer">
-                        Acepto la 
-                            <a href="{{ url_for('static', filename='documentos/Politica_de_Privacidad.pdf') }}" target="_blank" rel="noopener noreferrer" class="text-indigo-600 underline hover:text-indigo-800">
+                <div>
+                    <div class="flex items-center">
+                        {{ form.acepto_politica(class="h-5 w-5 text-indigo-600 focus:ring-indigo-500 border-gray-400 rounded") }}
+                        <label for="{{ form.acepto_politica.id }}" class="ml-2 block text-sm text-gray-900 cursor-pointer">
+                            Acepto la
+                            <a href="{{ url_for('static', filename='documentos/Politica_de_Privacidad.pdf') }}" target="_blank" rel="noopener noreferrer" class="font-medium text-indigo-600 hover:text-indigo-500">
                                 Política de Privacidad de Datos Personales
                             </a>
-                    </label>
-                    <p class="text-gray-500 mt-1">Al marcar esta casilla, confirmas que has leído y aceptas nuestros términos.</p>
-                    {{ form.acepto_politica.label(class="ml-2 block text-sm text-gray-700") }}
+                        </label>
+                    </div>
                     {% if form.acepto_politica.errors %}
-                        {% for error in form.acepto_politica.errors %}
-                            <span class="text-xs text-red-500 ml-2">{{ error }}</span>
-                        {% endfor %}
+                        <div class="mt-1"> {# Removed ml-7. Errors will now be directly under the checkbox line. #}
+                            {% for error in form.acepto_politica.errors %}
+                                <span class="text-xs text-red-500">{{ error }}</span><br>
+                            {% endfor %}
+                        </div>
                     {% endif %}
+                    <p class="mt-1 text-xs text-gray-500 ml-7">Al marcar esta casilla, confirmas que has leído y aceptas nuestros términos.</p>
                 </div>
 
                 <div>
