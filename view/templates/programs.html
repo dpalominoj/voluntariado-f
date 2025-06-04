@@ -41,7 +41,6 @@
                     <label for="enfoque_inclusivo" class="block text-sm font-medium text-gray-700">Enfoque Inclusivo</label>
                     <select name="enfoque_inclusivo" id="enfoque_inclusivo" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
                         <option value="" {% if not current_filters.get('enfoque_inclusivo') %}selected{% endif %}>Cualquiera</option>
-                        <option value="solo_inclusivas" {% if current_filters.get('enfoque_inclusivo') == 'solo_inclusivas' %}selected{% endif %}>Programas Inclusivos (General)</option>
                         {% for disc in discapacidades_filter_options %}
                         <option value="{{ disc.nombre.value }}" {% if current_filters.get('enfoque_inclusivo') == disc.nombre.value %}selected{% endif %}>
                             {{ disc.nombre.value }}

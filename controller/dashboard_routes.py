@@ -29,8 +29,16 @@ def dashboard():
                                title="Organizer Dashboard",
                                created_programs=created_programs,
                                member_organizations=member_organizations)
-    else: # Default to Volunteer
-        return render_template('volunteer_dashboard.html', title="Volunteer Dashboard")
+    elif current_user.perfil == 'voluntario':
+        user_enrollments = db.session.query(Inscripciones, Actividades) \
+                            .join(Actividades, Inscripciones.id_actividad == Actividades.id_actividad) \
+                            .filter(Inscripciones.id_usuario == current_user.id_usuario) \
+                            .order_by(Inscripciones.fecha_inscripcion.desc()) \
+                            .all()
+        return render_template('volunteer_dashboard.html', title="Volunteer Dashboard", user_enrollments=user_enrollments)
+    else: # Should not happen with defined roles
+        flash("Perfil de usuario no reconocido.", "warning")
+        return redirect(url_for('main.home'))
 
 @dashboard_bp.route('/profile') # This will be accessible at /dashboard/profile
 @login_required

@@ -19,7 +19,6 @@ def programs():
     organizacion_filter = request.args.get('organizacion', None)
     estado_filter = request.args.get('estado', None)
     enfoque_inclusivo_filter = request.args.get('enfoque_inclusivo', None) # New filter
-    etiqueta_filter_value = request.args.get('etiqueta', None) # New etiqueta filter
 
     # Fetch data for filter dropdowns
     tipos = [r[0] for r in db.session.query(Actividades.tipo).distinct().all() if r[0]] # Ensure not None
@@ -34,7 +33,6 @@ def programs():
         organizacion_filter=organizacion_filter,
         estado_filter=estado_filter,
         enfoque_inclusivo=enfoque_inclusivo_filter, # Pass the new filter
-        etiqueta_filter=etiqueta_filter_value, # Pass the new etiqueta filter
         preferencia_filter=request.args.get('preferencia', None)
     )
 
