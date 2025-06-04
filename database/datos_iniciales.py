@@ -2,12 +2,6 @@ from datetime import datetime, date, timezone, timedelta
 from werkzeug.security import generate_password_hash
 from database.db import db
 from model.models import Usuarios, Organizaciones, Preferencias, Discapacidades, Facilidad, Actividades, UsuarioDiscapacidad, Inscripciones, EstadoActividad
-import random
-++++++++++++
-from datetime import datetime, date, timezone, timedelta
-from werkzeug.security import generate_password_hash
-from database.db import db
-from model.models import Usuarios, Organizaciones, Preferencias, Discapacidades, Facilidad, Actividades, UsuarioDiscapacidad
 
 # Define peru_tz
 peru_tz = timezone(timedelta(hours=-5))
