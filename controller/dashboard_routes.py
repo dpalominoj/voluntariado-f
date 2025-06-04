@@ -48,10 +48,12 @@ def profile():
     """
     user_disabilities_data = []
     if current_user.is_authenticated and hasattr(current_user, 'discapacidades_pivot'):
+        user_general_preferences = list(current_user.preferencias)  # Fetch general preferences
         for disc_assoc in current_user.discapacidades_pivot:
             user_disabilities_data.append({
                 'nombre': disc_assoc.discapacidad.nombre.value if disc_assoc.discapacidad and disc_assoc.discapacidad.nombre else "No especificada",
-                'gravedad': disc_assoc.gravedad if disc_assoc.gravedad else "No especificada"
+                'gravedad': disc_assoc.gravedad if disc_assoc.gravedad else "No especificada",
+                'preferencias': user_general_preferences  # Add this line
             })
 
     user_preferences = current_user.preferencias

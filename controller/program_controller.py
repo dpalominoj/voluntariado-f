@@ -45,6 +45,8 @@ def get_programs_compatibility(tipo_filter=None, organizacion_filter=None, estad
                      .join(actividad_discapacidad_table, Actividades.id_actividad == actividad_discapacidad_table.c.id_actividad) \
                      .join(Discapacidades, actividad_discapacidad_table.c.id_discapacidad == Discapacidades.id_discapacidad) \
                      .filter(Discapacidades.nombre == enfoque_inclusivo)
+        # Add the following line to ensure only Actividades entities are returned
+        query = query.with_entities(Actividades)
 
     # New filter by Preferencia ID
     if preferencia_filter and preferencia_filter.isdigit(): # Check if it's a valid ID
