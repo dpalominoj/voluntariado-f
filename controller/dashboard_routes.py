@@ -3,6 +3,7 @@ from flask_login import login_required, current_user
 from model.models import UsuarioDiscapacidad, Discapacidades, Inscripciones, Actividades, Usuarios, EstadoActividad # Added EstadoActividad
 from database.db import db # Added import
 from services.participation_service import predecir_participacion # Path updated due to file rename
+from services.compatibility_service import get_compatibility_scores # Import for compatibility service
 
 dashboard_bp = Blueprint('user_dashboard', __name__, 
                          template_folder='../view/templates/dashboards',
@@ -84,6 +85,29 @@ def dashboard():
         actividades_abiertas = Actividades.query.filter_by(estado=EstadoActividad.ABIERTO).all()
         actividades_abiertas_con_prediccion = []
 
+        # Prepare user profile and activities for compatibility scoring
+        user_profile = {
+            'id': current_user.id_usuario,
+            'interests': [p.nombre_corto for p in current_user.preferencias]
+        }
+
+        programs_or_activities_for_compatibility = []
+        for actividad in actividades_abiertas:
+            programs_or_activities_for_compatibility.append({
+                'id': actividad.id_actividad,
+                'name': actividad.nombre,
+                'category': actividad.etiqueta if hasattr(actividad, 'etiqueta') else ''
+            })
+
+        compatibility_scores = {} # Default to empty dict
+        if user_profile and programs_or_activities_for_compatibility: # Ensure inputs are not empty
+            try:
+                compatibility_scores = get_compatibility_scores(user_profile, programs_or_activities_for_compatibility)
+            except Exception as e:
+                print(f"Error calling get_compatibility_scores: {e}") # Log error
+                flash("Error al calcular la compatibilidad de actividades.", "danger")
+                # compatibility_scores will remain empty, so activities won't be filtered by it harshly
+
         for actividad in actividades_abiertas:
             prediction_output = predecir_participacion(actividad.id_actividad)
 
@@ -110,17 +134,30 @@ def dashboard():
             elif prediction_output and 'info' in prediction_output: # Case for insufficient data without error
                 indicator_text = prediction_output['info']
 
+            # Get compatibility score, default to 0 if not found or error in service
+            activity_score = 0
+            if isinstance(compatibility_scores, dict): # Make sure it's a dict before using .get
+                 activity_score_value = compatibility_scores.get(str(actividad.id_actividad)) # IDs might be strings from service
+                 if activity_score_value is not None:
+                     activity_score = activity_score_value
+
             actividades_abiertas_con_prediccion.append({
                 'actividad': actividad,
                 'indicador': indicator,
-                'texto_indicador': indicator_text
-                # Not passing metrics or tree_dot_file to volunteer dashboard for now
+                'texto_indicador': indicator_text,
+                'compatibility_score': activity_score
             })
+
+        # Filter activities by compatibility score
+        actividades_compatibles_filtradas = [
+            actividad_info for actividad_info in actividades_abiertas_con_prediccion
+            if actividad_info.get('compatibility_score', 0) > 50
+        ]
 
         return render_template('volunteer_dashboard.html',
                                title="Volunteer Dashboard",
                                user_enrollments=user_enrollments,
-                               actividades_abiertas_con_prediccion=actividades_abiertas_con_prediccion)
+                               actividades_compatibles=actividades_compatibles_filtradas) # Pass filtered list
     else: # Should not happen with defined roles
         flash("Perfil de usuario no reconocido.", "warning")
         return redirect(url_for('main.home'))
