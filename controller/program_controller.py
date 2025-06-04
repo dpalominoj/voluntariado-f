@@ -2,7 +2,7 @@ from flask import flash, redirect, url_for
 from flask_login import current_user, login_required
 from model.models import Actividades, Discapacidades, Inscripciones, EstadoActividad, Preferencias, actividad_discapacidad_table # Make sure Usuarios is imported if needed for relationships
 from services.compatibility_service import get_compatibility_scores
-from services.recommendation_service import generate_user_based_recommendations
+# from services.participation_service import generate_user_based_recommendations # Old function, no longer exists in this service
 from sqlalchemy.orm import aliased
 from database.db import db
 
@@ -156,15 +156,16 @@ def enroll_program(program_id):
         db.session.commit()
         flash("¡Inscripción exitosa!", "success")
 
-        # Add this line:
-        try:
-            print(f"Attempting to update recommendations for user {current_user.id_usuario} after enrollment.")
-            generate_user_based_recommendations(target_user_id=current_user.id_usuario)
-            print(f"Successfully triggered recommendation update for user {current_user.id_usuario}.")
-        except Exception as e_rec:
-            print(f"Error updating recommendations for user {current_user.id_usuario}: {e_rec}")
-            # Optionally, flash a less critical message or just log,
-            # as the main enrollment was successful.
+        # Removed call to generate_user_based_recommendations as it's part of the old system
+        # The old system would try to update recommendations for the user here.
+        # try:
+        #     print(f"Attempting to update recommendations for user {current_user.id_usuario} after enrollment.")
+        #     generate_user_based_recommendations(target_user_id=current_user.id_usuario)
+        #     print(f"Successfully triggered recommendation update for user {current_user.id_usuario}.")
+        # except Exception as e_rec:
+        #     print(f"Error updating recommendations for user {current_user.id_usuario}: {e_rec}")
+        #     # Optionally, flash a less critical message or just log,
+        #     # as the main enrollment was successful.
 
     except Exception as e:
         db.session.rollback()

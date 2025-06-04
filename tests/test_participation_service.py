@@ -6,7 +6,7 @@ import pandas as pd
 from main import app
 from database.db import db
 from model.models import Actividades, Inscripciones, EstadoActividad, Organizaciones, Usuarios, PerfilesUsuario
-from services.recommendation_service import obtener_features, predecir_participacion
+from services.participation_service import obtener_features, predecir_participacion # Path updated due to file rename
 
 # Helper function to create a dummy organization if needed by activities
 def create_dummy_org(org_id=1, nombre_org="Dummy Org"):

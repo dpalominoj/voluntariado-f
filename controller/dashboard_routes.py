@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, flash, redirect, url_for
 from flask_login import login_required, current_user
 from model.models import UsuarioDiscapacidad, Discapacidades, Inscripciones, Actividades, Usuarios, EstadoActividad # Added EstadoActividad
 from database.db import db # Added import
-from services.recommendation_service import generate_user_based_recommendations, get_top_recommended_activities, predecir_participacion # Added predecir_participacion
+from services.participation_service import predecir_participacion # Path updated due to file rename
 
 dashboard_bp = Blueprint('user_dashboard', __name__, 
                          template_folder='../view/templates/dashboards',
@@ -64,17 +64,16 @@ def dashboard():
 
         member_organizations = current_user.organizaciones
 
-        # Fetch Top Recommended Activities - this part remains
-        print("Organizer dashboard: Fetching top recommended activities.")
-        recommended_activities = get_top_recommended_activities(limit=10)
-
-        print(f"Organizer Dashboard: Displaying {len(recommended_activities)} recommended activities.") # For logging
+        # Removed Fetch Top Recommended Activities - part of the old system
+        # print("Organizer dashboard: Fetching top recommended activities.")
+        # recommended_activities = get_top_recommended_activities(limit=10)
+        # print(f"Organizer Dashboard: Displaying {len(recommended_activities)} recommended activities.") # For logging
 
         return render_template('organizer_dashboard.html',
                                title="Organizer Dashboard",
                                created_programs_con_prediccion=actividades_con_prediccion, # Pass new list
-                               member_organizations=member_organizations,
-                               recommended_activities=recommended_activities)
+                               member_organizations=member_organizations)
+                               # recommended_activities=recommended_activities) # Removed
     elif current_user.perfil == 'voluntario':
         user_enrollments = db.session.query(Inscripciones, Actividades) \
                             .join(Actividades, Inscripciones.id_actividad == Actividades.id_actividad) \
@@ -178,14 +177,14 @@ def trigger_organizer_recommendations():
         return redirect(url_for('main.home')) # Or some other appropriate redirect
 
     try:
-        print(f"Organizer {current_user.id_usuario} manually triggered recommendation generation.")
-        # Call the function to generate recommendations for all relevant users
-        generate_user_based_recommendations()
-        flash("Se han actualizado las recomendaciones de actividades para los usuarios.", "success")
-        print("Recommendation generation completed successfully after manual trigger.")
+        print(f"Organizer {current_user.id_usuario} manually triggered recommendation generation (currently disabled).")
+        # Removed call to generate_user_based_recommendations as it's part of the old system.
+        # generate_user_based_recommendations()
+        flash("La generación manual de recomendaciones está actualmente deshabilitada.", "info")
+        # print("Recommendation generation completed successfully after manual trigger.") # Old message
     except Exception as e:
-        print(f"Error during manually triggered recommendation generation: {e}")
-        flash(f"Ocurrió un error al generar las recomendaciones: {str(e)}", "danger") # Use str(e) for safer flashing
+        print(f"Error during (disabled) manually triggered recommendation generation: {e}")
+        flash(f"Ocurrió un error: {str(e)}", "danger")
         # Log the full error e for debugging if necessary
 
     return redirect(url_for('user_dashboard.dashboard')) # Redirect back to the organizer dashboard

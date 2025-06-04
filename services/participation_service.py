@@ -1,6 +1,3 @@
-# TODO: Consider renaming this file to prediction_service.py as its role has shifted
-# from recommendations to participation prediction.
-
 """
 Service module for predicting activity participation levels.
 
