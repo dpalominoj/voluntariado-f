@@ -154,7 +154,7 @@ def dashboard():
 
         actividades_compatibles_filtradas = [
             actividad_info for actividad_info in actividades_abiertas_con_prediccion
-            if actividad_info.get('compatibility_score', 0) > 50
+            if actividad_info.get('compatibility_score', 0) > 65
         ]
 
         return render_template('volunteer_dashboard.html',
