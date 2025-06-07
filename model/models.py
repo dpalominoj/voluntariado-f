@@ -1,5 +1,5 @@
 from flask_login import UserMixin
-from database.db import db # Import db
+from database.db import db
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy import Column, Integer, String, Text, ForeignKey, DateTime, Enum, Boolean, DECIMAL, Table, func
 from sqlalchemy.orm import relationship
@@ -56,11 +56,11 @@ class Usuarios(db.Model, UserMixin):
     id_usuario = db.Column(db.Integer, primary_key=True, autoincrement=True)
 
     # Campos obligatorios en el registro inicial
-    DNI = db.Column(db.String(8), unique=True, nullable=False) # Obligatorio
+    DNI = db.Column(db.String(8), unique=True, nullable=False)
     nombre = db.Column(db.String(100), nullable=False)
     contrasena_hash = db.Column(db.String(255), nullable=False)
     perfil = db.Column(db.Enum('voluntario', 'organizador', 'administrador', name='perfil_enum'), nullable=False)
-    estado_usuario = db.Column(db.Enum(EstadoUsuario, name='estado_usuario_enum', values_callable=lambda x: [e.value for e in x]), nullable=False, default=EstadoUsuario.ACTIVO) # Usando Enum de Python
+    estado_usuario = db.Column(db.Enum(EstadoUsuario, name='estado_usuario_enum', values_callable=lambda x: [e.value for e in x]), nullable=False, default=EstadoUsuario.ACTIVO)
     fecha_registro = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
 
     # Campos opcionales en el registro inicial (se llenarán después)
@@ -71,7 +71,7 @@ class Usuarios(db.Model, UserMixin):
     fecha_nacimiento = db.Column(db.Date, nullable=True)
     genero = db.Column(db.Enum('masculino', 'femenino', name='genero_enum'))
 
-    # Relationships
+    # Relaciones
     organizaciones = relationship("Organizaciones", secondary=usuario_organizacion_table, back_populates="usuarios")
     preferencias = relationship("Preferencias", secondary=usuarios_preferencia_table, back_populates="usuarios")
     discapacidades_pivot = relationship("UsuarioDiscapacidad", back_populates="usuario", cascade="all, delete-orphan")
@@ -82,10 +82,10 @@ class Usuarios(db.Model, UserMixin):
     interacciones_chatbot = relationship("InteraccionesChatbot", back_populates="usuario")
 
     def set_password(self, password):
-        self.contrasena_hash = generate_password_hash(password) # Updated to contrasena_hash
+        self.contrasena_hash = generate_password_hash(password)
 
     def check_password(self, password):
-        return check_password_hash(self.contrasena_hash, password) # Updated to contrasena_hash
+        return check_password_hash(self.contrasena_hash, password)
 
     def get_id(self):
         return str(self.id_usuario)
@@ -99,7 +99,7 @@ class Organizaciones(db.Model):
     logo = db.Column(db.Text)
     fecha_registro = db.Column(db.DateTime, default=datetime.utcnow)
 
-    # Relationships
+    # Relaciones
     usuarios = relationship("Usuarios", secondary=usuario_organizacion_table, back_populates="organizaciones")
     actividades = relationship("Actividades", back_populates="organizacion")
 
@@ -127,7 +127,7 @@ class UsuarioDiscapacidad(db.Model):
 class Discapacidades(db.Model):
     __tablename__ = 'discapacidades'
     id_discapacidad = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    nombre = db.Column(db.Enum(TipoDiscapacidad, values_callable=lambda x: [e.value for e in x]), unique=True) # Usando Enum de Python
+    nombre = db.Column(db.Enum(TipoDiscapacidad, values_callable=lambda x: [e.value for e in x]), unique=True)
     descripcion = db.Column(db.Text)
 
     usuarios_pivot = relationship("UsuarioDiscapacidad", back_populates="discapacidad", cascade="all, delete-orphan")
@@ -145,13 +145,13 @@ class Actividades(db.Model):
     habilidades_requeridas = db.Column(db.Text)
     es_inclusiva = db.Column(db.Boolean, default=False)
     cupo_maximo = db.Column(db.Integer)
-    estado = db.Column(db.Enum(EstadoActividad, name='estado_actividad_enum', values_callable=lambda x: [e.value for e in x]), default=EstadoActividad.ABIERTO) # Usando Enum de Python
+    estado = db.Column(db.Enum(EstadoActividad, name='estado_actividad_enum', values_callable=lambda x: [e.value for e in x]), default=EstadoActividad.ABIERTO)
     imagen = db.Column(db.String(255))
     compatibilidad = db.Column(db.DECIMAL(5, 2))
     etiqueta = db.Column(db.String(100))
     id_organizacion = db.Column(db.Integer, ForeignKey('organizaciones.id_organizacion'))
 
-    # Relationships
+    # Relaciones
     organizacion = relationship("Organizaciones", back_populates="actividades")
     discapacidades = relationship("Discapacidades", secondary=actividad_discapacidad_table, back_populates="actividades")
     facilidades = relationship("Facilidad", secondary=actividad_facilidad_table, back_populates="actividades")
@@ -222,9 +222,9 @@ class Recomendaciones(db.Model):
     id_recomendacion = db.Column(db.Integer, primary_key=True, autoincrement=True)
     id_usuario = db.Column(db.Integer, ForeignKey('usuarios.id_usuario'), nullable=False)
     id_actividad = db.Column(db.Integer, ForeignKey('actividades.id_actividad'), nullable=False)
-    tipo_recomendacion = db.Column(db.Enum(TipoRecomendacion, name='tipo_recomendacion_enum', values_callable=lambda x: [e.value for e in x])) # Usando Enum de Python
+    tipo_recomendacion = db.Column(db.Enum(TipoRecomendacion, name='tipo_recomendacion_enum', values_callable=lambda x: [e.value for e in x]))
     score = db.Column(db.DECIMAL(5, 4), nullable=True)
-    descripcion = db.Column(db.Text, nullable=True) # Ensure nullable
+    descripcion = db.Column(db.Text, nullable=True)
     fecha = db.Column(db.DateTime, default=datetime.utcnow)
 
     usuario = relationship("Usuarios", back_populates="recomendaciones")

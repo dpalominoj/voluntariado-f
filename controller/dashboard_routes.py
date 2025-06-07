@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, flash, redirect, url_for
+from flask import Blueprint, render_template, flash, redirect, url_for, current_app
 from flask_login import login_required, current_user
 from model.models import UsuarioDiscapacidad, Discapacidades, Inscripciones, Actividades, Usuarios, EstadoActividad
 from database.db import db
@@ -13,12 +13,12 @@ dashboard_bp = Blueprint('user_dashboard', __name__,
 @login_required
 def dashboard():
     """
-    Redirects user to the appropriate dashboard based on their role.
+    Redirige al usuario al panel de control apropiado según su rol.
     """
     if current_user.perfil == 'administrador':
         total_users = Usuarios.query.count()
         total_programs = Actividades.query.count()
-        return render_template('admin_dashboard.html', title="Admin Dashboard", total_users=total_users, total_programs=total_programs)
+        return render_template('admin_dashboard.html', title="Panel de Administrador", total_users=total_users, total_programs=total_programs)
     elif current_user.perfil == 'organizador':
         organizer_org_ids = [org.id_organizacion for org in current_user.organizaciones]
         created_programs_query = []
@@ -66,7 +66,7 @@ def dashboard():
         member_organizations = current_user.organizaciones
 
         return render_template('organizer_dashboard.html',
-                               title="Organizer Dashboard",
+                               title="Panel de Organizador",
                                created_programs_con_prediccion=actividades_con_prediccion,
                                member_organizations=member_organizations)
     elif current_user.perfil == 'voluntario':
@@ -110,7 +110,7 @@ def dashboard():
             try:
                 compatibility_scores = get_compatibility_scores(user_profile, programs_or_activities_for_compatibility)
             except Exception as e:
-                print(f"Error calling get_compatibility_scores: {e}")
+                current_app.logger.error(f"Error al llamar a get_compatibility_scores: {e}")
                 flash("Error al calcular la compatibilidad de actividades.", "danger")
 
         for actividad in actividades_abiertas:
@@ -158,10 +158,10 @@ def dashboard():
         ]
 
         return render_template('volunteer_dashboard.html',
-                               title="Volunteer Dashboard",
+                               title="Panel de Voluntario",
                                user_enrollments=user_enrollments,
                                actividades_compatibles=actividades_compatibles_filtradas)
-    else: # Should not happen with defined roles
+    else: # No debería ocurrir con roles definidos
         flash("Perfil de usuario no reconocido.", "warning")
         return redirect(url_for('main.home'))
 
@@ -169,7 +169,7 @@ def dashboard():
 @login_required
 def profile():
     """
-    Displays the user's profile page.
+    Muestra la página de perfil del usuario.
     """
     user_disabilities_data = []
     if current_user.is_authenticated and hasattr(current_user, 'discapacidades_pivot'):
@@ -196,7 +196,7 @@ def profile():
                            user_disabilities_data=user_disabilities_data,
                            user_preferences=user_preferences,
                            user_enrollments=user_enrollments,
-                           title="My Profile")
+                           title="Mi Perfil")
 
 @dashboard_bp.route('/admin/manage_users')
 @login_required
@@ -216,10 +216,11 @@ def trigger_organizer_recommendations():
         return redirect(url_for('main.home'))
 
     try:
-        print(f"Organizer {current_user.id_usuario} manually triggered recommendation generation (currently disabled).")
+        # Esta función está actualmente deshabilitada.
+        current_app.logger.info(f"Organizador {current_user.id_usuario} activó manualmente la generación de recomendaciones (actualmente deshabilitada).")
         flash("La generación manual de recomendaciones está actualmente deshabilitada.", "info")
     except Exception as e:
-        print(f"Error during (disabled) manually triggered recommendation generation: {e}")
+        current_app.logger.error(f"Error durante la activación manual (deshabilitada) de generación de recomendaciones: {e}")
         flash(f"Ocurrió un error: {str(e)}", "danger")
 
     return redirect(url_for('user_dashboard.dashboard'))

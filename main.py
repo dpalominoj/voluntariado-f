@@ -34,10 +34,10 @@ def create_tables_if_not_exist(flask_app, db_instance):
         inspector = inspect(db_instance.engine)
         if not inspector.has_table(Usuarios.__tablename__):
             db_instance.create_all()
-            print("Database tables created.")
+            app.logger.info("Tablas de la base de datos creadas.")
             return True
         else:
-            print("Database tables already exist.")
+            app.logger.info("Tablas de la base de datos ya existen.")
             return False
 
 tables_created = create_tables_if_not_exist(app, db)
@@ -62,10 +62,11 @@ app.register_blueprint(program_bp)
 
 @app.cli.command('seed-db')
 def seed_db_command():
-    """Seeds the database with initial data."""
+    """Puebla la base de datos con datos iniciales."""
     with app.app_context():
         seed_data()
 
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
+    # TODO: DEBUG debe ser False en un entorno de producción. Considerar implicaciones de seguridad.
     app.run(host='0.0.0.0', port=port, debug=True)
