@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request
-from flask_login import current_user
-from model.models import Usuarios, Organizaciones, Discapacidades, Actividades, EstadoActividad, Preferencias
+# current_user no se usa en este archivo, Usuarios tampoco.
+from model.models import Organizaciones, Discapacidades, Actividades, EstadoActividad, Preferencias
 from database.db import db
 from controller.program_controller import get_programs_compatibility
 
@@ -8,12 +8,12 @@ main_bp = Blueprint('main', __name__, template_folder='../view/templates')
 
 @main_bp.route('/')
 def home():
-    """Serves the home page."""
+    """Sirve la página de inicio."""
     return render_template('home.html')
 
 @main_bp.route('/programs')
 def programs():
-    """Serves the page listing all programs, with filtering capabilities."""
+    """Sirve la página que lista todos los programas, con capacidades de filtrado."""
     tipo_filter = request.args.get('tipo', None)
     organizacion_filter = request.args.get('organizacion', None)
     estado_filter = request.args.get('estado', None)
@@ -45,5 +45,5 @@ def programs():
 
 @main_bp.route('/help')
 def help_page():
-    """Serves the help page."""
+    """Sirve la página de ayuda."""
     return render_template('help.html')

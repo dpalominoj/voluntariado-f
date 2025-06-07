@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, SelectField, SelectMultipleField, BooleanField
-from wtforms.validators import DataRequired, Email, EqualTo, Length, Optional
+from wtforms.validators import DataRequired, EqualTo, Length, Optional # Email removido
 
 class RegistrationForm(FlaskForm):
     dni = StringField('DNI',
@@ -25,4 +25,4 @@ class LoginForm(FlaskForm):
     dni = StringField('DNI',
                         validators=[DataRequired(), Length(min=8, max=8)])
     password = PasswordField('Contraseña', validators=[DataRequired()])
-    submit = SubmitField('Login')
+    submit = SubmitField('Iniciar Sesión')

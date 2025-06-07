@@ -20,7 +20,7 @@ def register():
         existing_user = Usuarios.query.filter_by(DNI=form.dni.data).first()
         if existing_user:
             flash('El DNI ingresado ya está registrado. Por favor, intente con otro.', 'danger')
-            return render_template('register.html', title='Register', form=form)
+            return render_template('register.html', title='Registro', form=form)
         user = Usuarios(
             DNI=form.dni.data,
             nombre=form.nombre.data,
@@ -46,7 +46,7 @@ def register():
         db.session.commit()
         flash('¡Felicidades, ahora eres un usuario registrado! Por favor Inicia Sesión.', 'success')
         return redirect(url_for('auth.login'))
-    return render_template('register.html', title='Register', form=form)
+    return render_template('register.html', title='Registro', form=form)
 
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
@@ -61,7 +61,7 @@ def login():
             return redirect(url_for('user_dashboard.dashboard'))
         else:
             flash('Inicio de sesión fallido. Por favor, verifica tu DNI y contraseña.', 'danger')
-    return render_template('login.html', title='Login', form=form)
+    return render_template('login.html', title='Iniciar Sesión', form=form)
 
 @auth_bp.route('/logout')
 @login_required
