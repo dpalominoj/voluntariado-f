@@ -9,12 +9,36 @@ dashboard_bp = Blueprint('user_dashboard', __name__,
                          template_folder='../view/templates/dashboards',
                          url_prefix='/dashboard')
 
+def _get_participation_indicator_info(prediction_output):
+    indicator = '⚪' # Indicador por defecto: círculo blanco
+    indicator_text = 'Predicción no disponible'
+
+    if prediction_output:
+        if 'error' not in prediction_output and 'probabilidad' in prediction_output:
+            prob = prediction_output.get('probabilidad') # Usar .get() para seguridad
+            if prob is None:
+                indicator = '⚪' # Círculo blanco si la probabilidad no se pudo calcular
+                indicator_text = 'Probabilidad no calculada (ej. datos insuficientes)'
+            elif prob < 0.3:
+                indicator = '🔴' # Círculo rojo para baja participación
+                indicator_text = f"Baja participación (Prob: {prob:.2f})"
+            elif prob < 0.7:
+                indicator = '🟠' # Círculo naranja para participación moderada
+                indicator_text = f"Participación moderada (Prob: {prob:.2f})"
+            else:
+                indicator = '🟢' # Círculo verde para alta participación
+                indicator_text = f"Alta participación (Prob: {prob:.2f})"
+        elif 'error' in prediction_output:
+            indicator_text = prediction_output['error']
+        elif 'info' in prediction_output: # Usar elif para evitar sobreescribir un error con info
+            indicator_text = prediction_output['info']
+    
+    return indicator, indicator_text
+
 @dashboard_bp.route('/')
 @login_required
 def dashboard():
-    """
-    Redirige al usuario al panel de control apropiado según su rol.
-    """
+    # Redirige al panel de control según perfil.
     if current_user.perfil == 'administrador':
         total_users = Usuarios.query.count()
         total_programs = Actividades.query.count()
@@ -26,34 +50,13 @@ def dashboard():
             created_programs_query = Actividades.query.filter(Actividades.id_organizacion.in_(organizer_org_ids)) \
                                                .order_by(Actividades.fecha_actividad.desc()) \
                                                .all()
-
+        
+        # Procesamiento de actividades creadas por el organizador para mostrar predicción de participación
         actividades_con_prediccion = []
         for actividad in created_programs_query:
             prediction_output = predecir_participacion(actividad.id_actividad)
-
-            prob = -1
-            indicator = '⚪'
-            indicator_text = 'Predicción no disponible'
-
-            if prediction_output and 'error' not in prediction_output and 'probabilidad' in prediction_output :
-                prob = prediction_output['probabilidad']
-                if prob is None:
-                    indicator = '⚪'
-                    indicator_text = 'Probabilidad no calculada (ej. datos insuficientes)'
-                elif prob < 0.3:
-                    indicator = '🔴'
-                    indicator_text = f"Baja participación (Prob: {prob:.2f})"
-                elif prob < 0.7:
-                    indicator = '🟠'
-                    indicator_text = f"Participación moderada (Prob: {prob:.2f})"
-                else:
-                    indicator = '🟢'
-                    indicator_text = f"Alta participación (Prob: {prob:.2f})"
-            elif prediction_output and 'error' in prediction_output:
-                 indicator_text = prediction_output['error']
-            elif prediction_output and 'info' in prediction_output:
-                indicator_text = prediction_output['info']
-
+            # Utilizar la función auxiliar para obtener el indicador y el texto
+            indicator, indicator_text = _get_participation_indicator_info(prediction_output)
 
             actividades_con_prediccion.append({
                 'actividad': actividad,
@@ -76,9 +79,14 @@ def dashboard():
                             .order_by(Inscripciones.fecha_inscripcion.desc()) \
                             .all()
 
+     
+        # 1. Obtener todas las actividades abiertas que podrían ser de interés
         actividades_abiertas = Actividades.query.filter_by(estado=EstadoActividad.ABIERTO).all()
-        actividades_abiertas_con_prediccion = []
+        
+        # Lista para almacenar las actividades abiertas junto con su información combinada (compatibilidad y participación)
+        actividades_abiertas_con_prediccion = [] 
 
+        # 2. Preparar datos del perfil del voluntario para el servicio de compatibilidad
         user_disabilities = []
         if hasattr(current_user, 'discapacidades_pivot'):
             user_disabilities = [
@@ -95,6 +103,7 @@ def dashboard():
             'disabilities': user_disabilities
         }
 
+        # 3. Cálculo de compatibilidad de programas con el perfil del voluntario.
         programs_or_activities_for_compatibility = []
         for actividad in actividades_abiertas:
             item_data = {
@@ -108,36 +117,18 @@ def dashboard():
         compatibility_scores = {}
         if user_profile and programs_or_activities_for_compatibility:
             try:
+                # Obtener los puntajes de compatibilidad
                 compatibility_scores = get_compatibility_scores(user_profile, programs_or_activities_for_compatibility)
             except Exception as e:
-                current_app.logger.error(f"Error al llamar a get_compatibility_scores: {e}")
-                flash("Error al calcular la compatibilidad de actividades.", "danger")
-
+                current_app.logger.error(f"Error al llamar a get_compatibility_scores para el usuario {user_profile.get('id')}: {e}")
+                flash("Error al calcular la compatibilidad de actividades. Intente más tarde.", "danger")
+        
+        # 4. Procesamiento de actividades para predicción de participación y combinación con compatibilidad.
         for actividad in actividades_abiertas:
+            # Obtener predicción de participación para la actividad
             prediction_output = predecir_participacion(actividad.id_actividad)
-
-            prob = -1
-            indicator = '⚪'
-            indicator_text = 'Predicción no disponible'
-
-            if prediction_output and 'error' not in prediction_output and 'probabilidad' in prediction_output:
-                prob = prediction_output['probabilidad']
-                if prob is None:
-                    indicator = '⚪'
-                    indicator_text = 'Probabilidad no calculada (ej. datos insuficientes)'
-                elif prob < 0.3:
-                    indicator = '🔴'
-                    indicator_text = f"Baja participación (Prob: {prob:.2f})"
-                elif prob < 0.7:
-                    indicator = '🟠'
-                    indicator_text = f"Participación moderada (Prob: {prob:.2f})"
-                else:
-                    indicator = '🟢'
-                    indicator_text = f"Alta participación (Prob: {prob:.2f})"
-            elif prediction_output and 'error' in prediction_output:
-                 indicator_text = prediction_output['error']
-            elif prediction_output and 'info' in prediction_output:
-                indicator_text = prediction_output['info']
+            # Utilizar la función auxiliar para obtener el indicador y el texto de participación
+            indicator, indicator_text = _get_participation_indicator_info(prediction_output)
 
             activity_score = 0
             if isinstance(compatibility_scores, dict):
@@ -154,14 +145,14 @@ def dashboard():
 
         actividades_compatibles_filtradas = [
             actividad_info for actividad_info in actividades_abiertas_con_prediccion
-            if actividad_info.get('compatibility_score', 0) > 35
+            if actividad_info.get('compatibility_score', 0) > 65
         ]
 
         return render_template('volunteer_dashboard.html',
                                title="Panel de Voluntario",
                                user_enrollments=user_enrollments,
                                actividades_compatibles=actividades_compatibles_filtradas)
-    else: # No debería ocurrir con roles definidos
+    else:
         flash("Perfil de usuario no reconocido.", "warning")
         return redirect(url_for('main.home'))
 
