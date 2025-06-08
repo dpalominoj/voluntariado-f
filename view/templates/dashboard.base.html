@@ -15,18 +15,18 @@
     {# Negative margins to expand to container edges if parent has padding, remove if not desired #}
     {# Adjusted min-height assuming approx 6rem for nav and 2rem for footer/margins from base.html #}
 
-    <nav class="w-full md:w-64 bg-gray-50 p-5 border-r border-gray-200 flex-shrink-0">
+    <nav class="w-full md:w-64 bg-gray-50 p-5 border-r border-gray-300 flex-shrink-0">
         <h3 class="text-xl font-semibold text-gray-800 mb-6">Menú del Panel</h3>
         <ul class="space-y-2">
             <li>
                 <a href="{{ url_for('main.home') }}"
-                   class="block py-2.5 px-4 text-gray-700 hover:bg-indigo-100 hover:text-indigo-700 rounded-md text-sm transition-colors duration-150 {% if request.endpoint == 'main.home' %}bg-indigo-100 text-indigo-700 font-semibold{% endif %}">
+                   class="block py-2.5 {% if request.endpoint == 'main.home' %}bg-indigo-100 text-indigo-700 font-semibold border-l-4 border-indigo-500 pl-3 pr-4{% else %}px-4 text-gray-700 hover:bg-indigo-100 hover:text-indigo-700{% endif %} rounded-md text-sm transition-colors duration-150">
                    Inicio del Sitio
                 </a>
             </li>
             <li>
                 <a href="{{ url_for('user_dashboard.profile') }}"
-                   class="block py-2.5 px-4 text-gray-700 hover:bg-indigo-100 hover:text-indigo-700 rounded-md text-sm transition-colors duration-150 {% if request.endpoint == 'user_dashboard.profile' %}bg-indigo-100 text-indigo-700 font-semibold{% endif %}">
+                   class="block py-2.5 {% if request.endpoint == 'user_dashboard.profile' %}bg-indigo-100 text-indigo-700 font-semibold border-l-4 border-indigo-500 pl-3 pr-4{% else %}px-4 text-gray-700 hover:bg-indigo-100 hover:text-indigo-700{% endif %} rounded-md text-sm transition-colors duration-150">
                    Mi Perfil
                 </a>
             </li>
