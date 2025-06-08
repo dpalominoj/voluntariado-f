@@ -68,19 +68,28 @@
             <div class="text-center">
                  <h3 class="text-2xl font-semibold text-gray-900">¿Necesitas más Ayuda? ¡Chatea con Nosotros!</h3>
             </div>
-            {# Modified section for n8n chat widget #}
-            <div id="n8n-chat-widget-container" class="mt-6 bg-gray-100 p-4 rounded-md min-h-[300px] flex flex-col justify-center items-center border border-gray-300 shadow-sm">
-                <!-- TODO: Embed n8n Chat Widget Here -->
-                <p class="text-center text-gray-600">
-                    El Asistente Virtual está casi listo.
-                </p>
-                <p class="text-center text-red-500 font-semibold mt-2">
-                    Integración del Chatbot pendiente: El código del widget de n8n (URL/snippet) necesita ser añadido aquí.
-                </p>
-                <p class="text-center text-sm text-gray-500 mt-1">
-                    (Esta sección mostrará la interfaz de chat interactiva.)
-                </p>
+            <!-- MODIFIED SECTION FOR CHAT INTERFACE -->
+            <div class="mt-6 bg-white p-4 sm:p-6 rounded-lg shadow-md max-w-2xl mx-auto border border-gray-200">
+                <h3 class="text-xl font-semibold text-gray-800 mb-4 text-center">Chatea con Nuestro Asistente Virtual</h3>
+                <!-- Chat Messages Display Area -->
+                <div id="chatMessages" class="h-80 overflow-y-auto mb-4 p-3 bg-gray-50 rounded-md border border-gray-300">
+                    <!-- Example Bot Message -->
+                    <div class="flex justify-start mb-2">
+                        <div class="bg-indigo-500 text-white p-3 rounded-lg max-w-xs shadow">
+                            <p class="text-sm">Hola! Soy tu asistente virtual. Como puedo ayudarte hoy?</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chat Input Area -->
+                <div class="flex items-center border-t border-gray-200 pt-4">
+                    <input type="text" id="chatInput" class="flex-grow p-3 border border-gray-300 rounded-l-md focus:ring-indigo-500 focus:border-indigo-500" placeholder="Escribe tu mensaje aqui...">
+                    <button id="sendChatButton" class="bg-indigo-600 hover:bg-indigo-700 text-white p-3 rounded-r-md font-semibold">
+                        Enviar
+                    </button>
+                </div>
             </div>
+            <!-- END OF MODIFIED SECTION -->
             <p class="mt-4 text-sm text-gray-500 text-center">Nuestro chatbot puede ayudar a responder preguntas comunes. Si no puede ayudarte, te guiará sobre cómo contactar a nuestro equipo de soporte.</p>
         </div>
     </div>
@@ -90,50 +99,166 @@
 {% block scripts %}
 {# {{ super() }} #} {# Uncomment if base.html defines a 'scripts' block and you want to extend it #}
 <script>
-    (function() { // IIFE to avoid polluting global scope
-        // TODO: n8n Chat Widget Initialization Script will go here.
-        // This script should be provided by n8n or your chat widget solution.
-        // It will likely target the 'n8n-chat-widget-container' div.
-        console.log("Attempting to initialize n8n chat widget placeholder...");
+   // Note: chatMessages, addMessageToChat are defined here for clarity,
+   // but ensure they are accessible in the scope where handleSendMessage is called.
+   const chatMessages = document.getElementById('chatMessages');
 
-        const chatContainer = document.getElementById('n8n-chat-widget-container');
-        if (!chatContainer) {
-            console.error("Chat widget container 'n8n-chat-widget-container' not found.");
+   function addMessageToChat(message, sender) {
+        if (!chatMessages) {
+            console.error("chatMessages container not found in addMessageToChat");
             return;
         }
+        const messageWrapper = document.createElement('div');
+        messageWrapper.classList.add('flex', (sender === 'user' ? 'justify-end' : 'justify-start'), 'mb-2');
 
-        // Example of how you might pass user data if needed by your widget:
-        let widgetConfig = {
-            context: 'help_page'
-            // Add other default configurations here
+        const messageContent = document.createElement('div');
+        messageContent.classList.add('p-3', 'rounded-lg', 'max-w-xs', 'shadow', 'text-sm');
+        if (sender === 'user') {
+            messageContent.classList.add('bg-gray-200', 'text-gray-800');
+        } else { // 'bot'
+            messageContent.classList.add('bg-indigo-500', 'text-white');
+        }
+
+        const p = document.createElement('p');
+        p.textContent = message; // Use textContent to prevent XSS
+        messageContent.appendChild(p);
+
+        messageWrapper.appendChild(messageContent);
+        chatMessages.appendChild(messageWrapper);
+        chatMessages.scrollTop = chatMessages.scrollHeight; // Auto-scroll to bottom
+    }
+
+   let isBotTyping = false;
+
+   function setBotTyping(isTyping) {
+        isBotTyping = isTyping;
+        const localChatInput = document.getElementById('chatInput');
+        const localSendChatButton = document.getElementById('sendChatButton');
+        const localChatMessages = document.getElementById('chatMessages'); // Re-fetch for safety, though global chatMessages should work.
+
+        if (localChatInput) localChatInput.disabled = isTyping;
+        if (localSendChatButton) localSendChatButton.disabled = isTyping;
+
+        const typingIndicator = document.getElementById('botTypingIndicator');
+        if (isTyping) {
+            if (!typingIndicator) {
+                const newTypingDiv = document.createElement('div');
+                newTypingDiv.id = 'botTypingIndicator';
+                newTypingDiv.classList.add('flex', 'justify-start', 'mb-2');
+                newTypingDiv.innerHTML = `
+                    <div class="bg-indigo-500 text-white p-3 rounded-lg max-w-xs shadow text-sm">
+                        <p><em>El asistente está escribiendo...</em></p>
+                    </div>`;
+                if (localChatMessages) {
+                    localChatMessages.appendChild(newTypingDiv);
+                    localChatMessages.scrollTop = localChatMessages.scrollHeight;
+                }
+            }
+        } else {
+            if (typingIndicator) {
+                typingIndicator.remove();
+            }
+        }
+    }
+
+   async function handleSendMessage() {
+       const localChatInput = document.getElementById('chatInput');
+       const messageText = localChatInput ? localChatInput.value.trim() : "";
+
+       if (messageText && !isBotTyping && typeof self !== 'undefined' && self.llmReady) {
+           addMessageToChat(messageText, 'user');
+           if (localChatInput) localChatInput.value = '';
+           setBotTyping(true);
+
+           try {
+               if (typeof self.getLLMResponse === 'function') {
+                   const botResponse = await self.getLLMResponse(messageText);
+                   addMessageToChat(botResponse, 'bot');
+               } else {
+                   addMessageToChat("La función del asistente no está definida.", 'bot');
+                   console.error("getLLMResponse is not a function.");
+               }
+           } catch (error) {
+               console.error("Error getting LLM response in handleSendMessage:", error);
+               addMessageToChat("Lo siento, tuve problemas para procesar tu solicitud.", 'bot');
+           } finally {
+               setBotTyping(false);
+           }
+       } else if (isBotTyping) {
+           console.warn("Attempted to send message while bot is typing.");
+       } else if (typeof self === 'undefined' || !self.llmReady) {
+            // Add a user-facing message if LLM is not ready
+            if (typeof self === 'undefined' || typeof self.llmReady === 'undefined') {
+                 addMessageToChat("El asistente se está cargando. Por favor espera un momento.", 'bot');
+            } else if (!self.llmReady) {
+                 addMessageToChat("El asistente no está listo. Puede que haya habido un error al cargarlo.", 'bot');
+            }
+            console.warn("Attempted to send message, but LLM not ready or self not defined.");
+       } else if (!messageText) {
+           console.warn("Attempted to send an empty message.");
+       }
+   }
+
+   document.addEventListener('DOMContentLoaded', function() {
+        const chatInput = document.getElementById('chatInput');
+        const sendChatButton = document.getElementById('sendChatButton');
+        // chatMessages is already defined globally in this script block
+
+        const updateChatAvailability = (isReady, errorMsg = "") => {
+            if (chatInput) {
+                chatInput.disabled = !isReady;
+                chatInput.placeholder = isReady ? "Escribe tu mensaje aqui..." : (errorMsg ? errorMsg : "Asistente cargando...");
+            }
+            if (sendChatButton) sendChatButton.disabled = !isReady;
         };
 
-        {% if current_user.is_authenticated %}
-        // User is authenticated, pass their ID and profile.
-        widgetConfig.userId = "{{ current_user.id_usuario }}";
-        widgetConfig.userProfile = "{{ current_user.perfil }}";
-        // Potentially add other user-specific data if your widget supports it
-        // widgetConfig.userName = "{{ current_user.nombre }}";
-        // widgetConfig.userEmail = "{{ current_user.email }}";
+        // Check initial LLM state
+        if (typeof self !== 'undefined' && typeof self.llmReady === 'boolean') {
+            if (self.llmReady) {
+                updateChatAvailability(true);
+            } else { // Loading has started or failed early
+                 updateChatAvailability(false, self.llmModelName ? "Asistente cargando..." : "Error al iniciar LLM.");
+            }
+        } else if (typeof self !== 'undefined' && self.llmPipeline === null && typeof self.llmReady === 'undefined'){
+            // This case means chatbot_llm.js has run, pipeline is null (set before async call), and llmReady is not yet defined
+            updateChatAvailability(false, self.llmModelName ? "Asistente cargando..." : "Iniciando LLM...");
+        }
+         else { // self or self.llmReady not yet defined, so still loading or transformers.js hasn't run
+            updateChatAvailability(false);
+        }
 
-        console.log("User is authenticated. Prepared widget config:", widgetConfig);
-        {% else %}
-        // User is not authenticated.
-        console.log("User is not authenticated. Prepared widget config:", widgetConfig);
-        {% endif %}
+        window.addEventListener('llm-loading', () => {
+            console.log("LLM loading event received in help.html");
+            updateChatAvailability(false, "Asistente cargando...");
+        });
 
-        // --- Placeholder for actual n8n widget initialization ---
-        // Replace this with the actual script provided by n8n or your chat solution.
-        // Example (this is purely illustrative):
-        // if (typeof YourN8NWidget !== 'undefined') {
-        //     YourN8NWidget.init(chatContainer, widgetConfig);
-        // } else {
-        //    console.warn("YourN8NWidget script not loaded. Chat cannot be initialized.");
-        //    // The placeholder text in the div will remain visible.
-        // }
-        // For now, we just log the config that would be used.
-        console.log("Placeholder: n8n widget would be initialized with config:", widgetConfig);
+        window.addEventListener('llm-ready', () => {
+            console.log("LLM ready event received in help.html");
+            updateChatAvailability(true);
+            // Consider removing the initial "Hola! Soy tu asistente virtual..." if it's added by default
+            // and the LLM is now ready to provide its own greeting or wait for user.
+            // For now, we leave it.
+        });
 
-    })();
+        window.addEventListener('llm-error', (event) => {
+            console.error("LLM error event received in help.html:", event.detail);
+            const message = event.detail && event.detail.message ? event.detail.message : 'Error desconocido.';
+            updateChatAvailability(false, "Error al cargar asistente.");
+            // Add message to chat only if chatMessages is available
+            if (chatMessages) {
+                addMessageToChat(`Error al cargar el asistente: ${message}. Intenta recargar la página.`, 'bot');
+            }
+        });
+
+        if (sendChatButton) sendChatButton.addEventListener('click', handleSendMessage);
+        if (chatInput) {
+            chatInput.addEventListener('keypress', function(event) {
+                if (event.key === 'Enter') {
+                    event.preventDefault(); // Prevent default form submission if it's part of a form
+                    handleSendMessage();
+                }
+            });
+        }
+   });
 </script>
 {% endblock %}
