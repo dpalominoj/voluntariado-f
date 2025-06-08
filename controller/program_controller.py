@@ -116,6 +116,8 @@ def get_programs_compatibility(tipo_filter=None, organizacion_filter=None, estad
     return programs, compatibility_scores
 
 from flask import Blueprint, render_template, redirect, url_for, flash
+from sqlalchemy.orm import joinedload # Importar joinedload
+
 # Definición del Blueprint
 program_bp = Blueprint('program', __name__,
                            template_folder='../view/templates', # Ruta a las plantillas
@@ -124,10 +126,17 @@ program_bp = Blueprint('program', __name__,
 # Ruta para ver el detalle de un programa
 @program_bp.route('/<int:program_id>')
 def view_program_detail(program_id):
-    program = Actividades.query.get(program_id) # Obtener programa por ID
+    # Cargar programa con relaciones de discapacidades y facilidades
+    program = Actividades.query.options(
+        joinedload(Actividades.discapacidades),
+        joinedload(Actividades.facilidades),
+        joinedload(Actividades.organizacion) # Asegurar que la organización también se carga si es necesario
+    ).get(program_id)
+
     if not program:
         flash('Programa no encontrado.', 'danger')
         return redirect(url_for('main.programs')) # Redirigir si no se encuentra
+
     # Renderizar la plantilla de detalle del programa
     return render_template('program_detail.html', program=program, title=program.nombre)
 
