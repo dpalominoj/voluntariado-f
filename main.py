@@ -1,5 +1,5 @@
 import os
-from flask import Flask
+from flask import Flask, send_from_directory
 from sqlalchemy import inspect
 from database.db import db, init_app
 from controller.routes import main_bp
@@ -59,6 +59,10 @@ app.register_blueprint(main_bp)
 app.register_blueprint(auth_bp)
 app.register_blueprint(dashboard_bp)
 app.register_blueprint(program_bp)
+
+@app.route('/services/<path:filename>')
+def serve_service_file(filename):
+    return send_from_directory(os.path.join(app.root_path, 'services'), filename)
 
 @app.cli.command('seed-db')
 def seed_db_command():
