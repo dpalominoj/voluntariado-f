@@ -244,7 +244,7 @@ class InteraccionesChatbot(db.Model):
     __tablename__ = 'interacciones_chatbot'
     id_interaccion = db.Column(db.Integer, primary_key=True, autoincrement=True)
     id_usuario = db.Column(db.Integer, ForeignKey('usuarios.id_usuario'))
-    mensaje_usuario = db.Column(db.Text)
+    pregunta_usuario = db.Column(db.Text)
     respuesta_chatbot = db.Column(db.Text)
     fecha = db.Column(db.DateTime, default=datetime.utcnow)
 
