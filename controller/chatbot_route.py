@@ -7,7 +7,13 @@ from services.chatbot.vector_store import VectorStore
 
 chatbot_bp = Blueprint('chatbot', __name__)
 
-vector_store = VectorStore()
+vector_store = None
+
+def get_vector_store():
+    global vector_store
+    if vector_store is None:
+        vector_store = VectorStore()
+    return vector_store
 
 RESPUESTAS_GENERALES = [
     "Puedo ayudarte con información sobre Programas o Actividades de voluntariado.",
