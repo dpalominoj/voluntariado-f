@@ -3,7 +3,13 @@ from flask_login import current_user
 from services.chatbot.vector_store import VectorStore
 
 socketio = SocketIO()
-vector_store = VectorStore()
+vector_store = None
+
+def get_vector_store():
+    global vector_store
+    if vector_store is None:
+        vector_store = VectorStore()
+    return vector_store
 
 @socketio.on('chat_message')
 def handle_chat_message(data):
