@@ -98,6 +98,7 @@
 
 {% block scripts %}
 {# {{ super() }} #} {# Uncomment if base.html defines a 'scripts' block and you want to extend it #}
+<script src="https://cdn.socket.io/4.5.2/socket.io.min.js"></script>
 <script>
    // Note: chatMessages, addMessageToChat are defined here for clarity,
    // but ensure they are accessible in the scope where handleSendMessage is called.
@@ -136,12 +137,16 @@
         const localSendChatButton = document.getElementById('sendChatButton');
         const localChatMessages = document.getElementById('chatMessages'); // Re-fetch for safety, though global chatMessages should work.
 
-        if (localChatInput) localChatInput.disabled = isTyping;
-        if (localSendChatButton) localSendChatButton.disabled = isTyping;
+        if (localChatInput) {
+            localChatInput.disabled = isTyping;
+        }
+        if (localSendChatButton) {
+            localSendChatButton.disabled = isTyping;
+        }
 
         const typingIndicator = document.getElementById('botTypingIndicator');
         if (isTyping) {
-            if (!typingIndicator) {
+            if (!typingIndicator && localChatMessages) { // Ensure localChatMessages exists
                 const newTypingDiv = document.createElement('div');
                 newTypingDiv.id = 'botTypingIndicator';
                 newTypingDiv.classList.add('flex', 'justify-start', 'mb-2');
@@ -149,10 +154,8 @@
                     <div class="bg-indigo-500 text-white p-3 rounded-lg max-w-xs shadow text-sm">
                         <p><em>El asistente está escribiendo...</em></p>
                     </div>`;
-                if (localChatMessages) {
-                    localChatMessages.appendChild(newTypingDiv);
-                    localChatMessages.scrollTop = localChatMessages.scrollHeight;
-                }
+                localChatMessages.appendChild(newTypingDiv);
+                localChatMessages.scrollTop = localChatMessages.scrollHeight;
             }
         } else {
             if (typingIndicator) {
@@ -161,92 +164,68 @@
         }
     }
 
-   async function handleSendMessage() {
-       const localChatInput = document.getElementById('chatInput');
-       const messageText = localChatInput ? localChatInput.value.trim() : "";
+   function handleSendMessage() { // Removed async as socket.emit is not async in the same way
+       const chatInput = document.getElementById('chatInput'); // Renamed for clarity, matches DOMContentLoaded
+       const messageText = chatInput ? chatInput.value.trim() : "";
 
-       if (messageText && !isBotTyping && typeof self !== 'undefined' && self.llmReady) {
+       if (messageText && !isBotTyping && window.socket) { // Check if socket is initialized
            addMessageToChat(messageText, 'user');
-           if (localChatInput) localChatInput.value = '';
+           window.socket.emit('chat_message', { query: messageText });
+           if (chatInput) chatInput.value = '';
            setBotTyping(true);
-
-           try {
-               if (typeof self.getLLMResponse === 'function') {
-                   const botResponse = await self.getLLMResponse(messageText);
-                   addMessageToChat(botResponse, 'bot');
-               } else {
-                   addMessageToChat("La función del asistente no está definida.", 'bot');
-                   console.error("getLLMResponse is not a function.");
-               }
-           } catch (error) {
-               console.error("Error getting LLM response in handleSendMessage:", error);
-               addMessageToChat("Lo siento, tuve problemas para procesar tu solicitud.", 'bot');
-           } finally {
-               setBotTyping(false);
-           }
-       } else if (isBotTyping) {
-           console.warn("Attempted to send message while bot is typing.");
-       } else if (typeof self === 'undefined' || !self.llmReady) {
-            // Add a user-facing message if LLM is not ready
-            if (typeof self === 'undefined' || typeof self.llmReady === 'undefined') {
-                 addMessageToChat("El asistente se está cargando. Por favor espera un momento.", 'bot');
-            } else if (!self.llmReady) {
-                 addMessageToChat("El asistente no está listo. Puede que haya habido un error al cargarlo.", 'bot');
-            }
-            console.warn("Attempted to send message, but LLM not ready or self not defined.");
        } else if (!messageText) {
            console.warn("Attempted to send an empty message.");
+       } else if (isBotTyping) {
+           console.warn("Attempted to send message while bot is typing.");
+       } else if (!window.socket) {
+           console.error("Socket not initialized. Cannot send message.");
+           addMessageToChat("Error de conexión con el chat. Intenta recargar la página.", 'bot');
        }
    }
 
    document.addEventListener('DOMContentLoaded', function() {
         const chatInput = document.getElementById('chatInput');
         const sendChatButton = document.getElementById('sendChatButton');
-        // chatMessages is already defined globally in this script block
+        // chatMessages is already defined globally
 
-        const updateChatAvailability = (isReady, errorMsg = "") => {
-            if (chatInput) {
-                chatInput.disabled = !isReady;
-                chatInput.placeholder = isReady ? "Escribe tu mensaje aqui..." : (errorMsg ? errorMsg : "Asistente cargando...");
-            }
-            if (sendChatButton) sendChatButton.disabled = !isReady;
-        };
+        // Initialize SocketIO
+        // Make socket global or pass it around if preferred, for now attaching to window for simplicity
+        window.socket = io();
 
-        // Check initial LLM state
-        if (typeof self !== 'undefined' && typeof self.llmReady === 'boolean') {
-            if (self.llmReady) {
-                updateChatAvailability(true);
-            } else { // Loading has started or failed early
-                 updateChatAvailability(false, self.llmModelName ? "Asistente cargando..." : "Error al iniciar LLM.");
-            }
-        } else if (typeof self !== 'undefined' && self.llmPipeline === null && typeof self.llmReady === 'undefined'){
-            // This case means chatbot_llm.js has run, pipeline is null (set before async call), and llmReady is not yet defined
-            updateChatAvailability(false, self.llmModelName ? "Asistente cargando..." : "Iniciando LLM...");
-        }
-         else { // self or self.llmReady not yet defined, so still loading or transformers.js hasn't run
-            updateChatAvailability(false);
-        }
-
-        window.addEventListener('llm-loading', () => {
-            console.log("LLM loading event received in help.html");
-            updateChatAvailability(false, "Asistente cargando...");
+        window.socket.on('connect', () => {
+            console.log('Socket.IO connected');
+            if (chatInput) chatInput.disabled = false;
+            if (sendChatButton) sendChatButton.disabled = false;
         });
 
-        window.addEventListener('llm-ready', () => {
-            console.log("LLM ready event received in help.html");
-            updateChatAvailability(true);
-            // Consider removing the initial "Hola! Soy tu asistente virtual..." if it's added by default
-            // and the LLM is now ready to provide its own greeting or wait for user.
-            // For now, we leave it.
+        window.socket.on('disconnect', () => {
+            console.log('Socket.IO disconnected');
+            addMessageToChat("Se ha perdido la conexión con el chat. Por favor, recarga la página.", 'bot');
+            if (chatInput) chatInput.disabled = true;
+            if (sendChatButton) sendChatButton.disabled = true;
+            setBotTyping(false); // Clear typing indicator if it was on
         });
 
-        window.addEventListener('llm-error', (event) => {
-            console.error("LLM error event received in help.html:", event.detail);
-            const message = event.detail && event.detail.message ? event.detail.message : 'Error desconocido.';
-            updateChatAvailability(false, "Error al cargar asistente.");
-            // Add message to chat only if chatMessages is available
-            if (chatMessages) {
-                addMessageToChat(`Error al cargar el asistente: ${message}. Intenta recargar la página.`, 'bot');
+        window.socket.on('chat_response', (data) => {
+            setBotTyping(false);
+            if (data && data.response) {
+                addMessageToChat(data.response, 'bot');
+                if (data.requires_auth) {
+                    addMessageToChat("Por favor, inicia sesión para obtener respuestas más personalizadas.", 'bot');
+                }
+            } else {
+                addMessageToChat("Recibida respuesta inesperada del servidor.", 'bot');
+                console.error("Unexpected chat_response data:", data);
+            }
+        });
+
+        window.socket.on('chat_error', (data) => {
+            setBotTyping(false);
+            if (data && data.message) {
+                addMessageToChat(data.message, 'bot');
+            } else {
+                addMessageToChat("Ocurrió un error desconocido con el chat.", 'bot');
+                console.error("Unknown chat_error:", data);
             }
         });
 
@@ -259,6 +238,9 @@
                 }
             });
         }
+        // Initial state: disable input until socket connects
+        if (chatInput) chatInput.disabled = true;
+        if (sendChatButton) sendChatButton.disabled = true;
    });
 </script>
 {% endblock %}
