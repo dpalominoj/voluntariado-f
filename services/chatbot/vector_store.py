@@ -1,5 +1,7 @@
 from langchain.vectorstores import Chroma
-from langchain.embeddings import HuggingFaceEmbeddings
+# no funciona: from langchain.embeddings import HuggingFaceEmbeddings
+from langchain_community.vectorstores import Chroma
+from langchain_community.embeddings import HuggingFaceEmbeddings
 from model.models import Actividades, Organizaciones, Discapacidades
 from flask import current_app
 
