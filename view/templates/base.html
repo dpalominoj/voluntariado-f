@@ -11,6 +11,16 @@
     <style>
       /* body { padding-top: 5rem; } Tailwind will handle spacing */
       [x-cloak] { display: none !important; }
+      body.voice-recognizing-for-base {
+          /* Styles for body when recognizing - can be empty or add specific global styles */
+      }
+      #voiceChatButton:disabled {
+          background-color: #6B7280; /* Tailwind gray-500 */
+          cursor: not-allowed;
+      }
+      #voiceChatButton:disabled svg {
+          stroke: #D1D5DB; /* Tailwind gray-300 */
+      }
     </style>
   </head>
   <body x-data="{ openMobileMenu: false }">
@@ -136,16 +146,233 @@
     {# Any page-specific scripts could go here, e.g., SocketIO for chat page #}
     {#{% endblock %}#}
 
-    <!-- A simple FAB for chat, if needed globally, or can be page-specific -->
-    <!-- For example, this could link to the /help page -->
+    <!-- Help FAB -->
     <a href="{{ url_for('main.help_page') }}"
        class="fixed bottom-6 right-6 bg-indigo-600 hover:bg-indigo-700 text-white p-4 rounded-full shadow-lg flex items-center justify-center z-50"
-       aria-label="Abrir chat de ayuda">
+       aria-label="Abrir chat de ayuda" title="Abrir chat de ayuda">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.755 4 3.985 0 1.307-.486 2.498-1.336 3.28A7.493 7.493 0 0112 17.5c-.897 0-1.73-.297-2.433-.816l-.764-.625V15.5a1 1 0 00-1-1h-.5a1 1 0 00-1 1v2.158l-.623.624a3.007 3.007 0 00-1.09 2.158V21h14v-.258c0-.845-.414-1.632-1.09-2.158l-.624-.624V16.5a1 1 0 00-1-1h-.5a1 1 0 00-1 1v.039l.008.014c.005.009.012.019.02.03.052.066.114.136.186.213.145.157.312.304.498.438.228.164.48.304.752.408.27.102.556.157.858.157.976 0 1.83-.37 2.465-1.003.642-.64 1.035-1.503 1.035-2.488 0-2.758-2.246-4.986-5-4.986-2.044 0-3.754.977-4.46 2.486L8.228 9z" />
             <path stroke-linecap="round" stroke-linejoin="round" d="M12 6a3.5 3.5 0 100-7 3.5 3.5 0 000 7z" />
         </svg>
         <span class="sr-only">Abrir chat de ayuda</span>
     </a>
+
+    <!-- Voice Chat Button -->
+    <button id="voiceChatButton"
+            class="fixed bottom-6 left-6 bg-purple-600 hover:bg-purple-700 text-white p-4 rounded-full shadow-lg flex items-center justify-center z-50"
+            aria-label="Iniciar chat de voz" title="Iniciar chat de voz">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+        </svg>
+        <span class="sr-only">Iniciar chat de voz</span>
+    </button>
+
+    <!-- Voice Status Display -->
+    <div id="voiceStatusDisplay" 
+         class="fixed bottom-20 left-6 bg-gray-800 text-white text-xs px-3 py-1 rounded-md shadow-lg z-50 hidden"
+         role="status" aria-live="polite">
+        Estado de voz
+    </div>
+
+    <script src="https://cdn.socket.io/4.5.2/socket.io.min.js"></script>
+    <script type="text/javascript">
+    document.addEventListener('DOMContentLoaded', function() {
+        const voiceChatButton = document.getElementById('voiceChatButton');
+        const voiceStatusDisplay = document.getElementById('voiceStatusDisplay');
+        let baseSocket; 
+        let recognition;
+        let isRecognizing = false; 
+        const synthèse = window.speechSynthesis;
+
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SpeechRecognition) {
+            if (voiceChatButton) voiceChatButton.style.display = 'none';
+            console.warn("Speech Recognition API not supported.");
+            return; 
+        }
+        if (!synthèse) {
+            console.warn("Speech Synthesis API not supported.");
+        }
+
+        recognition = new SpeechRecognition();
+        recognition.lang = 'es-ES';
+        recognition.interimResults = false;
+        recognition.continuous = false;
+
+        function showVoiceStatus(message, duration = 3000, isError = false) {
+            if (!voiceStatusDisplay) return;
+            voiceStatusDisplay.textContent = message;
+            voiceStatusDisplay.className = 'fixed bottom-20 left-6 text-xs px-3 py-1 rounded-md shadow-lg z-50'; 
+            if (isError) {
+                voiceStatusDisplay.classList.add('bg-red-600', 'text-white');
+            } else {
+                voiceStatusDisplay.classList.add('bg-gray-800', 'text-white');
+            }
+            voiceStatusDisplay.classList.remove('hidden');
+            
+            if (duration > 0) {
+                setTimeout(() => {
+                    voiceStatusDisplay.classList.add('hidden');
+                }, duration);
+            }
+        }
+
+        function initializeBaseSocket() {
+            if (typeof io === 'undefined') {
+                showVoiceStatus('Error: Biblioteca de chat no cargada.', 0, true);
+                if (voiceChatButton) voiceChatButton.disabled = true;
+                return;
+            }
+            if (baseSocket && baseSocket.connected) {
+                if (voiceChatButton) voiceChatButton.disabled = false;
+                return;
+            }
+            if (baseSocket && baseSocket.connecting) {
+                return;
+            }
+
+            baseSocket = io(window.location.origin, {
+                reconnectionAttempts: 3,
+                timeout: 5000
+            });
+
+            baseSocket.on('connect', () => {
+                console.log('VoiceChat (base.html): Socket.IO connected', baseSocket.id);
+                showVoiceStatus('Chat de voz conectado', 2000);
+                if (voiceChatButton) voiceChatButton.disabled = false;
+            });
+
+            baseSocket.on('disconnect', (reason) => {
+                console.log('VoiceChat (base.html): Socket.IO disconnected:', reason);
+                showVoiceStatus('Chat de voz desconectado', 3000, true);
+                if (voiceChatButton) voiceChatButton.disabled = true;
+                if (isRecognizing) { 
+                    recognition.stop(); 
+                }
+            });
+
+            baseSocket.on('connect_error', (error) => {
+                console.error('VoiceChat (base.html): Socket.IO connection error:', error);
+                showVoiceStatus('Error de conexión de chat de voz', 3000, true);
+                if (voiceChatButton) voiceChatButton.disabled = true;
+                if (isRecognizing) {
+                    recognition.stop();
+                }
+            });
+
+            baseSocket.on('chat_response', (data) => {
+                if (document.body.classList.contains('voice-recognizing-for-base')) { 
+                    isRecognizing = false; 
+                    if (voiceChatButton) voiceChatButton.disabled = false;
+                    document.body.classList.remove('voice-recognizing-for-base');
+                    showVoiceStatus('Respuesta recibida.', 2000);
+                    if (data && data.response) {
+                        speakResponse(data.response);
+                    } else if (data && data.error) {
+                        const errorMsg = "Hubo un error: " + data.error;
+                        speakResponse(errorMsg);
+                        showVoiceStatus(errorMsg, 4000, true);
+                    }
+                }
+            });
+
+            baseSocket.on('chat_error', (data) => { 
+                if (document.body.classList.contains('voice-recognizing-for-base')) {
+                    isRecognizing = false; 
+                    if (voiceChatButton) voiceChatButton.disabled = false;
+                    document.body.classList.remove('voice-recognizing-for-base');
+                    const errorMessage = (data && data.message) ? data.message : "Error desconocido en el chat.";
+                    showVoiceStatus(errorMessage, 4000, true);
+                    speakResponse("Hubo un error en el chat: " + errorMessage);
+                }
+            });
+        }
+        
+        function speakResponse(text) {
+            if (!synthèse || !text) return;
+            synthèse.cancel(); 
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'es-ES';
+            utterance.onerror = (event) => {
+                console.error("SpeechSynthesis Error:", event);
+                showVoiceStatus('Error al reproducir respuesta de voz', 3000, true);
+            };
+            synthèse.speak(utterance);
+        }
+
+        if (voiceChatButton) {
+            voiceChatButton.addEventListener('click', () => {
+                if (!baseSocket || !baseSocket.connected) {
+                    showVoiceStatus('Chat no conectado. Intentando...', 2000, true);
+                    initializeBaseSocket();
+                    return;
+                }
+
+                if (isRecognizing) { 
+                    recognition.stop(); 
+                } else { 
+                    try {
+                        recognition.start();
+                    } catch (e) { 
+                        console.warn("Recognition start error:", e);
+                        isRecognizing = false; 
+                        if (voiceChatButton) voiceChatButton.disabled = false;
+                        document.body.classList.remove('voice-recognizing-for-base');
+                        showVoiceStatus('Error al iniciar micrófono.', 3000, true);
+                    }
+                }
+            });
+        }
+
+        recognition.onstart = () => {
+            isRecognizing = true; 
+            if (voiceChatButton) voiceChatButton.disabled = true; 
+            document.body.classList.add('voice-recognizing-for-base'); 
+            showVoiceStatus('Escuchando...', 0); 
+        };
+
+        recognition.onresult = (event) => {
+            const transcript = event.results[0][0].transcript;
+            showVoiceStatus('Procesando: ' + transcript.substring(0, 30) + '...', 0); 
+            if (baseSocket && baseSocket.connected) {
+                baseSocket.emit('chat_message', { query: transcript });
+            } else {
+                showVoiceStatus('No conectado para enviar.', 3000, true);
+                isRecognizing = false; 
+                if (voiceChatButton) voiceChatButton.disabled = false;
+                document.body.classList.remove('voice-recognizing-for-base');
+            }
+        };
+
+        recognition.onerror = (event) => {
+            isRecognizing = false; 
+            if (voiceChatButton) voiceChatButton.disabled = false;
+            document.body.classList.remove('voice-recognizing-for-base');
+            console.error("SpeechRecognition Error:", event.error);
+            let errorMsg = 'Error de reconocimiento de voz.';
+            if (event.error === 'no-speech') errorMsg = 'No se detectó voz.';
+            else if (event.error === 'audio-capture') errorMsg = 'Problema con el micrófono.';
+            else if (event.error === 'not-allowed') errorMsg = 'Permiso de micrófono denegado.';
+            showVoiceStatus(errorMsg, event.error === 'not-allowed' ? 0 : 3000, true);
+        };
+
+        recognition.onend = () => {
+            // Only reset button and class if not waiting for a response from the server
+            if (!document.body.classList.contains('voice-recognizing-for-base') || !isRecognizing) {
+                 if (voiceChatButton) voiceChatButton.disabled = false;
+                 document.body.classList.remove('voice-recognizing-for-base');
+            }
+             // If isRecognizing is true here, it means stop() was called programmatically, 
+             // and we are likely waiting for a server response.
+             // The server response handler or error handler should manage disabling the button
+             // and removing the class.
+        };
+        
+        // Initialize the socket connection when the page loads if the button exists
+        if (voiceChatButton) { 
+            initializeBaseSocket();
+        }
+    });
+    </script>
   </body>
 </html>
