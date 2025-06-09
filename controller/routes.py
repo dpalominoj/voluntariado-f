@@ -2,7 +2,6 @@ from flask import Blueprint, render_template, request
 from model.models import Organizaciones, Discapacidades, Actividades, EstadoActividad, Preferencias
 from database.db import db
 from controller.program_controller import get_programs_compatibility
-from controller.chatbot_route import chatbot_bp
 
 main_bp = Blueprint('main', __name__, template_folder='../view/templates')
 

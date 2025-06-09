@@ -6,8 +6,6 @@ from controller.routes import main_bp
 from controller.auth_routes import auth_bp
 from controller.dashboard_routes import dashboard_bp
 from controller.program_controller import program_bp
-from controller.chatbot_route import chatbot_bp
-from services.chatbot.chatbot_events import socketio
 from flask_login import LoginManager
 from flask_migrate import Migrate
 from model.models import Usuarios
@@ -61,10 +59,6 @@ app.register_blueprint(main_bp)
 app.register_blueprint(auth_bp)
 app.register_blueprint(dashboard_bp)
 app.register_blueprint(program_bp)
-app.register_blueprint(chatbot_bp)
-
-# Inicializa SocketIO con appFlask
-socketio.init_app(app)
 
 @app.route('/services/<path:filename>')
 def serve_service_file(filename):
