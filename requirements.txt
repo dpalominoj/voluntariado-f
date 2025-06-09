@@ -5,8 +5,6 @@ Flask-WTF
 Flask-Login
 Werkzeug
 requests
-flask-socketio
-openai
 python-dotenv
 scikit-learn
 pandas
