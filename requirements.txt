@@ -1,12 +1,19 @@
 Flask
 Flask-SQLAlchemy
-psycopg2-binary # For PostgreSQL
+
 Flask-Migrate
 Flask-WTF
 Flask-Login
 Werkzeug
 requests
-python-dotenv # For local .env file support (Replit uses Secrets)
-pandas
-scikit-learn
-pytest
+langchain # optional version { ==0.1.16 }
+chromadb # optional version { ==0.4.24 }
+sentence-transformers # optional version { ==2.5.1 }
+# flask-socketio==5.3.6
+# flask-limiter==3.5.0
+
+# psycopg2-binary --For PostgreSQL
+# pytest
+# pandas
+# scikit-learn
+# python-dotenv --For local .env file support (Secrets)
