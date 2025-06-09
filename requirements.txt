@@ -9,3 +9,4 @@ flask-socketio
 openai
 python-dotenv
 scikit-learn
+pandas
