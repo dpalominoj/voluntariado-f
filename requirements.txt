@@ -5,13 +5,6 @@ Flask-WTF
 Flask-Login
 Werkzeug
 requests
-chromadb # optional version { ==0.4.24 }
-sentence-transformers # optional version { ==2.5.1 }
-flask-socketio # optional version { ==5.3.6 }
-# flask-limiter==3.5.0
-
-# psycopg2-binary --For PostgreSQL
-# pytest
-# pandas
-# scikit-learn
-# python-dotenv --For local .env file support (Secrets)
+chromadb==0.4.24
+sentence-transformers==2.5.1
+flask-socketio==5.3.6
