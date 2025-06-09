@@ -7,6 +7,7 @@ from controller.auth_routes import auth_bp
 from controller.dashboard_routes import dashboard_bp
 from controller.program_controller import program_bp
 from controller.chatbot_routes import chatbot_bp
+from services.chatbot.events import socketio
 from flask_login import LoginManager
 from flask_migrate import Migrate
 from model.models import Usuarios
@@ -62,6 +63,9 @@ app.register_blueprint(dashboard_bp)
 app.register_blueprint(program_bp)
 app.register_blueprint(chatbot_bp)
 
+# Inicializa SocketIO con appFlask
+socketio.init_app(app)
+
 @app.route('/services/<path:filename>')
 def serve_service_file(filename):
     return send_from_directory(os.path.join(app.root_path, 'services'), filename)
@@ -74,5 +78,5 @@ def seed_db_command():
 
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
-    # TODO: DEBUG debe ser False en un entorno de producción. Considerar implicaciones de seguridad.
+    # TODO: DEBUG debe ser False en un entorno de producción
     app.run(host='0.0.0.0', port=port, debug=True)
