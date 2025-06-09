@@ -6,6 +6,7 @@ from controller.routes import main_bp
 from controller.auth_routes import auth_bp
 from controller.dashboard_routes import dashboard_bp
 from controller.program_controller import program_bp
+from controller.chatbot_routes import chatbot_bp
 from flask_login import LoginManager
 from flask_migrate import Migrate
 from model.models import Usuarios
@@ -16,7 +17,7 @@ app = Flask(__name__, instance_relative_config=True, template_folder='view/templ
 app.static_folder = 'view/assets'
 app.static_url_path = '/assets'
 
-app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev_secret_key_replace_me_if_not_using_env_or_secrets')
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-key968')
 default_sqlite_uri = f"sqlite:///{os.path.join(app.instance_path, 'konectai.db')}"
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', default_sqlite_uri)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -59,6 +60,7 @@ app.register_blueprint(main_bp)
 app.register_blueprint(auth_bp)
 app.register_blueprint(dashboard_bp)
 app.register_blueprint(program_bp)
+app.register_blueprint(chatbot_bp)
 
 @app.route('/services/<path:filename>')
 def serve_service_file(filename):
