@@ -15,9 +15,7 @@
         </div>
 
         <div class="bg-white p-4 sm:p-6 rounded-lg shadow-xl border border-gray-200">
-            <!-- Chat Messages Display Area -->
             <div id="chatMessages" class="h-80 overflow-y-auto mb-4 p-3 bg-gray-100 rounded-md border border-gray-300">
-                <!-- Example Bot Message (can be removed if bot sends a welcome message on connect) -->
                 <div class="flex justify-start mb-2">
                     <div class="bg-indigo-500 text-white p-3 rounded-lg max-w-xs shadow">
                         <p class="text-sm">Hola! Soy tu asistente virtual. &iquest;C&oacute;mo puedo ayudarte hoy?</p>
@@ -32,7 +30,7 @@
                     Enviar
                 </button>
             </div>
-             <div id="chatConnectionError" class="text-red-500 text-sm mt-2 text-center"></div> <!-- For displaying connection status errors -->
+             <div id="chatConnectionError" class="text-red-500 text-sm mt-2 text-center"></div> 
         </div>
     </div>
 </div>
@@ -62,7 +60,7 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log('Socket.IO connected:', socket.id);
             chatInput.disabled = false;
             sendChatButton.disabled = false;
-            chatConnectionErrorDiv.textContent = ''; // Clear previous connection errors
+            chatConnectionErrorDiv.textContent = '';
         });
 
         socket.on('disconnect', (reason) => {
@@ -132,14 +130,17 @@ document.addEventListener('DOMContentLoaded', function() {
             case 'user':
                 messageWrapper.classList.add('justify-end');
                 messageContent.classList.add('bg-blue-500', 'text-white', 'ml-auto');
+                // User messages retain the default max-w-md from initial messageContent setup
                 break;
             case 'bot-error':
                 messageWrapper.classList.add('justify-start');
-                messageContent.classList.add('bg-red-600', 'text-white', 'mr-auto');
+                messageContent.classList.add('bg-red-600', 'text-white', 'mr-auto', 'max-w-lg');
+                messageContent.classList.remove('max-w-md');
                 break;
             case 'bot-info':
                 messageWrapper.classList.add('justify-start');
-                messageContent.classList.add('bg-yellow-400', 'text-gray-800', 'mr-auto');
+                messageContent.classList.add('bg-yellow-400', 'text-gray-800', 'mr-auto', 'max-w-lg');
+                messageContent.classList.remove('max-w-md');
                 break;
             case 'system':
                 messageWrapper.classList.add('justify-center', 'my-2');
@@ -147,10 +148,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 break;
             default: // 'bot'
                 messageWrapper.classList.add('justify-start');
-                messageContent.classList.add('bg-indigo-500', 'text-white', 'mr-auto');
+                messageContent.classList.add('bg-indigo-500', 'text-white', 'mr-auto', 'max-w-lg');
+                messageContent.classList.remove('max-w-md');
         }
 
         const p = document.createElement('p');
+        p.style.whiteSpace = 'pre-wrap'; // Added for newline rendering
         p.textContent = message;
         messageContent.appendChild(p);
 
