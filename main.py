@@ -6,8 +6,8 @@ from controller.routes import main_bp
 from controller.auth_routes import auth_bp
 from controller.dashboard_routes import dashboard_bp
 from controller.program_controller import program_bp
-from controller.chatbot_routes import chatbot_bp
-from services.chatbot.events import socketio
+from controller.chatbot_route import chatbot_bp
+from services.chatbot.chatbot_events import socketio
 from flask_login import LoginManager
 from flask_migrate import Migrate
 from model.models import Usuarios
