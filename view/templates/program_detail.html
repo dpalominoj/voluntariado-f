@@ -18,7 +18,7 @@
 
         <div class="p-8 md:p-10">
             <h1 class="text-4xl font-extrabold text-gray-900 mb-1 tracking-tight">{{ program.nombre }}</h1>
-            <p class="text-md text-gray-600 mb-2">Publicado por: <span class="font-semibold">{{ program.organizacion.nombre_org if program.organizacion else 'Organización no especificada' }}</span></p>
+            <p class="text-base text-gray-600 mb-2">Publicado por: <span class="font-semibold">{{ program.organizacion.nombre_org if program.organizacion else 'Organización no especificada' }}</span></p>
 
             {% if program.compatibilidad is not none %}
             <div class="my-4 p-3 rounded-md {% if program.compatibilidad >= 75 %}bg-green-50 border-l-4 border-green-500{% elif program.compatibilidad >= 50 %}bg-yellow-50 border-l-4 border-yellow-500{% else %}bg-red-50 border-l-4 border-red-500{% endif %}">
@@ -38,38 +38,38 @@
                     <h2 class="text-2xl font-bold text-gray-800 mb-4 border-b pb-2">Detalles Clave</h2>
                     <dl class="space-y-4">
                         <div>
-                            <dt class="font-semibold text-gray-700 flex items-center"><span class="mr-2 text-indigo-600">📅</span>Fecha y Hora:</dt>
+                            <dt class="font-semibold text-gray-700 flex items-center"><span class="mr-2 text-purple-600">📅</span>Fecha y Hora:</dt>
                             <dd class="mt-1 text-gray-800 pl-6">{{ program.fecha_actividad.strftime('%d/%m/%Y %H:%M Hs') if program.fecha_actividad else 'No especificada' }}</dd>
                         </div>
                         <div>
-                            <dt class="font-semibold text-gray-700 flex items-center"><span class="mr-2 text-indigo-600">📍</span>Ubicación:</dt>
+                            <dt class="font-semibold text-gray-700 flex items-center"><span class="mr-2 text-purple-600">📍</span>Ubicación:</dt>
                             <dd class="mt-1 text-gray-800 pl-6">{{ program.ubicacion if program.ubicacion else 'No especificada' }}</dd>
                         </div>
                         <div>
-                            <dt class="font-semibold text-gray-700 flex items-center"><span class="mr-2 text-indigo-600">💻</span>Modalidad:</dt>
+                            <dt class="font-semibold text-gray-700 flex items-center"><span class="mr-2 text-purple-600">💻</span>Modalidad:</dt>
                             <dd class="mt-1 text-gray-800 pl-6">{{ program.tipo.value if program.tipo else 'No especificado' }}</dd>
                         </div>
                         <div>
-                            <dt class="font-semibold text-gray-700 flex items-center"><span class="mr-2 text-indigo-600">📊</span>Estado Actual:</dt>
+                            <dt class="font-semibold text-gray-700 flex items-center"><span class="mr-2 text-purple-600">📊</span>Estado Actual:</dt>
                             <dd class="mt-1 text-gray-800 pl-6">{{ program.estado.value if program.estado else 'No especificado' }}</dd>
                         </div>
                         <div>
-                            <dt class="font-semibold text-gray-700 flex items-center"><span class="mr-2 text-indigo-600">👥</span>Cupos Disponibles:</dt>
+                            <dt class="font-semibold text-gray-700 flex items-center"><span class="mr-2 text-purple-600">👥</span>Cupos Disponibles:</dt>
                             <dd class="mt-1 text-gray-800 pl-6">{{ program.cupo_maximo if program.cupo_maximo is not none else 'Ilimitados' }}</dd>
                         </div>
                         <div>
-                            <dt class="font-semibold text-gray-700 flex items-center"><span class="mr-2 text-indigo-600">♿</span>¿Es Inclusiva?:</dt>
+                            <dt class="font-semibold text-gray-700 flex items-center"><span class="mr-2 text-purple-600">♿</span>¿Es Inclusiva?:</dt>
                             <dd class="mt-1 text-gray-800 pl-6">
                                 {% if program.es_inclusiva %}
                                     <span class="px-2 inline-flex text-sm leading-5 font-semibold rounded-full bg-green-100 text-green-800">Sí</span>
                                     {% if program.discapacidades %}
-                                        <ul class="list-disc list-inside ml-2 mt-2 text-sm space-y-1">
+                                        <ul class="list-disc list-inside ml-2 mt-2 text-base space-y-1">
                                         {% for disc in program.discapacidades %}
                                             <li class="text-gray-700">{{ disc.nombre.value }}</li>
                                         {% endfor %}
                                         </ul>
                                     {% else %}
-                                     <p class="text-xs text-gray-500 mt-1">Detalles específicos de inclusión no provistos.</p>
+                                     <p class="text-sm text-gray-500 mt-1">Detalles específicos de inclusión no provistos.</p>
                                     {% endif %}
                                 {% else %}
                                     <span class="px-2 inline-flex text-sm leading-5 font-semibold rounded-full bg-red-100 text-red-800">No</span>
@@ -78,7 +78,7 @@
                         </div>
                         {% if program.etiqueta %}
                         <div>
-                            <dt class="font-semibold text-gray-700 flex items-center"><span class="mr-2 text-indigo-600">🏷️</span>Categoría:</dt>
+                            <dt class="font-semibold text-gray-700 flex items-center"><span class="mr-2 text-purple-600">🏷️</span>Categoría:</dt>
                             <dd class="mt-1 text-gray-800 pl-6">{{ program.etiqueta }}</dd>
                         </div>
                         {% endif %}
@@ -132,7 +132,7 @@
                         Inscribirse (Crear Cuenta)
                     </a>
                 {% endif %}
-                <a href="{{ url_for('main.programs') }}" class="mt-4 md:mt-0 md:ml-4 inline-flex items-center justify-center px-6 py-3 border border-gray-400 text-base font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-150 ease-in-out">
+                <a href="{{ url_for('main.programs') }}" class="mt-4 md:mt-0 md:ml-4 inline-flex items-center justify-center px-6 py-3 border border-gray-400 text-base font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-all duration-150 ease-in-out">
                     <svg class="-ml-1 mr-2 h-5 w-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
                     Volver a Programas
                 </a>

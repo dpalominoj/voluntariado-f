@@ -31,15 +31,15 @@
       }
     </style>
   </head>
-  <body x-data="{ openMobileMenu: false }">
-    <nav class="bg-indigo-700 text-white fixed top-0 w-full shadow-lg z-50">
+  <body x-data="{ openMobileMenu: false }" class="text-base">
+    <nav class="bg-purple-700 text-white fixed top-0 w-full shadow-lg z-50">
       <div class="container mx-auto px-4 py-3 md:flex md:items-center md:justify-between">
         <div class="flex justify-between items-center">
-          <a class="text-xl hover:text-indigo-200 flex items-center" href="{{ url_for('main.home') }}">
+          <a class="text-xl hover:text-purple-200 flex items-center" href="{{ url_for('main.home') }}">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1.5" viewBox="0 0 20 20" fill="currentColor">
               <path fill-rule="evenodd" d="M12.586 4.586a2 2 0 112.828 2.828l-3 3a2 2 0 01-2.828 0M7.414 15.414a2 2 0 11-2.828-2.828l3-3a2 2 0 012.828 0M4 8a1 1 0 011.447-.894l4 2a1 1 0 010 1.788l-4 2A1 1 0 014 12V8z" clip-rule="evenodd" />
             </svg>
-            <span class="font-bold tracking-tight">KONECT</span><span class="font-medium tracking-tight text-indigo-400">Ai</span>
+            <span class="font-bold tracking-tight">KONECT</span><span class="font-medium tracking-tight text-purple-300">Ai</span>
           </a>
           
           <!-- Icono de Notificacion Movil-->
@@ -64,22 +64,22 @@
         <!-- Mobile Menu / Desktop Links -->
         <div :class="{'block': openMobileMenu, 'hidden': !openMobileMenu}" class="mobile-menu-container md:flex md:items-center w-full md:w-auto md:bg-transparent shadow-lg md:shadow-none" x-cloak>
           <ul class="md:flex flex-col md:flex-row md:space-x-4 mt-4 md:mt-0 text-indigo-100">
-            <li><a href="{{ url_for('main.home') }}" class="nav-link block py-2 px-3 text-indigo-100 hover:bg-indigo-600 hover:text-white rounded">Inicio</a></li>
-            <li><a href="{{ url_for('main.programs') }}" class="nav-link block py-2 px-3 text-indigo-100 hover:bg-indigo-600 hover:text-white rounded">Programas</a></li>
-            <li><a href="{{ url_for('main.help_page') }}" class="nav-link block py-2 px-3 text-indigo-100 hover:bg-indigo-600 hover:text-white rounded">Ayuda</a></li>
+            <li><a href="{{ url_for('main.home') }}" class="nav-link block py-2 px-3 text-indigo-100 hover:bg-purple-600 hover:text-white rounded">Inicio</a></li>
+            <li><a href="{{ url_for('main.programs') }}" class="nav-link block py-2 px-3 text-indigo-100 hover:bg-purple-600 hover:text-white rounded">Programas</a></li>
+            <li><a href="{{ url_for('main.help_page') }}" class="nav-link block py-2 px-3 text-indigo-100 hover:bg-purple-600 hover:text-white rounded">Ayuda</a></li>
           </ul>
 
-          <ul class="md:flex md:items-center flex-col md:flex-row md:space-x-4 mt-4 md:mt-0 md:ml-auto text-indigo-100">
+          <ul class="md:flex md:items-center flex-col md:flex-row md:space-x-4 mt-4 md:mt-0 md:ml-auto">
             {% if current_user.is_authenticated %}
             <li class="mr-2 hidden md:block"> {# Or ml-2 depending on placement relative to user menu #}
-              <button class="p-2 rounded-full text-white hover:text-indigo-200 focus:outline-none focus:bg-indigo-600" aria-label="Notifications">
+              <button class="p-2 rounded-full text-white hover:text-purple-200 focus:outline-none focus:bg-purple-600" aria-label="Notifications">
                 <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
                 </svg>
               </button>
             </li>
             <li class="relative" x-data="{ openUserMenu: false }" @click.away="openUserMenu = false">
-              <button @click="openUserMenu = !openUserMenu" class="flex items-center w-full text-left py-2 px-3 text-white hover:text-indigo-200 rounded focus:outline-none focus:bg-indigo-600">
+              <button @click="openUserMenu = !openUserMenu" class="flex items-center w-full text-left py-2 px-3 text-white hover:text-purple-200 rounded focus:outline-none focus:bg-purple-600">
                 <svg class="h-6 w-6 mr-2 inline-block" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
                     <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path>
                 </svg>
@@ -87,16 +87,15 @@
                 <svg class="h-5 w-5 ml-1 fill-current" viewBox="0 0 20 20"><path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"></path></svg>
               </button>
               <div x-show="openUserMenu" x-cloak class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 ring-1 ring-black ring-opacity-5">
-                <a href="{{ url_for('user_dashboard.dashboard') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50">Mi Panel</a>
-                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50">Configuración</a>
+                <a href="{{ url_for('user_dashboard.dashboard') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-purple-50">Mi Panel</a>
+                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-purple-50">Configuración</a>
                 <hr class="border-t border-gray-200 my-1">
-                <a href="{{ url_for('auth.logout') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50">Cerrar Sesión</a>
+                <a href="{{ url_for('auth.logout') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-purple-50">Cerrar Sesión</a>
               </div>
             </li>
             {% else %}
-            <li><a href="{{ url_for('auth.login') }}" class="block py-2 px-3 text-indigo-100 hover:bg-indigo-600 hover:text-white rounded">Iniciar Sesión</a></li>
-            <li><a href="{{ url_for('auth.register') }}" class="block py-2 px-3 text-indigo-100 hover:bg-indigo-600 hover:text-white rounded">Registrarse</a>
-              </li>
+            <div class="ml-2"><li><a href="{{ url_for('auth.login') }}" class="block py-2 px-4 text-sm font-medium text-purple-700 bg-white rounded-md hover:bg-purple-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500">Iniciar Sesión</a></li></div>
+            <div class="ml-2"><li><a href="{{ url_for('auth.register') }}" class="block py-2 px-4 text-sm font-medium text-white bg-purple-500 rounded-md hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-400">Registrarse</a></li></div>
             {% endif %}
           </ul>
         </div>
@@ -153,7 +152,7 @@
     <!-- Chatbot Icon and Menu -->
     <div x-data="{ openChatbotMenu: false }" class="fixed bottom-4 right-4 z-40">
       <!-- Chatbot Icon Button -->
-      <button id="mainChatbotButton" @click="openChatbotMenu = !openChatbotMenu" aria-label="Abrir menú del chatbot" class="bg-indigo-600 hover:bg-indigo-700 text-white p-3 rounded-full shadow-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-50">
+      <button id="mainChatbotButton" @click="openChatbotMenu = !openChatbotMenu" aria-label="Abrir menú del chatbot" class="bg-purple-600 hover:bg-purple-700 text-white p-3 rounded-full shadow-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 5.523-4.477 10-10 10S1 17.523 1 12 5.477 2 11 2s10 4.477 10 10z" />
         </svg>

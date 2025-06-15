@@ -9,14 +9,14 @@
     </li>
     <li>
         <a href="{{ url_for('main.programs') }}"
-           class="block py-2.5 px-4 text-gray-700 hover:bg-indigo-100 hover:text-indigo-700 rounded-md text-sm transition-colors duration-150 {% if request.endpoint == 'main.programs' %}bg-indigo-100 text-indigo-700 font-semibold{% endif %}">
+           class="block py-2.5 px-4 text-gray-700 hover:bg-purple-100 hover:text-purple-700 rounded-md text-sm transition-colors duration-150 {% if request.endpoint == 'main.programs' %}bg-purple-100 text-purple-700 font-semibold{% endif %}">
            Explorar Programas
         </a>
     </li>
     {#
     <li>
         <a href="{{ url_for('user_dashboard.volunteer_my_contributions') if 'user_dashboard.volunteer_my_contributions' in get_flashed_messages(category_filter=['url_exists']) else '#' }}"
-           class="block py-2.5 px-4 text-gray-700 hover:bg-indigo-100 hover:text-indigo-700 rounded-md text-sm transition-colors duration-150 {% if request.endpoint == 'user_dashboard.volunteer_my_contributions' %}bg-indigo-100 text-indigo-700 font-semibold{% endif %}">
+           class="block py-2.5 px-4 text-gray-700 hover:bg-purple-100 hover:text-purple-700 rounded-md text-sm transition-colors duration-150 {% if request.endpoint == 'user_dashboard.volunteer_my_contributions' %}bg-purple-100 text-purple-700 font-semibold{% endif %}">
            Mis Contribuciones
         </a>
     </li>
@@ -27,7 +27,7 @@
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8">
         <h1 class="text-3xl font-bold text-gray-800 mb-4 sm:mb-0">Panel de Voluntario</h1>
         <a href="{{ url_for('main.programs') }}"
-           class="inline-flex items-center px-6 py-3 border border-transparent shadow-sm text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-150">
+           class="inline-flex items-center px-6 py-3 border border-transparent shadow-sm text-base font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-colors duration-150">
             <svg class="-ml-1 mr-3 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                 <path fill-rule="evenodd" d="M6.5 5a.5.5 0 01.5.5v2h2a.5.5 0 010 1h-2v2a.5.5 0 01-1 0v-2h-2a.5.5 0 010-1h2v-2a.5.5 0 01.5-.5zM3 3a2 2 0 00-2 2v10a2 2 0 002 2h14a2 2 0 002-2V5a2 2 0 00-2-2H3zm14 12H3V5h14v10z" clip-rule="evenodd" />
             </svg>
@@ -50,12 +50,12 @@
                 <li class="py-4 hover:bg-gray-50">
                     <div class="flex items-center justify-between">
                         <div class="truncate">
-                            <p class="text-md font-medium text-indigo-600 truncate">{{ actividad.nombre }}</p>
-                            <p class="text-sm text-gray-500">Organizado por: {{ actividad.organizacion.nombre_org if actividad.organizacion else 'N/A' }}</p>
-                            <p class="text-sm text-gray-500">Fecha de inscripción: {{ inscripcion.fecha_inscripcion.strftime('%d/%m/%Y %H:%M') }}</p>
+                            <p class="text-base font-medium text-purple-600 truncate">{{ actividad.nombre }}</p>
+                            <p class="text-base text-gray-500">Organizado por: {{ actividad.organizacion.nombre_org if actividad.organizacion else 'N/A' }}</p>
+                            <p class="text-base text-gray-500">Fecha de inscripción: {{ inscripcion.fecha_inscripcion.strftime('%d/%m/%Y %H:%M') }}</p>
                         </div>
                         <div class="ml-2 flex-shrink-0">
-                            <a href="{{ url_for('program.view_program_detail', program_id=actividad.id_actividad) }}" class="px-3 py-1 text-sm font-semibold text-indigo-700 bg-indigo-100 rounded-full hover:bg-indigo-200">
+                            <a href="{{ url_for('program.view_program_detail', program_id=actividad.id_actividad) }}" class="px-3 py-1 text-sm font-semibold text-purple-700 bg-purple-100 rounded-full hover:bg-purple-200">
                                 Ver Actividad
                             </a>
                         </div>
@@ -77,15 +77,15 @@
                 <li class="p-4 hover:bg-gray-50 sm:px-6">
                     <div class="flex items-center justify-between">
                         <div class="truncate">
-                            <p class="text-md font-medium text-indigo-600 truncate">
+                            <p class="text-base font-medium text-purple-600 truncate">
                                 ♦ {{ item.actividad.nombre }}
                             </p>
-                            <p class="text-sm text-gray-500">Organizado por: {{ item.actividad.organizacion.nombre_org if item.actividad.organizacion else 'N/A' }}</p>
-                            <p class="text-sm text-gray-500">Fecha Actividad: {{ item.actividad.fecha_actividad.strftime('%d/%m/%Y') if item.actividad.fecha_actividad else 'N/A' }}</p>
+                            <p class="text-base text-gray-500">Organizado por: {{ item.actividad.organizacion.nombre_org if item.actividad.organizacion else 'N/A' }}</p>
+                            <p class="text-base text-gray-500">Fecha Actividad: {{ item.actividad.fecha_actividad.strftime('%d/%m/%Y') if item.actividad.fecha_actividad else 'N/A' }}</p>
                             <p class="text-sm text-green-600 font-semibold mt-1">Compatibilidad: {{ item.compatibility_score | round(1) }}%</p> {# Display compatibility score #}
                         </div>
                         <div class="ml-2 flex-shrink-0">
-                            <a href="{{ url_for('program.view_program_detail', program_id=item.actividad.id_actividad) }}" class="px-3 py-1 text-sm font-semibold text-indigo-700 bg-indigo-100 rounded-full hover:bg-indigo-200">
+                            <a href="{{ url_for('program.view_program_detail', program_id=item.actividad.id_actividad) }}" class="px-3 py-1 text-sm font-semibold text-purple-700 bg-purple-100 rounded-full hover:bg-purple-200">
                                 Ver Detalles
                             </a>
                         </div>
