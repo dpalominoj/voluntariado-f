@@ -9,15 +9,15 @@
         <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
                 <tr>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">DNI</th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Apellido</th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Perfil</th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Registrado</th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+                    <th scope="col" class="px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                    <th scope="col" class="px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">DNI</th>
+                    <th scope="col" class="px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
+                    <th scope="col" class="px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">Apellido</th>
+                    <th scope="col" class="px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                    <th scope="col" class="px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">Perfil</th>
+                    <th scope="col" class="px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">Estado</th>
+                    <th scope="col" class="px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">Registrado</th>
+                    <th scope="col" class="px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
                 </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
@@ -25,11 +25,11 @@
                     {% for user_item in users %} {# Renamed to user_item to avoid conflict with global 'user' #}
                         <tr>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ user_item.id_usuario }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ user_item.DNI }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ user_item.nombre }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ user_item.apellido if user_item.apellido else 'N/A' }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ user_item.email if user_item.email else 'N/A' }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ user_item.perfil | capitalize }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-base text-gray-500">{{ user_item.DNI }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-base text-gray-900">{{ user_item.nombre }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-base text-gray-500">{{ user_item.apellido if user_item.apellido else 'N/A' }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-base text-gray-500">{{ user_item.email if user_item.email else 'N/A' }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-base text-gray-500">{{ user_item.perfil | capitalize }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                 <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full
                                     {% if user_item.estado_usuario.value == 'activo' %} bg-green-100 text-green-800
@@ -41,7 +41,7 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ user_item.fecha_registro.strftime('%Y-%m-%d') if user_item.fecha_registro else 'N/A' }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                <a href="#" class="px-3 py-1 text-sm font-semibold text-indigo-700 bg-indigo-100 rounded-full hover:bg-indigo-200">Editar</a> {# Placeholder #}
+                                <a href="#" class="px-3 py-1 text-sm font-semibold text-purple-700 bg-purple-100 rounded-full hover:bg-purple-200">Editar</a> {# Placeholder #}
                                 {# Add other actions like change status here later #}
                             </td>
                         </tr>
