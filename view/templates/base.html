@@ -4,35 +4,51 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{% block title %}KONECTAi - Voluntariado Inclusivo{% endblock %}</title>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              'hr-inicio': '#8e65ab',
+              'cl-inicio': '#8157a0',
+              'hr-programa': '#f8ca0e',
+              'cl-programa': '#d3a701',
+              'hr-ayuda': '#f6e05e',
+              'cl-ayuda': '#faf089',
+              'hr-auth': '#e4f9ff',
+              'cl-auth': '#42cdfa',
+            }
+          }
+        }
+      }
+    </script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.userway.org/widget.js" data-account="w1p59Fihx2" data-position="5"></script>
     <style>
-      /* body { padding-top: 5rem; } Tailwind will handle spacing */
       [x-cloak] { display: none !important; }
       body.voice-recognizing-for-base {
-          /* Styles for body when recognizing - can be empty or add specific global styles */
       }
       #voiceChatButton:disabled {
-          background-color: #6B7280; /* Tailwind gray-500 */
+          background-color: #6B7280;
           cursor: not-allowed;
       }
       #voiceChatButton:disabled svg {
-          stroke: #D1D5DB; /* Tailwind gray-300 */
+          stroke: #D1D5DB;
       }
       body.voice-recognizing-for-base #mainChatbotButton {
         animation: pulse-animation 1.5s infinite;
       }
       @keyframes pulse-animation {
-        0% { box-shadow: 0 0 0 0px rgba(99, 102, 241, 0.7); } /* Tailwind's indigo-500 with opacity */
+        0% { box-shadow: 0 0 0 0px rgba(99, 102, 241, 0.7); }
         70% { box-shadow: 0 0 0 10px rgba(99, 102, 241, 0); }
         100% { box-shadow: 0 0 0 0px rgba(99, 102, 241, 0); }
       }
     </style>
   </head>
   <body x-data="{ openMobileMenu: false }" class="text-base">
-    <nav class="bg-purple-700 text-white fixed top-0 w-full shadow-lg z-50">
+    <nav class="bg-hr-inicio border-cl-inicio text-white fixed top-0 w-full shadow-lg h-24 border-b-8 z-50">
       <div class="container mx-auto px-4 py-3 md:flex md:items-center md:justify-between">
         <div class="flex justify-between items-center">
           <a class="text-xl hover:text-purple-200 flex items-center" href="{{ url_for('main.home') }}">
