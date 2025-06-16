@@ -55,7 +55,7 @@
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1.5" viewBox="0 0 20 20" fill="currentColor">
               <path fill-rule="evenodd" d="M12.586 4.586a2 2 0 112.828 2.828l-3 3a2 2 0 01-2.828 0M7.414 15.414a2 2 0 11-2.828-2.828l3-3a2 2 0 012.828 0M4 8a1 1 0 011.447-.894l4 2a1 1 0 010 1.788l-4 2A1 1 0 014 12V8z" clip-rule="evenodd" />
             </svg>
-            <span class="font-bold tracking-tight">KONECT</span><span class="font-medium tracking-tight text-purple-600">Ai</span>
+            <span class="font-bold tracking-tight">KONECT</span><span class="font-medium tracking-tight text-white">Ai</span>
           </a>
           
           <!-- Icono de Notificacion Movil-->
@@ -110,8 +110,8 @@
               </div>
             </li>
             {% else %}
-            <div class="ml-2"><li><a href="{{ url_for('auth.login') }}" class="block py-2 px-4 text-sm font-medium text-purple-700 bg-white rounded-md hover:bg-purple-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500">Iniciar Sesión</a></li></div>
-            <div class="ml-2"><li><a href="{{ url_for('auth.register') }}" class="block py-2 px-4 text-sm font-medium text-white bg-purple-500 rounded-md hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-400">Registrarse</a></li></div>
+            <div class="ml-2"><li><a href="{{ url_for('auth.login') }}" class="block py-2 px-4 text-sm text-purple-700 bg-white rounded-md hover:bg-purple-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500">Iniciar Sesión</a></li></div>
+            <div class="ml-2"><li><a href="{{ url_for('auth.register') }}" class="block py-2 px-4 text-sm text-white bg-purple-800 rounded-md hover:bg-black focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-400">Registrarse</a></li></div>
             {% endif %}
           </ul>
         </div>
