@@ -48,7 +48,7 @@
     </style>
   </head>
   <body x-data="{ openMobileMenu: false }" class="text-base">
-    <nav class="class="{{ nav_bg | default('bg-hr-inicio') }} text-black fixed top-0 w-full border-b-8 {{ border_color | default('border-cl-inicio') }} z-50"" >
+    <nav class="class="{{ nav_bg }} text-black fixed top-0 w-full border-b-8 {{ border_color }} z-50" >
       <div class="container mx-auto h-20 px-4 py-3 md:flex md:items-center md:justify-between">
         <div class="flex justify-between items-center text-xl">
           <a class="text-xl hover:text-purple-200 flex items-center" href="{{ url_for('main.home') }}">
